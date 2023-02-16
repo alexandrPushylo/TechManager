@@ -1,0 +1,12 @@
+{% extends 'show_info_application.html' %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+    <a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>
+
+    <a href="{% url 'foreman_app_list' cw_day %}" class="btn btn-primary col-auto m-1" aria-current="page">Статус заявок</a>
+
+    <a href="{% url 'clear_application' application_id %}" class="btn btn btn-danger   col-auto m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
+    <a href="{% url 'add_application' application_id %}" class="btn btn-primary  col-auto m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
+</div>
+{% endblock %}

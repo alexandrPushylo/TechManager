@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+
+{% block choosedate %}
+    <div class="container mt-3">
+    <h3 class="text-center">{{ current_user.last_name }} {{ current_user.first_name }}</h3>
+        <h3 class="text-center m-0">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'application_list' current_user.id lw_day %}" class="btn " aria-current="page">
+                Сегодня <
+                </a>
+                {{ DAY }}
+            {% else %}
+                {{ DAY }}
+                <a href="{% url 'application_list' current_user.id nw_day %}" class="btn fw-light" aria-current="page">
+                > Следующий рабочий день
+                </a>
+            {% endif %}
+
+        </h3>
+    </div>
+    {% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+<a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>
+
+<a href="{% url 'foreman_app_list' cw_day %}" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
+
+
+</div>
+{% endblock %}

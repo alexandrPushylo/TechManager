@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% block choosedate %}
+    <div class="container mt-3">
+        <h3 class="text-center m-0">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'foreman_app_list' lw_day %}" class="btn " aria-current="page">
+                Сегодня <
+                </a>
+                {{ DAY }}
+            {% else %}
+                {{ DAY }}
+                <a href="{% url 'foreman_app_list' nw_day %}" class="btn fw-light" aria-current="page">
+                > Следующий рабочий день
+                </a>
+            {% endif %}
+
+        </h3>
+    </div>
+{% endblock %}
+
+    <div class="container mt-5">
+        <div class="row">
+        {% for fman, appDay in app_list %}
+        <div class="col-auto">
+        <div class="card shadow-lg" style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
+          <div class="card-body">
+              <h5 class="card-title fw-bold" style="text-align: center">
+
+                  <a href="{% url 'application_list' fman.user.id cw_day  %}" class="btn btn-light border border-2" aria-current="page">
+                      <b>{{fman.user.last_name}} {{fman.user.first_name}}</b>
+                  </a>
+              </h5>
+              <hr>
+                <h6 class="card-text fw-bold">Объекты:</h6>
+                {% for a in appDay %}
+
+
+                    <a href="{% url 'show_info_application' a.id %}" class="card-text
+                    {% if  a.status.status  == 'Сохранена' %} text-warning
+                    {% elif a.status.status == 'Подана' %} text-primary
+                    {% elif a.status.status == 'Одобрена' %} text-success
+                    {% else %} text-dark
+                    {% endif %}">{{ a.construction_site.address }} [{{ a.status }}]</a>
+                    <h6 class="card-text"></h6>
+
+                {% endfor %}
+
+{#            <div class="btn-group ">#}
+{#                <a href="{% url 'application_for_driver' CH_DAY drv.driver.user.id %}" class="btn btn-outline-primary m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>#}
+{#            </div>#}
+          </div>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+    </div>
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+</div>
+{% endblock %}

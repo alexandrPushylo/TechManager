@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="container mt-5" style="width: 300px">
+    <form  method="post">{% csrf_token %}
+        <div >
+            <label for="exampleInputEmail1" class="form-label">Имя пользователя</label>
+            <input type="text" class="form-control" name="username">
+
+        </div>
+        <div>
+            <label for="exampleInputPassword1" class="form-label">Пороль</label>
+            <input type="password" class="form-control" name="password">
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Вход</button>
+    </form>
+    {% if err %}
+    <div class="alert  mt-5 shadow-lg" role="alert" style="background-color: rgba(247,247,248,0.71)">
+
+        Неверный логин или пороль
+    </div>
+    {% endif %}
+</section>
+
+{% endblock %}

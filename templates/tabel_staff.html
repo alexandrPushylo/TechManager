@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container-sm m-3 mx-auto p-3"  >
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+        <p class="card-text"> <b class="fs-5">Водители </b> </p><hr>
+      <div>
+    <form method="post" id="create_new_appls_form" enctype="multipart/form-data">{% csrf_token %}
+        <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+        <th scope="col">Работает</th>
+      <th scope="col">Фамилия</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Телефон</th>
+      <th scope="col" hidden>id</th>
+
+    </tr>
+  </thead>
+  <tbody>{% for staff in staff_list %}
+
+    <tr id="row_{{ forloop.counter }}" class="user_row" >
+      <th scope="row">{{ forloop.counter }}</th>
+        <td><input {% if staff.status  %} checked {% endif %}
+              id="inp_{{ forloop.counter }}" type="checkbox" name="staff_status_{{ forloop.counter }}"/></td>
+      <td>{{ staff.user.last_name }}</td>
+      <td>{{ staff.user.first_name }}</td>
+      <td>{{ staff.telephone }}</td>
+      <td hidden><input type="hidden" name="staff_id" value="{{ staff.id }}"></td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    <input class="btn btn-primary  col-auto " type="submit" value="Сохранить">
+
+
+    </form>
+
+
+
+
+      </div>
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/tabel_staff.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+    <a href="{% url 'start_page'  %}" class="btn btn-outline-secondary active col-auto m-1" aria-current="page"> Все заявки</a>
+{#    <a href="/signup/" class="btn btn-outline-secondary active col-auto m-1" aria-current="page">Добавить сотрудника</a>#}
+{% endblock %}

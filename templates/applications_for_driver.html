@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-3">
+        <h3 class="text-center m-0">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn " aria-current="page">
+                Сегодня <
+                </a>
+                {{ DAY }}
+            {% else %}
+                {{ DAY }}
+                <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light" aria-current="page">
+                > Завтра
+                </a>
+            {% endif %}
+        </h3>
+    </div>
+
+<div class="container-lg m-3 mx-auto p-3"  >
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+
+        <p class="card-text">
+            <b class="fs-5">{{ DAY }},</b>
+            <br>
+            <b class="fs-5">{{ current_user.last_name }} {{ current_user.first_name }}</b>
+            <hr>
+        </p>
+
+        <ul class="container-fluid" >
+            {% for v in applications %}
+                <div class=" mb-3" id="vehicle_list">
+                    <label  class= "fw-bold start-50">{{ v.priority }}){% if v.app_for_day.construction_site.address %} - {{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman }}){% endif %}</label>
+                    <textarea class="form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ v.description }}</textarea>
+                </div>
+            {% endfor %}
+        </ul>
+
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+{% endblock %}
+
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+{% if post == 'admin' %}
+    <a href="{% url 'driver_app_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+{% endif %}
+
+<a href="{% url 'show_today_applications' cw_day  %}" class="btn btn-outline-secondary active m-1" aria-current="page">Все заявки на {{ DAY }}</a>
+</div>
+
+
+
+{% endblock %}

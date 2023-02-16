@@ -1,0 +1,65 @@
+{% extends 'main.html' %}
+{% block content %}
+{% block choosedate %}
+    <div class="container mt-3">
+    <h3 class="text-center">{{ current_user.last_name }} {{ current_user.first_name }}</h3>
+        <h3 class="text-center m-0">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'tech_list'  lw_day %}" class="btn " aria-current="page">
+                Сегодня <
+                </a>
+                {{ DAY }}
+            {% else %}
+                {{ DAY }}
+                <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light" aria-current="page">
+                > Следующий рабочий день
+                </a>
+            {% endif %}
+
+        </h3>
+    </div>
+    {% endblock %}
+
+
+
+    <div class="container mt-5 mx-auto">
+        <div class="row">
+        {% for tdl in technic_driver_list %}
+        <div class="col-auto m-1">
+        <div class="card shadow-lg
+        {% if tdl.status %} border border-success border-2
+        {% else %} border border-danger border-2
+        {% endif %}
+            " style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
+          <div class="card-body">
+              <h6 class="card-text fw-bold">{{ tdl.technic.name.name }} ({{ tdl.technic.attached_driver.user.last_name }})</h6>
+              <h6 class="card-text">[ {{ tdl.technic.id_information }} ]</h6>
+              <h6 class="card-text">{{ tdl.technic.description }}</h6>
+              <hr>
+              {% if tdl.driver.status %}
+                  <h6 class="card-text fw-bold">{{ tdl.driver.driver.user.last_name }} {{ tdl.driver.driver.user.first_name }}</h6>
+              {% else %}
+                  <h6 class="card-text fw-bold text-danger">Водитель не назначен</h6>
+
+                {% endif %}
+
+
+
+          </div>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+<a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
+
+{#<a href="" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>#}
+
+
+</div>
+{% endblock %}

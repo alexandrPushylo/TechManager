@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container-sm m-3 mx-auto p-3"  >
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+        <p class="card-text"> <b class="fs-5">{{ week_title }}</b> </p>
+      {% if ch_week == 'nextweek' %}
+      <a href="{% url 'tabel_workday' 'currweek' %}" class="btn btn-outline-secondary  position-absolute top-0 end-0 m-3" aria-current="page">Текущая неделя</a>
+        {% else %}
+          <a href="{% url 'tabel_workday' 'nextweek' %}" class="btn btn-outline-secondary  position-absolute top-0 end-0 m-3" aria-current="page">Следующая неделя</a>
+      {% endif %}
+      <div><hr>
+    <form method="post" id="workday_form" enctype="multipart/form-data">{% csrf_token %}
+        <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Рабочий день</th>
+      <th scope="col">Дата</th>
+      <th scope="col">День недель</th>
+      <th scope="col" hidden>id</th>
+
+    </tr>
+  </thead>
+  <tbody>{% for day in week %}
+    <tr id="row_{{ forloop.counter }}" class="day_row" >
+      <td><input {% if day.0.status  %} checked {% endif %}
+              id="inp_{{ forloop.counter }}" type="checkbox" name="day_status_{{ forloop.counter }}"/></td>
+      <td>{{ day.0.date }}</td>
+      <td>{{ day.1 }}</td>
+      <td hidden><input id="day_id_{{ forloop.counter }}" type="hidden" name="day_id" value="{{ day.0.id }}"></td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </form>
+
+      </div>
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/tabel_work_days.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+    <div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+  <input form="workday_form" class="btn btn-success  col-auto " type="submit" value="Сохранить">
+</div>
+{% endblock %}

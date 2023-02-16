@@ -1,0 +1,8 @@
+{% extends 'applications_for_driver.html' %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+<a href="{% url 'driver_app_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+<a href="{% url 'show_today_applications' cw_day  %}" class="btn btn-outline-secondary active m-1" aria-current="page">Все заявки на {{ DAY }}</a>
+</div>
+{% endblock %}

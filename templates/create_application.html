@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-sm mx-auto m-2 "  >
+  <form method="post" id="create_new_appls_form" enctype="multipart/form-data">{% csrf_token %}
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="container-fluid">
+
+
+      <div class="input-group">
+        <p class="card-text">
+            <label>Объект:</label>
+            <input class="form-control form-control-sm" readonly type="text" name="construction_site" value="{{ construction_site.address }}">
+        </p>
+
+        <p class="card-text ms-3">
+            <label>Заявка на:</label>
+            <input class="form-control form-control-sm" readonly type="date" name="date_of_target" value="{{ date_of_target }}">
+
+        </p>
+      </div>
+      <hr>
+        <div class="container-fluid pb-3 ul_tech_list" >
+             {% for v in list_of_vehicles %}
+            <div class="mt-4" id="{{forloop.counter}}">
+                <div class="input-group tech_driver_list" id="{{forloop.counter}}">
+                    <input name="io_id_app_tech" type="hidden" value="{{ v.id }}">
+                    <input name="io_id_tech_driver" type="hidden" value="{{ v.technic_driver.id }}" id="io_id_tech_driver_{{forloop.counter}}">
+
+                    <input name="io_technic" type="text" id="io_technic_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.technic.name }}">
+                    <input name="io_driver" type="text" id="io_driver_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.driver.driver.user.last_name }}">
+                    <button role="button" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
+                    <button role="button" class="btn btn-danger col-auto btn_del_io"><i class="fa-solid fa-trash"></i></button>
+                </div>
+
+
+                <div hidden="" class="  input-group mt-2 div_edit_io" id="div_edit_io_{{forloop.counter}}">
+                    <select class="col-4" id="select_add_technic_{{forloop.counter}}">
+                    <option selected></option>
+                    {% for v in D %}
+                    {% if v.1 in work_tech_name_list %}
+                        <option {% if v.1 in conflicts_vehicles_list %} style="color: blue" {% endif %}  value="{{ v.1 }}">{{ v.1 }}</option>
+                    {% endif %}
+                    {% endfor %}
+                    </select>
+
+                    <select class="col-4" id="select_add_driver_{{forloop.counter}}">
+                        <option selected id_dt=""></option>
+                        {% for drv in D2 %}
+                        <option {% if drv.0 in work_TD_list %} style="color: blue" {% endif %} hidden="" id_dt="{{ drv.0 }}" short_name="{{drv.1}}" value="{{drv.3}}">{{drv.3}}</option>
+                        {% endfor %}
+                    </select>
+                    <button role="button" class="btn btn-success btn-sm col-2 btn_check_new_tech" ><i class="fa-sharp fa-solid fa-check"></i></button>
+                    <button role="button" class="btn btn-danger btn-sm col-2 btn_check_cancel_tech" ><i class="fa-solid fa-ban"></i></button>
+                </div>
+
+
+                <div class="input-group mt-1">
+                    <textarea class="form-control app_description" name="description_app_list" rows="1">{{ v.description }}</textarea>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </form>
+
+{#------------------------------------------------------------------------------------------------------------------#}
+
+    <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+        <div class="container-fluid row">
+
+
+            <select class=" col-auto" id="input_tech_add">
+                <option selected>---</option>
+                {% for v in D %}
+                    {% if v.1 in work_tech_name_list %}
+                    <option {% if v.1 in conflicts_vehicles_list %} style="color: blue" {% endif %}  value="{{ v.0 }}">{{ v.1 }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            {% for d in D %}
+
+            <select hidden="" class="col-auto {{ d.0 }} driver_add" id="input_driver_add">
+                <option selected id_dt=""></option>
+                {% for v in d.2 %}
+                    <option  {% if v.0 in work_TD_list %} style="color: blue" {% endif %} value="{{ v.1 }}" id_dt="{{ v.0 }}">{{ v.1 }}</option>
+                {% endfor %}
+            </select>
+
+            {% endfor %}
+
+            <button role="button" class="btn btn-success   btn-sm  col-auto position-absolute end-0  me-3" id = "add_vehicle_btn">Добавить</button>
+        </div>
+            <textarea class="form-control mt-3 app_description mx-auto" id="description_app_add" rows="3" placeholder="Пишите подробное описание"></textarea>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/create_application.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
+
+  <input form="create_new_appls_form" class="btn btn-success  col-auto  m-1" type="submit" value="Сохранить заявку">
+
+</div>
+
+{% endblock %}

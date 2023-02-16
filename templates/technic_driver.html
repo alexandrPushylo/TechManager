@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-sm m-3 mx-auto "  >
+    <div class="" >
+      <div class="card-body row">
+        <p class="card-text col"> <b class="fs-5">Техника на<br>{{ DAY }}</b> </p>
+        {% if cw_day == nw_day %}
+      <a href="{% url 'technic_driver' lw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на сегодня</a>
+        {% else %}
+          <a href="{% url 'technic_driver' nw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на следующий день</a>
+      {% endif %}
+
+
+      <div><hr>
+    <form method="post" id="technic_driver_form" enctype="multipart/form-data">{% csrf_token %}
+           <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Работает</th>
+      <th scope="col">Название техники</th>
+      <th scope="col">ид. №</th>
+      <th scope="col">Водитель на {{ DAY }}</th>
+
+      <th scope="col" hidden>id</th>
+
+    </tr>
+  </thead>
+  <tbody>{% for tech_drv in technic_driver_list %}
+
+    <tr  class="tech_drv_row" >
+    <th scope="row">{{ forloop.counter }}</th>
+
+    <td class="row_{{ forloop.counter }}"><input {% if tech_drv.status  %} checked {% endif %}
+              id="inp_{{ forloop.counter }}" type="checkbox" name="tech_status_{{ forloop.counter }}"/></td>
+
+    <td class="row_{{ forloop.counter }}">{{ tech_drv.technic.name }} ({{ tech_drv.technic.attached_driver.user.last_name}})</td>
+    <td class="row_{{ forloop.counter }}">[{{ tech_drv.technic.id_information }}]</td>
+
+    <td><input type="hidden" id="io_drv_{{forloop.counter}}" value="{{ tech_drv.driver.id }}"/>
+            <select id="select_drv_{{forloop.counter}}" name="select_drv">
+              <option selected value=""></option>
+              {% for drv in work_driver_list %}
+                <option value="{{ drv.id }}">{{drv.driver.user.last_name}} {{drv.driver.user.first_name}}</option>
+              {% endfor %}
+            </select>
+    </td>
+    <td hidden><input id="id_tech_drv_{{ forloop.counter }}" type="hidden" name="tech_drv_id" value="{{ tech_drv.id }}"></td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </form>
+      </div>
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/technic_driver.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+  <input form="technic_driver_form" class="btn btn-success  col-auto " type="submit" value="Сохранить">
+</div>
+{% endblock %}
+<script type="text/javascript">
+
+
+</script>

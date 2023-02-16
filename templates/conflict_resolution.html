@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container-lg m-3 mx-auto p-3"  >
+
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+
+        <p class="card-text">
+            <b class="fs-5"> {{ WEEKDAY }}, </b><b class="fs-5">{{ date_of_target }} </b>
+        </p>
+
+      </div>
+    </div>
+
+    {% if not today_technic_applications %}
+        <div class="card mt-5 w-50 shadow-lg  start-50 translate-middle" style="background-color: rgba(247,247,248,0.71)">
+            <div class="card-body">
+                <p class="card-text"> <b class="fs-5">Конфликты отсутствуют</b></p>
+            </div>
+        </div>
+    {% endif %}
+
+    {% for v in today_technic_applications %}
+
+    <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+
+        <ul class="container-fluid" >
+
+
+                <div class=" mb-3 " id="vehicle_list">
+                    <label><b class="fs-5 me-5">{{ v.0 }}</b>
+                    <a href="/conflict_correction/{{ cw_day }}/{% for i in v.1 %}{{ i.id }},{% endfor %}" class="btn btn-outline-secondary  col-auto " aria-current="page">Редактировать</a>
+                    </label>
+                    {% for l in lack_list %}{% if v.0 in l.0 %}
+                        <p class="text-danger mt-1">Не хватает {{ l.1 }} ед.  {{ v.0 }}</p>
+                    {% endif %}{% endfor %}
+                    <hr>
+                    {% for d in v.1 %}
+                        <label>{{ d.app_for_day__construction_site__address }} ({{ d.app_for_day__construction_site__foreman__user__last_name }})</label>
+                        <div class="form-floating">
+
+
+                            <textarea class="form-control app_description mb-2" id="floatingInputValue" readonly rows="1">{{ d.description }}</textarea>
+                        <label  class="fw-bold ms-5"{% if d.technic_driver__driver__driver__user__last_name %} >{{ d.technic_driver__driver__driver__user__last_name }} {% if d.technic_driver_id in work_TD_list %}<i class="fa-sharp fa-solid fa-circle-exclamation"></i> {% endif %}
+                            {% else %}  style="color: red"> Водитель не назначен
+
+                        {% endif %}</label>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+        </ul>
+
+
+      </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+</div>
+
+{% endblock %}

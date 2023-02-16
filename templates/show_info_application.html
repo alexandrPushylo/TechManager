@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-lg m-3 mx-auto  p-3"  >
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+
+        <p class="card-text">
+            <b class="fs-5">{{ construction_site.address }}</b>
+        <br>
+            <b class="fs-5">{{ WEEKDAY }}, </b>
+            <b class="fs-5">{{ date_of_target }}</b>
+            <hr>
+        </p>
+
+        <ul class="container-fluid" >
+            {% for v in list_of_vehicles %}
+                <div class=" mb-3" id="vehicle_list">
+                    <label >{{ v.technic_driver.technic.name }}  ({{ v.technic_driver.driver.driver.user.last_name }})</label>
+                    <textarea class="form-control app_description" disabled rows="1">{{ v.description }}</textarea>
+                </div>
+            {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+    <a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>
+    <a href="{% url 'clear_application' application_id %}" class="btn btn btn-danger   col-auto m-1" aria-current="page">Отчистить</a>
+    <a href="{% url 'add_application' application_id %}" class="btn btn-primary  col-auto m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i> Редактировать</a>
+</div>
+
+{% endblock %}

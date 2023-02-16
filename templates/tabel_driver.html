@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-sm m-3 mx-auto "  >
+    <div class="" >
+      <div class="card-body row">
+        <p class="card-text col"> <b class="fs-5">Водители <br>{{ DAY }}</b> </p>
+        {% if cw_day == nw_day %}
+      <a href="{% url 'tabel_driver' lw_day %}" class=" col-auto btn btn-outline-secondary  position-absolute mt-4" style="margin-left: 200px;" aria-current="page">Список на сегодня</a>
+        {% else %}
+          <a href="{% url 'tabel_driver' nw_day %}" class="col-auto btn btn-outline-secondary  position-absolute mt-4 " style="margin-left: 200px;" aria-current="page">Список на следующий день</a>
+      {% endif %}
+
+
+      <div><hr>
+    <form method="post" id="drivers_form" enctype="multipart/form-data">{% csrf_token %}
+        <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Работает</th>
+      <th scope="col">Фамилия</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Телефон</th>
+      <th scope="col" hidden>id</th>
+
+    </tr>
+  </thead>
+  <tbody>{% for driver in driver_list %}
+
+    <tr id="row_{{ forloop.counter }}" class="user_row" >
+      <th scope="row">{{ forloop.counter }}</th>
+        <td><input {% if driver.status  %} checked {% endif %}
+              id="inp_{{ forloop.counter }}" type="checkbox" name="staff_status_{{ forloop.counter }}"/></td>
+      <td>{{ driver.driver.user.last_name }}</td>
+      <td>{{ driver.driver.user.first_name }}</td>
+      <td>{{ driver.driver.telephone }}</td>
+      <td hidden><input id="drv_id_{{ forloop.counter }}" type="hidden" name="staff_id" value="{{ driver.id }}"></td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{#    <input class="btn btn-primary  col-auto " type="submit" value="Сохранить">#}
+
+
+    </form>
+
+
+
+
+      </div>
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/tabel_staff.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+  <input form="drivers_form" class="btn btn-success  col-auto " type="submit" value="Сохранить">
+</div>
+{% endblock %}
