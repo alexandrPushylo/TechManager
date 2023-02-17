@@ -20,11 +20,11 @@
         <h3 class="btn-group position-absolute start-50 translate-middle">
             {% if cw_day == nw_day %}
                 <a href="{% url 'application_list' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <</a>
-                <input class="form-control io_current_day" type="date" style="width: 45px;"  value=""/>
+                <input class="form-control io_current_day" type="date" style="width: 45px;"  value="{{ cw_day }}"/>
                 <div class="ms-2 text-nowrap">{{ DAY }}</div>
             {% else %}
-                <div class="me-2 text-nowrap io_current_day">{{ DAY }}</div>
-                <input class="form-control io_current_day" type="date" style="width: 45px;" value=""/>
+                <div class="me-2 text-nowrap ">{{ DAY }}</div>
+                <input class="form-control io_current_day" type="date" style="width: 45px;" value="{{ cw_day }}"/>
                 <a href="{% url 'application_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">> {{ nw_day }}</a>
             {% endif %}
 
@@ -33,7 +33,7 @@
     {% endblock %}
 
 <div class="container container-fluid mx-auto row">
-    <div class="container mt-5 col-auto ">
+    <div class="container mt-5 col-auto " >
         <div class="row">
         {% for a in today_applications_list %}
         <div class="col-auto">
@@ -60,7 +60,7 @@
                 {% else %}
                     text-dark border-dark
                 {% endif %}
-                fw-bold text-lowercase">Заявка {{ a.app_today.status.status }}</label>
+                fw-bold text-lowercase ps-2 pe-2">Заявка {{ a.app_today.status.status }}</label>
 
 
           <div class="card-body mt-1" >
@@ -77,10 +77,12 @@
                         {% elif v.id in conf_app_id_list %}
                         text-danger{% endif %}
                             ">{{ v.technic_driver.technic.name }}</div>
-                <div class="card-text fs-6 col-auto
+                <div id="{{ v.technic_driver.driver.driver.user.id }}" class="card-text fs-6 col-auto driver_name_link
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
-                            ">({{ v.technic_driver.driver.driver }})</div>
+                            ">({{ v.technic_driver.driver.driver }})
+{#                <a href=""  class="btn btn-sm btn-outline-info text-black  mb-1" aria-current="page" style="height: 25px;">info</a>#}
+                </div>
                     </div>
 
                   {% if v.description %}

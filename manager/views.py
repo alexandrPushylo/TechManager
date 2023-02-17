@@ -20,8 +20,6 @@ from manager.utilities import WEEKDAY
 from manager.utilities import TODAY
 from manager.utilities import TOMORROW
 from manager.utilities import MONTH
-from manager.utilities import set_locale
-from manager.utilities import choice_day
 from manager.utilities import dict_Staff
 from manager.utilities import status_application as STATUS_AP
 from manager.utilities import status_constr_site as STATUS_CS
@@ -53,7 +51,7 @@ def append_in_hos_tech(request, id_drv):
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address='',
         foreman=None)
-    constr_site.status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+    constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
     constr_site.save()
 
     app_for_day, _ = ApplicationToday.objects.get_or_create(
@@ -396,7 +394,7 @@ def tabel_driver_view(request, day):
                 st = DriverTabel.objects.get(id=staff_id)
                 st.status = False
                 st.save()
-        return HttpResponseRedirect(f'/tabel_driver/{day}')
+            out['save_status'] = True
 
     return render(request, 'tabel_driver.html', out)
 
@@ -510,18 +508,6 @@ def Technic_Driver_view(request, day):
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
     out['work_driver_list'] = work_driver_list.order_by('driver__user__last_name')
 
-    if request.POST.get('tech'):
-        tech = request.POST.get('tech')
-        id_drv = request.POST.get('id_drv')
-        stat = request.POST.get('status')
-        _td = TechnicDriver.objects.get(id=tech)
-        if id_drv:
-            _td.driver = DriverTabel.objects.get(id=id_drv)
-        else:
-            _td.driver = None
-        _td.status = str(stat).capitalize()
-        _td.save()
-
     if request.POST.getlist('tech_drv_id'):
         driver_list = request.POST.getlist('select_drv')
         tech_drv_id_list = request.POST.getlist('tech_drv_id')  ###   tech_status_
@@ -538,6 +524,7 @@ def Technic_Driver_view(request, day):
             else:
                 _td.status = False
                 _td.save()
+            out['save_status'] = True
 
     if 'tech_list' in request.path:
         return render(request, 'tech_list.html', out)

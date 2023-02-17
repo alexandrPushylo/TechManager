@@ -1,5 +1,4 @@
 from datetime import date, timedelta, datetime
-import locale
 from random import choice
 #---------------------------------------------------
 
@@ -9,13 +8,11 @@ WEEKDAY = ("Понедельник", "Вторник", "Среда", "Четве
 MONTH = ('января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября','декабря')
 TODAY = date.today()
 TOMORROW = TODAY + ONE_DAY
-choice_day = {'today': TODAY, 'next_day': TOMORROW}
 dict_Staff = {'admin': 'Администратор', 'foreman': 'Прораб', 'master': 'Мастер', 'driver': 'Водитель', 'mechanic': 'Механик', 'employee_supply': 'Снабжение'}
 status_application = {'absent': 'Отсутствует', 'saved': 'Сохранена', 'submitted': 'Подана', 'approved': 'Одобрена', 'send': 'Отправлена'}
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 
 #--FUNCTIONS-------------------------------------------------
-def set_locale(): locale.setlocale(locale.LC_ALL, 'ru-RU')
 
 def get_day_in_days(day: date, count_days: int):
     return day + timedelta(count_days)

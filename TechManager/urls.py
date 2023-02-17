@@ -56,7 +56,6 @@ from manager.views import append_in_hos_tech
 
 
 urlpatterns = [
-    # re_path(r'.*', redirect_view),
     path('', show_start_page, name='start_page'),
     path('applications/<str:day>', show_applications_view, name='application_list'),
     path('applications/<int:id_user>/<str:day>', show_applications_view, name='application_list'),
@@ -100,7 +99,6 @@ urlpatterns = [
     path('send_all_applications/<str:day>', send_all_applications, name='send_all_applications'),
     path('approv_all_applications/<str:day>', approv_all_applications, name='approv_all_applications'),
     path('submitted_all_applications/<str:day>', submitted_all_applications, name='submitted_all_applications'),
-    # re_path(r'.*', redirect_view),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
