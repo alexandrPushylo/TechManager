@@ -693,7 +693,7 @@ def show_today_applications(request, day):
     app_tech_day = ApplicationTechnic.objects.filter(
         Q(app_for_day__date=current_day),
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved']))  |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
     )
     driver_technic = app_tech_day.values_list('technic_driver__driver__driver__user__last_name',
