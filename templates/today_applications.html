@@ -49,7 +49,9 @@
                                 {% endif %}
 
                                 <textarea {% if post != 'admin' %} readonly {% endif %} class="form-control app_description" aria-label="With textarea" id="floatingInputValue" name="descr">{{ d.description }}</textarea>
+                                 {% if d.app_for_day.construction_site.foreman.user.last_name %}
                                 <label for="floatingInputValue" class="fw-bold text-nowrap" style="color: black; margin-left: 60px; margin-top: -10px">{{ d.app_for_day.construction_site.foreman.user.last_name }} ({{ d.app_for_day.construction_site.address }})</label>
+                                {% endif %}
                             </div>
                         </div>
                       {% endfor %}
