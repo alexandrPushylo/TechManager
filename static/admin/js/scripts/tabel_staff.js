@@ -27,4 +27,9 @@ function sent(i) {
                 status: status
             }
         })
+const notice = $('#notice_stat');
+notice.hide()
+if (notice.attr('status')){
+    notice.show()
+    setTimeout(function() { notice.hide(); }, 2000)
 }

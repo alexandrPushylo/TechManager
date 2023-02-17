@@ -394,7 +394,8 @@ def tabel_driver_view(request, day):
                 st = DriverTabel.objects.get(id=staff_id)
                 st.status = False
                 st.save()
-        return HttpResponseRedirect(f'/tabel_driver/{day}')
+            out['save_status'] = True
+        # return HttpResponseRedirect(f'/tabel_driver/{day}')
 
     return render(request, 'tabel_driver.html', out)
 
