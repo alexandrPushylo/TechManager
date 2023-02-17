@@ -508,18 +508,6 @@ def Technic_Driver_view(request, day):
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
     out['work_driver_list'] = work_driver_list.order_by('driver__user__last_name')
 
-    if request.POST.get('tech'):
-        tech = request.POST.get('tech')
-        id_drv = request.POST.get('id_drv')
-        stat = request.POST.get('status')
-        _td = TechnicDriver.objects.get(id=tech)
-        if id_drv:
-            _td.driver = DriverTabel.objects.get(id=id_drv)
-        else:
-            _td.driver = None
-        _td.status = str(stat).capitalize()
-        _td.save()
-
     if request.POST.getlist('tech_drv_id'):
         driver_list = request.POST.getlist('select_drv')
         tech_drv_id_list = request.POST.getlist('tech_drv_id')  ###   tech_status_
@@ -536,6 +524,7 @@ def Technic_Driver_view(request, day):
             else:
                 _td.status = False
                 _td.save()
+            out['save_status'] = True
 
     if 'tech_list' in request.path:
         return render(request, 'tech_list.html', out)

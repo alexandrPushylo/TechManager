@@ -7,7 +7,10 @@ for (let i=1;i<=count_row;i++) {
     const io_drv = '#io_drv_'+i;
     const select_drv = '#select_drv_'+i;
     const io_drv_val = $(io_drv).val();
+
+    if ($('#inp_'+i).is(':checked')){
         $(select_drv+' > option[value="'+io_drv_val+'"]').prop('selected', true);
+    }
 
     $('.row_'+i).click(function () {
         if ($('#inp_'+i).is(':checked')){
@@ -15,29 +18,13 @@ for (let i=1;i<=count_row;i++) {
         } else {
 	        $('#inp_'+i).prop('checked', true);
         }
-        sent(i);
-
     })
-    $('#select_drv_'+i).change(function () {
-        sent(i)
-    });
 }
 
-
-function sent(i) {
-        let id_drv = $('#select_drv_'+i).val();
-        let status = $('#inp_'+i).is(':checked');
-        let tech = $('#id_tech_drv_'+i).val()
-
-        $.ajax({
-        type: 'POST',
-        mode: 'same-origin',
-        url: pathname,
-        data:{
-            csrfmiddlewaretoken: csrf,
-                id_drv: id_drv,
-                status: status,
-                tech: tech
-            }
-        })
+const notice = $('#notice_stat');
+notice.hide()
+if (notice.attr('status')){
+    notice.show()
+    setTimeout(function() { notice.hide(); }, 2000)
 }
+
