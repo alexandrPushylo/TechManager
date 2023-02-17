@@ -20,11 +20,11 @@
         <h3 class="btn-group position-absolute start-50 translate-middle">
             {% if cw_day == nw_day %}
                 <a href="{% url 'application_list' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <</a>
-                <input class="form-control io_current_day" type="date" style="width: 45px;"  value=""/>
+                <input class="form-control io_current_day" type="date" style="width: 45px;"  value="{{ cw_day }}"/>
                 <div class="ms-2 text-nowrap">{{ DAY }}</div>
             {% else %}
-                <div class="me-2 text-nowrap io_current_day">{{ DAY }}</div>
-                <input class="form-control io_current_day" type="date" style="width: 45px;" value=""/>
+                <div class="me-2 text-nowrap ">{{ DAY }}</div>
+                <input class="form-control io_current_day" type="date" style="width: 45px;" value="{{ cw_day }}"/>
                 <a href="{% url 'application_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">> {{ nw_day }}</a>
             {% endif %}
 
