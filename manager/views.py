@@ -774,7 +774,7 @@ def show_info_application(request, id_application):
 
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = current_application.date
-    get_prepare_data(out, request, selected_day=get_CH_day(current_application.date))
+    get_prepare_data(out, request, current_day=current_application.date)
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles
