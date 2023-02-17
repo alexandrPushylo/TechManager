@@ -2,7 +2,8 @@ $('.app_description').each(function () {
     this.style.height = ""+(this.scrollHeight)+"px";
 });
 
-$('.io_current_day').change(function () {
+const cw_date = $('.io_current_day');
+cw_date.change(function () {
     location.href = '/applications/'+this.value;
 })
 
@@ -30,4 +31,8 @@ $('.btn_driver_panel').click(function () {
         }
     })
     return false
+})
+
+$('.driver_name_link').click(function () {
+    location.href = '/personal_application/'+$('.io_current_day').val()+'/'+this.id;
 })
