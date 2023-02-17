@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<div class="container mt-3">
-        <h3 class="text-center m-0">
+    <div class="container mt-3 ">
+        <h3 class="btn-group position-relative start-50 translate-middle">
             {% if cw_day == nw_day %}
-                <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn " aria-current="page">
-                Сегодня <
-                </a>
-                {{ DAY }}
+                <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <</a>
+                <input class="form-control io_current_day" type="date" style="width: 45px;" id="{{ current_user.id }}"  value="{{ cw_day }}"/>
+                <div class="ms-2 text-nowrap">{{ DAY }}</div>
             {% else %}
-                {{ DAY }}
-                <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light" aria-current="page">
-                > Завтра
-                </a>
+                <div class="me-2 text-nowrap ">{{ DAY }}</div>
+                <input class="form-control io_current_day" type="date" style="width: 45px;" id="{{ current_user.id }}" value="{{ cw_day }}"/>
+                <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">> {{ nw_day }}</a>
             {% endif %}
+
         </h3>
     </div>
+
+
 
 <div class="container-lg m-3 mx-auto p-3"  >
     <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
@@ -45,7 +45,7 @@
 {% endblock %}
 
 {% block script %}{% load static %}
-    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+    <script src="{% static "admin/js/scripts/application_for_driver.js" %}"></script>
 {% endblock %}
 
 
