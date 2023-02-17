@@ -1,25 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-    <div class="container mt-3">
-        <h3 class="text-center m-0">
+    
+    <div class="container mt-3 ">
+        <h3 class="btn-group position-relative start-50 translate-middle">
             {% if cw_day == nw_day %}
-                <a href="{% url 'driver_app_list' lw_day %}" class="btn " aria-current="page">
-                Сегодня <
-                </a>
-                {{ DAY }}
+                <a href="{% url 'driver_app_list' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <</a>
+                <input class="form-control io_current_day" type="date" style="width: 45px;"  value="{{ cw_day }}"/>
+                <div class="ms-2 text-nowrap">{{ DAY }}</div>
             {% else %}
-                {{ DAY }}
-                <a href="{% url 'driver_app_list' nw_day %}" class="btn fw-light" aria-current="page">
-                > Следующий рабочий день
-                </a>
+                <div class="me-2 text-nowrap ">{{ DAY }}</div>
+                <input class="form-control io_current_day" type="date" style="width: 45px;" value="{{ cw_day }}"/>
+                <a href="{% url 'driver_app_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">> {{ nw_day }}</a>
             {% endif %}
 
         </h3>
     </div>
 
-    <div class="container mt-5">
+    <div class="container mt-2">
         <div class="row">
         {% for drv, app in app_list %}
         <div class="col-auto">
@@ -53,7 +51,7 @@
 {% endblock %}
 
 {% block script %}{% load static %}
-    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+    <script src="{% static "admin/js/scripts/driver_app_list.js" %}"></script>
 {% endblock %}
 
 {% block bottom_panel %}
