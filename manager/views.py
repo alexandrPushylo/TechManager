@@ -40,6 +40,48 @@ from manager.utilities import convert_str_to_date
 # ------FUNCTION VIEW----------------------
 
 
+def copy_app_view(request, id_application):
+    out = {}
+    _app_for_day = ApplicationToday.objects.get(id=id_application)
+    current_day = _app_for_day.date
+    get_prepare_data(out, request, current_day)
+    _app_technic = ApplicationTechnic.objects.filter(app_for_day=_app_for_day)
+    if is_admin(request.user):
+        _status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+    else:
+        _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+
+    if current_day != get_current_day('next_day'):
+        next_app_for_day, _ = ApplicationToday.objects.get_or_create(date=get_current_day('next_day'),
+                                                                     construction_site=_app_for_day.construction_site)
+        next_app_for_day.status = _status
+        next_app_for_day.save()
+
+        for _apptech in _app_technic:
+            if DriverTabel.objects.filter(date=get_current_day('next_day'),
+                                          status=True, driver=_apptech.technic_driver.driver.driver).count() != 0:
+                _drv_tab = DriverTabel.objects.get(date=get_current_day('next_day'),
+                                                   status=True, driver__user=_apptech.technic_driver.driver.driver.user)
+
+                if TechnicDriver.objects.filter(status=True,
+                                                date=get_current_day('next_day'),
+                                                driver=_drv_tab,
+                                                technic=_apptech.technic_driver.technic).count() != 0:
+                    _td = ApplicationTechnic.objects.create(app_for_day=next_app_for_day)
+                    _td.priority = _apptech.priority
+                    _td.description = _apptech.description
+                    _td.technic_driver = TechnicDriver.objects.get(status=True,
+                                                                   technic=_apptech.technic_driver.technic,
+                                                                   date=get_current_day('next_day'),
+                                                                   driver=_drv_tab)
+                    _td.save()
+                else:
+                    continue
+            else:
+                continue
+    return HttpResponseRedirect(f'/applications/{current_day}')
+
+
 def append_in_hos_tech(request, id_drv):
     _driver_table = DriverTabel.objects.get(id=id_drv)
     status = _driver_table.status
