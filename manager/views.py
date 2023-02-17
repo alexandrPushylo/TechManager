@@ -748,7 +748,7 @@ def create_new_application(request, id_application):
     current_user = request.user
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
-    get_prepare_data(out, request, selected_day=get_CH_day(current_application.date))
+    get_prepare_data(out, request, current_day=current_date)
     out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = str(current_application.date)
@@ -1129,7 +1129,7 @@ def show_start_page(request):
             return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
 
 
-def get_prepare_data(out: dict, request, current_day=TOMORROW, selected_day: str = 'next_day'):
+def get_prepare_data(out: dict, request, current_day=TOMORROW):
     if isinstance(current_day, str):
         current_day = convert_str_to_date(current_day)
     out['nw_day'] = str(get_current_day('next_day'))
@@ -1140,9 +1140,6 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW, selected_day: str
     out["DAY"] = f'{current_day.day} {MONTH[current_day.month-1]}'
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user, key=True)
-
-    # out["TOMORROW"] = TOMORROW.strftime('%d %B')
-    # out["CH_DAY"] = selected_day
     return out
 
 
