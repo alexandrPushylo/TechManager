@@ -20,8 +20,6 @@ from manager.utilities import WEEKDAY
 from manager.utilities import TODAY
 from manager.utilities import TOMORROW
 from manager.utilities import MONTH
-from manager.utilities import set_locale
-from manager.utilities import choice_day
 from manager.utilities import dict_Staff
 from manager.utilities import status_application as STATUS_AP
 from manager.utilities import status_constr_site as STATUS_CS
@@ -53,7 +51,7 @@ def append_in_hos_tech(request, id_drv):
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address='',
         foreman=None)
-    constr_site.status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+    constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
     constr_site.save()
 
     app_for_day, _ = ApplicationToday.objects.get_or_create(
