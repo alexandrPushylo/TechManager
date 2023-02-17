@@ -16,7 +16,7 @@
     <body style="margin-bottom: 100px; margin-top: 100px;">
 
         {% include 'components/top_panel.html' %}
-        <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 40px;">
+        <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 15px;">
             {% block indicator %}
                 {% if user.is_authenticated %}
                 <a href="{% url 'start_page' %}"  class="btn btn-sm btn-primary  " aria-current="page">На главную страницу</a>
