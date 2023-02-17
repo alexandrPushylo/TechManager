@@ -1,6 +1,4 @@
 const count_row = $('.tech_drv_row').length;
-const csrf = $('input[name="csrfmiddlewaretoken"]').val();
-const pathname = window.location.pathname
 
 
 for (let i=1;i<=count_row;i++) {
