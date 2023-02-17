@@ -33,7 +33,7 @@
     {% endblock %}
 
 <div class="container container-fluid mx-auto row">
-    <div class="container mt-5 col-auto ">
+    <div class="container mt-5 col-auto " >
         <div class="row">
         {% for a in today_applications_list %}
         <div class="col-auto">
@@ -60,7 +60,7 @@
                 {% else %}
                     text-dark border-dark
                 {% endif %}
-                fw-bold text-lowercase">Заявка {{ a.app_today.status.status }}</label>
+                fw-bold text-lowercase ps-2 pe-2">Заявка {{ a.app_today.status.status }}</label>
 
 
           <div class="card-body mt-1" >

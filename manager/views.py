@@ -395,7 +395,6 @@ def tabel_driver_view(request, day):
                 st.status = False
                 st.save()
             out['save_status'] = True
-        # return HttpResponseRedirect(f'/tabel_driver/{day}')
 
     return render(request, 'tabel_driver.html', out)
 
