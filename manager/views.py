@@ -850,11 +850,16 @@ def create_new_application(request, id_application):
         _len__id_app_list = len(id_app_tech)
         for i, _id in enumerate(id_app_tech):
             l_of_v = ApplicationTechnic.objects.get(id=int(_id))
-            v_d_app = TechnicDriver.objects.get(
-                driver__driver__user__last_name=driver_list[i],
-                technic__name__name=vehicle_list[i],
-                date=current_date,
-                status=True)
+            v_d_app = TechnicDriver.objects.get(id=id_tech_drv_list[i])
+                # driver__driver__user__last_name=driver_list[i],
+                # technic__name__name=vehicle_list[i],
+                # date=current_date,
+                # status=True)
+            # v_d_app = TechnicDriver.objects.get(
+            #     driver__driver__user__last_name=driver_list[i],
+            #     technic__name__name=vehicle_list[i],
+            #     date=current_date,
+            #     status=True)
 
             l_of_v.technic_driver = v_d_app
             l_of_v.description = description_app_list[i]
