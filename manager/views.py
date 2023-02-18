@@ -91,7 +91,7 @@ def append_in_hos_tech(request, id_drv):
         return HttpResponseRedirect(f'/applications/{date}')
 
     constr_site, _ = ConstructionSite.objects.get_or_create(
-        address='',
+        address=None,
         foreman=None)
     constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
     constr_site.save()
@@ -230,7 +230,7 @@ def show_construction_sites_view(request):
     out = {}
     get_prepare_data(out, request)
 
-    all_constr_site_list = ConstructionSite.objects.all().order_by('address').exclude(address='')
+    all_constr_site_list = ConstructionSite.objects.all().order_by('address').exclude(address=None, foreman=None)
 
     if is_admin(request.user):
         construction_sites_list = all_constr_site_list

@@ -6,8 +6,10 @@
       <div class="card-body">
 
         <p class="card-text">
+            {% if construction_site.address %}
             <b class="fs-5">{{ construction_site.address }}</b>
         <br>
+            {% endif %}
             <b class="fs-5">{{ WEEKDAY }}, </b>
             <b class="fs-5">{{ date_of_target }}</b>
             <hr>
