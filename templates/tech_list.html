@@ -1,34 +1,46 @@
 {% extends 'main.html' %}
 {% block content %}
-{% block choosedate %}
-    <div class="container mt-3">
-    <h3 class="text-center">{{ current_user.last_name }} {{ current_user.first_name }}</h3>
-        <h3 class="text-center m-0">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'tech_list'  lw_day %}" class="btn " aria-current="page">
-                Сегодня <
-                </a>
-                {{ DAY }}
-            {% else %}
-                {{ DAY }}
-                <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light" aria-current="page">
-                > Следующий рабочий день
-                </a>
-            {% endif %}
+{#{% block choosedate %}#}
+{#    <div class="container mt-3">#}
+{#    <h3 class="text-center">{{ current_user.last_name }} {{ current_user.first_name }}</h3>#}
+{#        <h3 class="text-center m-0">#}
+{#            {% if cw_day == nw_day %}#}
+{#                <a href="{% url 'tech_list'  lw_day %}" class="btn " aria-current="page">{{ lw_day }} <<</a>#}
+{#                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>#}
+{#            {% else %}#}
+{#                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>#}
+{#                <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light" aria-current="page">>> {{ nw_day }}</a>#}
+{#            {% endif %}#}
+{##}
+{#        </h3>#}
+{#    </div>#}
+{#    {% endblock %}#}
 
-        </h3>
+
+    {% block choosedate %}
+    <div class="container-fluid  ">
+        <div class="btn-group position-relative start-50 translate-middle">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'tech_list'  lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+            {% else %}
+                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+            {% endif %}
+        </div>
+    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 
 
-
-    <div class="container mt-5 mx-auto">
+<div class="container container-fluid mx-auto row">
+    <div class="container mt-4 mx-auto">
         <div class="row">
         {% for tdl in technic_driver_list %}
         <div class="col-auto m-1">
         <div class="card shadow-lg
         {% if tdl.status %} border border-success border-2
-        {% else %} border border-danger border-2
+        {% else %} border border-danger border-3
         {% endif %}
             " style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
           <div class="card-body">
@@ -50,8 +62,13 @@
         </div>
         {% endfor %}
     </div>
+</div>
 
 
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/tech_list.js" %}"></script>
 {% endblock %}
 
 {% block bottom_panel %}

@@ -40,6 +40,48 @@ from manager.utilities import convert_str_to_date
 # ------FUNCTION VIEW----------------------
 
 
+def copy_app_view(request, id_application):
+    out = {}
+    _app_for_day = ApplicationToday.objects.get(id=id_application)
+    current_day = _app_for_day.date
+    get_prepare_data(out, request, current_day)
+    _app_technic = ApplicationTechnic.objects.filter(app_for_day=_app_for_day)
+    if is_admin(request.user):
+        _status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+    else:
+        _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+
+    if current_day != get_current_day('next_day'):
+        next_app_for_day, _ = ApplicationToday.objects.get_or_create(date=get_current_day('next_day'),
+                                                                     construction_site=_app_for_day.construction_site)
+        next_app_for_day.status = _status
+        next_app_for_day.save()
+
+        for _apptech in _app_technic:
+            if DriverTabel.objects.filter(date=get_current_day('next_day'),
+                                          status=True, driver=_apptech.technic_driver.driver.driver).count() != 0:
+                _drv_tab = DriverTabel.objects.get(date=get_current_day('next_day'),
+                                                   status=True, driver__user=_apptech.technic_driver.driver.driver.user)
+
+                if TechnicDriver.objects.filter(status=True,
+                                                date=get_current_day('next_day'),
+                                                driver=_drv_tab,
+                                                technic=_apptech.technic_driver.technic).count() != 0:
+                    _technic_driver = TechnicDriver.objects.get(status=True,
+                                                                technic=_apptech.technic_driver.technic,
+                                                                date=get_current_day('next_day'),
+                                                                driver=_drv_tab)
+                    _td, _ = ApplicationTechnic.objects.get_or_create(app_for_day=next_app_for_day,
+                                                                      description=_apptech.description,
+                                                                      technic_driver=_technic_driver)
+                    _td.save()
+                else:
+                    continue
+            else:
+                continue
+    return HttpResponseRedirect(f'/applications/{current_day}')
+
+
 def append_in_hos_tech(request, id_drv):
     _driver_table = DriverTabel.objects.get(id=id_drv)
     status = _driver_table.status
@@ -48,8 +90,9 @@ def append_in_hos_tech(request, id_drv):
     if not status:
         return HttpResponseRedirect(f'/applications/{date}')
 
+
     constr_site, _ = ConstructionSite.objects.get_or_create(
-        address='',
+        address=None,
         foreman=None)
     constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
     constr_site.save()
@@ -188,7 +231,7 @@ def show_construction_sites_view(request):
     out = {}
     get_prepare_data(out, request)
 
-    all_constr_site_list = ConstructionSite.objects.all().order_by('address').exclude(address='')
+    all_constr_site_list = ConstructionSite.objects.all().order_by('address').exclude(address=None, foreman=None)
 
     if is_admin(request.user):
         construction_sites_list = all_constr_site_list
@@ -732,7 +775,7 @@ def show_info_application(request, id_application):
 
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = current_application.date
-    get_prepare_data(out, request, selected_day=get_CH_day(current_application.date))
+    get_prepare_data(out, request, current_day=current_application.date)
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles
@@ -748,7 +791,7 @@ def create_new_application(request, id_application):
     current_user = request.user
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
-    get_prepare_data(out, request, selected_day=get_CH_day(current_application.date))
+    get_prepare_data(out, request, current_day=current_date)
     out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = str(current_application.date)
@@ -781,6 +824,7 @@ def create_new_application(request, id_application):
     out["list_of_vehicles"] = list_of_vehicles
 
     if request.method == "POST":  # ----------------POST
+        print(request.POST)
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
         vehicle_list = request.POST.getlist('io_technic')
@@ -808,11 +852,16 @@ def create_new_application(request, id_application):
         _len__id_app_list = len(id_app_tech)
         for i, _id in enumerate(id_app_tech):
             l_of_v = ApplicationTechnic.objects.get(id=int(_id))
-            v_d_app = TechnicDriver.objects.get(
-                driver__driver__user__last_name=driver_list[i],
-                technic__name__name=vehicle_list[i],
-                date=current_date,
-                status=True)
+            v_d_app = TechnicDriver.objects.get(id=id_tech_drv_list[i])
+                # driver__driver__user__last_name=driver_list[i],
+                # technic__name__name=vehicle_list[i],
+                # date=current_date,
+                # status=True)
+            # v_d_app = TechnicDriver.objects.get(
+            #     driver__driver__user__last_name=driver_list[i],
+            #     technic__name__name=vehicle_list[i],
+            #     date=current_date,
+            #     status=True)
 
             l_of_v.technic_driver = v_d_app
             l_of_v.description = description_app_list[i]
@@ -1129,7 +1178,7 @@ def show_start_page(request):
             return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
 
 
-def get_prepare_data(out: dict, request, current_day=TOMORROW, selected_day: str = 'next_day'):
+def get_prepare_data(out: dict, request, current_day=TOMORROW):
     if isinstance(current_day, str):
         current_day = convert_str_to_date(current_day)
     out['nw_day'] = str(get_current_day('next_day'))
@@ -1140,9 +1189,6 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW, selected_day: str
     out["DAY"] = f'{current_day.day} {MONTH[current_day.month-1]}'
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user, key=True)
-
-    # out["TOMORROW"] = TOMORROW.strftime('%d %B')
-    # out["CH_DAY"] = selected_day
     return out
 
 
@@ -1233,5 +1279,4 @@ def set_var(name, value=None, flag=False):
     _var.save()
     return _var
 
-def redirect_view(request):
-    return render(request, 'REDIRECT.html', {})
+

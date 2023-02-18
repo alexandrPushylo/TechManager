@@ -1,28 +1,27 @@
 {% extends 'main.html' %}
 
 {% block choosedate %}
-    <div class="container mt-3">
-    <h3 class="text-center">{{ current_user.last_name }} {{ current_user.first_name }}</h3>
-        <h3 class="text-center m-0">
+    <div class="container">
+    <h3 class="text-center" style="margin-top: -25px; margin-bottom: -10px;">{{ current_user.last_name }} {{ current_user.first_name }}</h3>
+        <div class="btn-group position-relative start-50 translate-middle-x mt-4">
             {% if cw_day == nw_day %}
-                <a href="{% url 'application_list' current_user.id lw_day %}" class="btn " aria-current="page">
-                Сегодня <
-                </a>
-                {{ DAY }}
+                <a href="{% url 'application_list' current_user.id lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
             {% else %}
-                {{ DAY }}
-                <a href="{% url 'application_list' current_user.id nw_day %}" class="btn fw-light" aria-current="page">
-                > Следующий рабочий день
-                </a>
+                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'application_list' current_user.id nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
-
-        </h3>
+        </div>
     </div>
     {% endblock %}
 
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/admin_app_foreman.js" %}"></script>
+{% endblock %}
+
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-<a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>
+<a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> На главную страницу</a>
 
 <a href="{% url 'foreman_app_list' cw_day %}" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
 

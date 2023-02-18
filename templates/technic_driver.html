@@ -1,15 +1,37 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+
+  {% block choosedate %}
+    <div class="container">
+        <div class="btn-group position-relative start-50 top-0 translate-middle ">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'technic_driver' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+            {% else %}
+                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'technic_driver' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+            {% endif %}
+        </div>
+    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
+    </div>
+    {% endblock %}
+
+
+
+
+
+
 <div class="container-sm m-3 mx-auto "  >
-    <div class="" >
-      <div class="card-body row">
-        <p class="card-text col"> <b class="fs-5">Техника на<br>{{ DAY }}</b> </p>
-        {% if cw_day == nw_day %}
-      <a href="{% url 'technic_driver' lw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на сегодня</a>
-        {% else %}
-          <a href="{% url 'technic_driver' nw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на следующий день</a>
-      {% endif %}
+{#    <div class="" >#}
+{#      <div class="card-body row">#}
+{#        <p class="card-text col"> <b class="fs-5">Техника на<br>{{ DAY }}</b> </p>#}
+{#        {% if cw_day == nw_day %}#}
+{#      <a href="{% url 'technic_driver' lw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на сегодня</a>#}
+{#        {% else %}#}
+{#          <a href="{% url 'technic_driver' nw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на следующий день</a>#}
+{#      {% endif %}#}
 
 
       <div><hr>

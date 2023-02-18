@@ -1,30 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% block choosedate %}
-    <div class="container mt-3">
-        <h3 class="text-center m-0">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'foreman_app_list' lw_day %}" class="btn " aria-current="page">
-                Сегодня <
-                </a>
-                {{ DAY }}
-            {% else %}
-                {{ DAY }}
-                <a href="{% url 'foreman_app_list' nw_day %}" class="btn fw-light" aria-current="page">
-                > Следующий рабочий день
-                </a>
-            {% endif %}
 
-        </h3>
+    {% block choosedate %}
+    <div class="container-fluid  ">
+        <div class="btn-group position-relative start-50 translate-middle">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'foreman_app_list' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+            {% else %}
+                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'foreman_app_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+            {% endif %}
+        </div>
+    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
-{% endblock %}
+    {% endblock %}
 
     <div class="container mt-5">
         <div class="row">
         {% for fman, appDay in app_list %}
         <div class="col-auto">
-        <div class="card shadow-lg" style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
+        <div class="card shadow-lg" style=" margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
           <div class="card-body">
               <h5 class="card-title fw-bold" style="text-align: center">
 
@@ -36,20 +33,16 @@
                 <h6 class="card-text fw-bold">Объекты:</h6>
                 {% for a in appDay %}
 
-
-                    <a href="{% url 'show_info_application' a.id %}" class="card-text
-                    {% if  a.status.status  == 'Сохранена' %} text-warning
-                    {% elif a.status.status == 'Подана' %} text-primary
-                    {% elif a.status.status == 'Одобрена' %} text-success
-                    {% else %} text-dark
-                    {% endif %}">{{ a.construction_site.address }} [{{ a.status }}]</a>
+                    <a href="{% url 'show_info_application' a.id %}"
+                    {% if  a.status.status  == 'Сохранена' %}class="card-text text-warning"><i class="fa-regular fa-floppy-disk"></i>
+                    {% elif a.status.status == 'Подана' %}class="card-text text-primary"><i class="fa-solid fa-bars"></i>
+                    {% elif a.status.status == 'Одобрена' %}class="card-text text-success"><i class="fa-regular fa-circle-check"></i>
+                    {% elif a.status.status == 'Отправлена' %}class="card-text text-black"><i class="fa-solid fa-paper-plane"></i>
+                    {% else %}class="card-text text-muted">
+                    {% endif %}{{ a.construction_site.address }} [ {{ a.status }} ]</a>
                     <h6 class="card-text"></h6>
 
                 {% endfor %}
-
-{#            <div class="btn-group ">#}
-{#                <a href="{% url 'application_for_driver' CH_DAY drv.driver.user.id %}" class="btn btn-outline-primary m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>#}
-{#            </div>#}
           </div>
         </div>
         </div>
@@ -59,7 +52,7 @@
 {% endblock %}
 
 {% block script %}{% load static %}
-    <script src="{% static "admin/js/scripts/show_info_application.js" %}"></script>
+    <script src="{% static "admin/js/scripts/foreman_app_list.js" %}"></script>
 {% endblock %}
 
 {% block bottom_panel %}
