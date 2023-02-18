@@ -90,6 +90,7 @@ def append_in_hos_tech(request, id_drv):
     if not status:
         return HttpResponseRedirect(f'/applications/{date}')
 
+
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address=None,
         foreman=None)
@@ -823,6 +824,7 @@ def create_new_application(request, id_application):
     out["list_of_vehicles"] = list_of_vehicles
 
     if request.method == "POST":  # ----------------POST
+        print(request.POST)
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
         vehicle_list = request.POST.getlist('io_technic')
@@ -1277,5 +1279,4 @@ def set_var(name, value=None, flag=False):
     _var.save()
     return _var
 
-def redirect_view(request):
-    return render(request, 'REDIRECT.html', {})
+
