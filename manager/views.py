@@ -67,13 +67,13 @@ def copy_app_view(request, id_application):
                                                 date=get_current_day('next_day'),
                                                 driver=_drv_tab,
                                                 technic=_apptech.technic_driver.technic).count() != 0:
-                    _td = ApplicationTechnic.objects.create(app_for_day=next_app_for_day)
-                    _td.priority = _apptech.priority
-                    _td.description = _apptech.description
-                    _td.technic_driver = TechnicDriver.objects.get(status=True,
-                                                                   technic=_apptech.technic_driver.technic,
-                                                                   date=get_current_day('next_day'),
-                                                                   driver=_drv_tab)
+                    _technic_driver = TechnicDriver.objects.get(status=True,
+                                                                technic=_apptech.technic_driver.technic,
+                                                                date=get_current_day('next_day'),
+                                                                driver=_drv_tab)
+                    _td, _ = ApplicationTechnic.objects.get_or_create(app_for_day=next_app_for_day,
+                                                                      description=_apptech.description,
+                                                                      technic_driver=_technic_driver)
                     _td.save()
                 else:
                     continue
