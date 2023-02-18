@@ -116,7 +116,7 @@
     </div>
 
     {% if post == 'admin' %}{% csrf_token %}
-    <div class="driver_panel container col-auto   position-fixed end-0 "style="margin-top: -45px; height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
+    <div class="driver_panel container col-auto   position-fixed end-0 "style="margin-top: -65px; height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
         <div class="card-body  overflow-auto "style="height: 90%" >
 
             {% for drv, count, attach_drv, tech_drv in DRV_LIST %}
