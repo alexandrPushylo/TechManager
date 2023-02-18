@@ -1,24 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container mt-3 ">
-        <h3 class="btn-group position-relative start-50 translate-middle">
+
+    {% block choosedate %}
+    <div class="container-fluid  ">
+        <div class="btn-group position-relative start-50 translate-middle">
             {% if cw_day == nw_day %}
-                <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <</a>
-                <input class="form-control io_current_day" type="date" style="width: 45px;" id="{{ current_user.id }}"  value="{{ cw_day }}"/>
-                <div class="ms-2 text-nowrap">{{ DAY }}</div>
+                <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
             {% else %}
-                <div class="me-2 text-nowrap ">{{ DAY }}</div>
-                <input class="form-control io_current_day" type="date" style="width: 45px;" id="{{ current_user.id }}" value="{{ cw_day }}"/>
-                <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">> {{ nw_day }}</a>
+                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
-
-        </h3>
+        </div>
+    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
+    {% endblock %}
 
-
-
-<div class="container-lg m-3 mx-auto p-3"  >
+<div class="container-lg  mx-auto  mt-4"  >
     <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
       <div class="card-body">
 
@@ -57,7 +56,6 @@
 
 <a href="{% url 'show_today_applications' cw_day  %}" class="btn btn-outline-secondary active m-1" aria-current="page">Все заявки на {{ DAY }}</a>
 </div>
-
 
 
 {% endblock %}

@@ -17,3 +17,8 @@ if (notice.attr('status')){
     notice.show()
     setTimeout(function() { notice.hide(); }, 2000)
 }
+
+const cw_date = $('.io_current_day');
+cw_date.change(function () {
+    location.href = '/tabel_driver/'+this.value;
+})

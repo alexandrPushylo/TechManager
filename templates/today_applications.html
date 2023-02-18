@@ -2,26 +2,22 @@
 
 {% block content %}
 
-<div class="container-lg  mx-auto p-3"  >
-
-    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
-
-        <p class="card-text">
-
-
-            <b class="fs-5">{{ WEEKDAY }}, </b><br><b class="fs-5">{{ date_of_target }}</b>
-
-
-        </p>
-          {% if cw_day == nw_day %}
-      <a href="/today_app/{{ lw_day }}" class="btn btn-outline-secondary  position-absolute top-0 end-0 m-3" aria-current="page">Сегодня</a>
-        {% else %}
-          <a href="/today_app/{{ nw_day }}" class="btn btn-outline-secondary  position-absolute top-0 end-0 m-3" aria-current="page">Следующий день</a>
-      {% endif %}
-      </div>
+    {% block choosedate %}
+    <div class="container">
+        <div class="btn-group position-relative start-50 top-0 translate-middle ">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'show_today_applications' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+            {% else %}
+                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'show_today_applications' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+            {% endif %}
+        </div>
+    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
+    {% endblock %}
 
+<div class="container-lg  mx-auto mt-4">
       <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
       {% for v in today_technic_applications %}
     <div class="card shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
@@ -61,20 +57,16 @@
     </div>
       {% endfor %}
       </form>
-
-
-
-
 </div>
 
 {% endblock %}
 
-
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/today_application.js" %}"></script>
+{% endblock %}
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-
-
     {% if post == 'admin' %}
     <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
     <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить изменения">
@@ -82,10 +74,4 @@
         <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
     {% endif %}
 </div>
-{% endblock %}
-
-
-
-{% block script %}{% load static %}
-    <script src="{% static "admin/js/scripts/today_application.js" %}"></script>
 {% endblock %}
