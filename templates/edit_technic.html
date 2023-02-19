@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container container-fluid mx-auto row">
+    <div class="container mt-1 col-auto " >
+        <div class="row">
+        <div class="card shadow-lg" style="width: 20rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
+          <div class="card-body " >
+            <form  id="edit_tech_form"  method="post">{% csrf_token %}
+        <input type="hidden" id="io_id_tech" name="id_tech" value="{{ tech.id }}">
+        <p class="col-auto">
+            <label class="col-auto">Название группы</label><br>
+            <input type="hidden" id="io_name_tech"  value="{{ tech.name.id }}">
+            <select class=" col-auto" required id="name_tech_select" name="name_tech">
+                <option></option>
+                         {% for name in name_technic %}
+                            <option value="{{ name.id }}">{{ name.name }}</option>
+                        {% endfor %}
+            </select>
+
+        <a class="related-widget-wrapper-link add-related" id="add_id_name"
+            data-popup="yes"
+            href="/admin/manager/technicname/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа 'Название группы техники'">
+                <img src="/static/admin/img/icon-addlink.svg" alt="Добавить">
+            </a>
+        </p>
+
+        <p class="col-auto">
+            <input type="hidden" id="io_type_tech"  value="{{ tech.tech_type.id }}">
+            <label for="type_tech_select">Тип техники</label><br>
+            <select class=" col-auto" required id="type_tech_select" name="type_tech">
+                <option></option>
+                         {% for type in type_technic %}
+                            <option value="{{ type.id }}">{{ type.name }}</option>
+                        {% endfor %}
+            </select>
+        <a class="related-widget-wrapper-link add-related" id="add_id_tech_type"
+            data-popup="yes"
+            href="/admin/manager/technictype/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа 'Тип техники'">
+            <img src="/static/admin/img/icon-addlink.svg" alt="Добавить">
+        </a>
+        </p>
+
+        <p class="col-auto">
+            <label>Идентификационная информация</label>
+            <input type="text" class="form-control col-auto" required name="iden_inf" value="{{ tech.id_information }}">
+        </p>
+        <p class="col-auto">
+            <label>Описание</label>
+            <textarea  class="form-control app_description" name="description">{{ tech.description }}</textarea>
+        </p>
+
+        <p class="col-auto">
+            <label>Прикрепленный водитель</label>
+            <input type="hidden" id="io_att_drv" value="{{ tech.attached_driver.id }}">
+            <select class=" col-auto" required id="att_drv_tech_select" name="att_drv_tech">
+                <option></option>
+                         {% for drv in attach_drv %}
+                            <option value="{{ drv.id }}">{{ drv.user.last_name}} {{ drv.user.first_name }}</option>
+                        {% endfor %}
+            </select>
+        <a class="related-widget-wrapper-link add-related" id="add_id_attached_driver"
+            data-popup="yes"
+            href="/admin/manager/staffdriver/add/?_to_field=id&amp;_popup=1"
+            title="Добавить ещё один объект типа 'Водитель'">
+            <img src="/static/admin/img/icon-addlink.svg" alt="Добавить">
+            </a>
+        </p>
+    </form>
+          </div>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/edit_technic.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+
+  <a href="{% url 'technic_list' %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
+    {% if tech.id %}
+  <a href="{% url 'del_technic' tech.id %}" class="btn btn-outline-danger  col-auto m-1" aria-current="page">Удалить</a>
+    {% endif %}
+  <button form="edit_tech_form" type="submit" class="btn btn-success m-1">Сохранить</button>
+
+</div>
+{% endblock %}
