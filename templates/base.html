@@ -6,7 +6,7 @@
 
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta http-equiv="refresh" content="10" >
+        <meta http-equiv="refresh" content="60" >
         <title>KIP TechManager</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
@@ -40,10 +40,19 @@
 
             </div>
         </nav>
-
-
+    {% if message_status %}
+<div class="alert alert-success w-25 mx-auto text-center position-fixed start-50 top-50 translate-middle" hidden=""  id="notice_stat" status="{{ message_status }}"  role="alert">
+    {{ message }}</div>
+        {% endif %}
         <script src="{% static "admin/js/scripts/bootstrap.bundle.min.js" %}"></script>
         <script src="{% static "admin/js/scripts/jquery-3.6.3.min.js" %}"></script>
+        <script>const notice = $('#notice_stat');
+
+            if (notice.attr('status')){
+                notice.prop('hidden',false)
+                setTimeout(function() { notice.prop('hidden',true); }, 2000)
+            }
+        </script>
         {% block script %}
         {% endblock %}
 
