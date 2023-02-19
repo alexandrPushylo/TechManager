@@ -10,7 +10,7 @@ Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.urls import include, path
+    1. Import the, include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
@@ -44,6 +44,10 @@ from manager.views import show_staff_view
 from manager.views import edit_staff_view
 from manager.views import del_staff
 
+from manager.views import edit_technic_view
+from manager.views import show_technic_view
+from manager.views import del_technic
+
 from manager.views import tabel_driver_view
 from manager.views import tabel_workday_view
 from manager.views import Technic_Driver_view
@@ -71,6 +75,11 @@ urlpatterns = [
     path('show_staff/', show_staff_view, name='show_staff'),
     path('edit_staff/<int:id_staff>', edit_staff_view, name='edit_staff'),
     path('del_staff/<int:id_staff>', del_staff, name='del_staff'),
+
+    path('technic_list/', show_technic_view, name='technic_list'),
+    path('add_technic/', edit_technic_view, name='add_technic'),
+    path('edit_technic/<int:id_tech>', edit_technic_view, name='edit_technic'),
+    path('delete_technic/<int:id_tech>', del_technic, name='del_technic'),
 
 
     path('tabel_driver/<str:day>', tabel_driver_view, name='tabel_driver'),

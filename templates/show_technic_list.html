@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container-sm m-3 mx-auto "  >
+        <p class="card-text ms-3"> <b class="fs-5">Вся техника </b> </p>
+        <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Название техники</th>
+      <th scope="col">Тип техники</th>
+      <th scope="col">Идентификационная информация</th>
+      <th scope="col">Описание</th>
+      <th scope="col">Прикрепленный водитель</th>
+    </tr>
+  </thead>
+  <tbody>{% for tech in all_technic_list %}
+
+    <tr id="{{ tech.id }}" class="technic_row">
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ tech.name }}</td>
+      <td>{{ tech.tech_type }}</td>
+      <td>{{ tech.id_information }}</td>
+      <td>{{ tech.description }}</td>
+      <td>{{ tech.attached_driver }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/show_technic_list.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+    <a href="{% url 'add_technic' %}" class="btn btn-outline-success active col-auto m-1" aria-current="page">Добавить технику</a>
+</div>
+{% endblock %}

@@ -40,6 +40,67 @@ from manager.utilities import convert_str_to_date
 # ------FUNCTION VIEW----------------------
 
 
+def del_technic(request, id_tech):
+    if is_admin(request.user) or is_mechanic(request.user):
+        _technic = Technic.objects.get(id=id_tech)
+        _technic.delete()
+    return HttpResponseRedirect('/technic_list/')
+
+
+def show_technic_view(request):
+    out = {}
+    get_prepare_data(out, request)
+    all_technic_list = Technic.objects.all()
+    out['all_technic_list'] = all_technic_list.order_by('name__name')
+    return render(request, 'show_technic_list.html', out)
+
+
+def edit_technic_view(request, id_tech=None):
+    out = {}
+    get_prepare_data(out, request)
+    if id_tech:
+        _technic = Technic.objects.get(id=id_tech)
+        out['tech'] = _technic
+    _attach_drv = StaffDriver.objects.all()
+    out['attach_drv'] = _attach_drv.order_by('user__last_name')
+
+    _name_technic = TechnicName.objects.all()
+    out['name_technic'] = _name_technic.order_by('name')
+
+    _type_technic = TechnicType.objects.all()
+    out['type_technic'] = _type_technic.order_by('name')
+
+    if request.method == 'POST':
+        if request.POST.get('id_tech'):
+            _id = request.POST.get('id_tech')
+            _technic = Technic.objects.get(id=_id)
+        else:
+            _technic = Technic.objects.create()
+
+        _t_name = request.POST.get('name_tech')
+        t_name = TechnicName.objects.get(id=_t_name)
+
+        _t_type = request.POST.get('type_tech')
+        t_type = TechnicType.objects.get(id=_t_type)
+
+        _t_attr_drv = request.POST.get('att_drv_tech')
+        t_attr_drv = StaffDriver.objects.get(id=_t_attr_drv)
+
+        t_desc = request.POST.get('description')
+        t_iden_inf = request.POST.get('iden_inf')
+
+        _technic.name = t_name
+        _technic.tech_type = t_type
+        _technic.attached_driver = t_attr_drv
+        _technic.description = t_desc
+        _technic.id_information = t_iden_inf
+        _technic.save()
+
+        return HttpResponseRedirect('/technic_list/')
+
+    return render(request, 'edit_technic.html', out)
+
+
 def copy_app_view(request, id_application):
     out = {}
     _app_for_day = ApplicationToday.objects.get(id=id_application)
@@ -709,7 +770,7 @@ def show_application_for_driver(request, day, id_user=None):
 
     out['applications'] = applications
 
-    if is_admin(request.user):
+    if is_admin(request.user) or is_master(request.user) or is_foreman(request.user):
         return render(request, 'extend/admin_app_for_driver.html', out)
     return render(request, 'applications_for_driver.html', out)
 
