@@ -968,6 +968,7 @@ def signin_view(request):
             return HttpResponseRedirect('/')
         else:
             out['err'] = True
+            out['message'] = 'Неверный логин или пороль'
     return render(request, 'signin.html', out)
 
 
