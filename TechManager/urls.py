@@ -46,6 +46,7 @@ from manager.views import del_staff
 
 from manager.views import edit_technic_view
 from manager.views import show_technic_view
+from manager.views import del_technic
 from manager.views import tabel_driver_view
 from manager.views import tabel_workday_view
 from manager.views import Technic_Driver_view
@@ -77,6 +78,7 @@ urlpatterns = [
     path('technic_list/', show_technic_view, name='technic_list'),
     path('add_technic/', edit_technic_view, name='add_technic'),
     path('edit_technic/<int:id_tech>', edit_technic_view, name='edit_technic'),
+    path('delete_technic/<int:id_tech>', del_technic, name='del_technic'),
 
     path('tabel_driver/<str:day>', tabel_driver_view, name='tabel_driver'),
     path('tabel_workday/<str:ch_week>', tabel_workday_view, name='tabel_workday'),

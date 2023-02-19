@@ -40,6 +40,13 @@ from manager.utilities import convert_str_to_date
 # ------FUNCTION VIEW----------------------
 
 
+def del_technic(request, id_tech):
+    if is_admin(request.user) or is_mechanic(request.user):
+        _technic = Technic.objects.get(id=id_tech)
+        _technic.delete()
+    return HttpResponseRedirect('/technic_list/')
+
+
 def show_technic_view(request):
     out = {}
     get_prepare_data(out, request)
