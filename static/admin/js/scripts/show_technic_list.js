@@ -1,0 +1,1 @@
+$('.technic_row').click(function () {location.href = '/edit_technic/'+this.id})

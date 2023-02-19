@@ -40,6 +40,12 @@ from manager.utilities import convert_str_to_date
 # ------FUNCTION VIEW----------------------
 
 
+def show_technic_view(request):
+    out = {}
+    get_prepare_data(out, request)
+    all_technic_list = Technic.objects.all()
+    out['all_technic_list'] = all_technic_list.order_by('name__name')
+    return render(request, 'show_technic_list.html', out)
 def copy_app_view(request, id_application):
     out = {}
     _app_for_day = ApplicationToday.objects.get(id=id_application)
