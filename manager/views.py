@@ -53,6 +53,8 @@ def show_technic_view(request):
     all_technic_list = Technic.objects.all()
     out['all_technic_list'] = all_technic_list.order_by('name__name')
     return render(request, 'show_technic_list.html', out)
+
+
 def edit_technic_view(request, id_tech=None):
     out = {}
     get_prepare_data(out, request)
@@ -97,6 +99,8 @@ def edit_technic_view(request, id_tech=None):
         return HttpResponseRedirect('/technic_list/')
 
     return render(request, 'edit_technic.html', out)
+
+
 def copy_app_view(request, id_application):
     out = {}
     _app_for_day = ApplicationToday.objects.get(id=id_application)
@@ -766,7 +770,7 @@ def show_application_for_driver(request, day, id_user=None):
 
     out['applications'] = applications
 
-    if is_admin(request.user):
+    if is_admin(request.user) or is_master(request.user) or is_foreman(request.user):
         return render(request, 'extend/admin_app_for_driver.html', out)
     return render(request, 'applications_for_driver.html', out)
 
