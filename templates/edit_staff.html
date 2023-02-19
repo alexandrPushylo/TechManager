@@ -67,10 +67,11 @@
 <div class="input-group d-flex justify-content-center align-items-center">
 {% if post == 'admin' %}
   <a href="{% url 'show_staff' %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
+  <a href="{% url 'del_staff' current_user.id %}" class="btn btn-outline-danger  col-auto m-1" aria-current="page">Удалить</a>
 {% else %}
     <a href="{% url 'start_page' %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
 {% endif %}
-  <a href="{% url 'del_staff' current_user.id %}" class="btn btn-outline-danger  col-auto m-1" aria-current="page">Удалить</a>
+
   <button form="edit_staff_form" type="submit" class="btn btn-success m-1">Сохранить</button>
 
 </div>
