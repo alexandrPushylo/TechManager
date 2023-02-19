@@ -498,7 +498,8 @@ def tabel_driver_view(request, day):
                 st = DriverTabel.objects.get(id=staff_id)
                 st.status = False
                 st.save()
-            out['save_status'] = True
+        out['message_status'] = True
+        out['message'] = 'Сохранено'
 
     return render(request, 'tabel_driver.html', out)
 
@@ -549,7 +550,9 @@ def tabel_workday_view(request, ch_week):
                 st = WorkDayTabel.objects.get(id=day_id)
                 st.status = False
                 st.save()
-        return HttpResponseRedirect(f'/tabel_workday/{ch_week}')
+        out['message_status'] = True
+        out['message'] = 'Сохранено'
+        # return HttpResponseRedirect(f'/tabel_workday/{ch_week}')
 
     return render(request, 'tabel_workday.html', out)
 
@@ -562,8 +565,6 @@ def Technic_Driver_view(request, day):
     get_prepare_data(out, request, current_day)
     if DriverTabel.objects.filter(date=current_day, status=True).count() == 0:
         prepare_driver_table(day)
-
-
 
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     if work_driver_list.count()==0:
@@ -628,7 +629,8 @@ def Technic_Driver_view(request, day):
             else:
                 _td.status = False
                 _td.save()
-            out['save_status'] = True
+        out['message_status'] = True
+        out['message'] = 'Сохранено'
 
     if 'tech_list' in request.path:
         return render(request, 'tech_list.html', out)
@@ -749,7 +751,7 @@ def show_applications_view(request, day, id_user=None):
         return render(request, "main.html", out)
 
 
-def show_application_for_driver(request, day, id_user=None):
+def show_application_for_driver(request, day, id_user):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     out = {}
@@ -822,7 +824,9 @@ def show_today_applications(request, day):
             app.priority = pr
             app.description = desc
             app.save()
-        return HttpResponseRedirect(f'/today_app/{day}')
+        out['message_status'] = True
+        out['message'] = 'Сохранено'
+        # return HttpResponseRedirect(f'/today_app/{day}')
     return render(request, "today_applications.html", out)
 
 
@@ -849,6 +853,7 @@ def create_new_application(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     out = {}
+
     current_user = request.user
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
@@ -955,7 +960,7 @@ def signin_view(request):
     out = {
         'TODAY': TODAY,
         'WEEKDAY_TODAY': WEEKDAY[TODAY.weekday()],
-        'err': False
+
     }
 
     if request.method == 'POST':
@@ -967,7 +972,8 @@ def signin_view(request):
             login(request, user)
             return HttpResponseRedirect('/')
         else:
-            out['err'] = True
+            out['message_status'] = True
+            out['message'] = 'Неверный логин или пороль'
     return render(request, 'signin.html', out)
 
 
@@ -1242,6 +1248,7 @@ def show_start_page(request):
 def get_prepare_data(out: dict, request, current_day=TOMORROW):
     if isinstance(current_day, str):
         current_day = convert_str_to_date(current_day)
+    out['message_status'] = False
     out['nw_day'] = str(get_current_day('next_day'))
     out['cw_day'] = str(get_current_day(get_CH_day(current_day)))
     out['lw_day'] = str(get_current_day('last_day'))

@@ -18,21 +18,7 @@
     </div>
     {% endblock %}
 
-
-
-
-
-
 <div class="container-sm m-3 mx-auto "  >
-{#    <div class="" >#}
-{#      <div class="card-body row">#}
-{#        <p class="card-text col"> <b class="fs-5">Техника на<br>{{ DAY }}</b> </p>#}
-{#        {% if cw_day == nw_day %}#}
-{#      <a href="{% url 'technic_driver' lw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на сегодня</a>#}
-{#        {% else %}#}
-{#          <a href="{% url 'technic_driver' nw_day %}" class="col-auto btn btn-outline-secondary  position-absolute " style="margin-left: 200px;" aria-current="page">Список на следующий день</a>#}
-{#      {% endif %}#}
-
 
       <div><hr>
     <form method="post" id="technic_driver_form" enctype="multipart/form-data">{% csrf_token %}
@@ -78,7 +64,7 @@
       </div>
       </div>
     </div>
-        <div class="alert alert-success w-25 mx-auto text-center position-fixed start-50 top-50 translate-middle"  id="notice_stat" status="{{ save_status }}"  role="alert">Сохранено!</div>
+
 </div>
 
 {% endblock %}

@@ -19,13 +19,6 @@ for (let i=1;i<=count_row;i++) {
     })
 }
 
-const notice = $('#notice_stat');
-notice.hide()
-if (notice.attr('status')){
-    notice.show()
-    setTimeout(function() { notice.hide(); }, 2000)
-}
-
 const cw_date = $('.io_current_day');
 cw_date.change(function () {
     location.href = '/technic_driver/'+this.value;
