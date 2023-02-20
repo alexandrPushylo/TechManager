@@ -51,6 +51,8 @@
 
         {% elif post == 'driver' %}
             <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+        {% else %}
+            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
 
         {% endif %}
 

@@ -35,7 +35,8 @@
         <div class="mt-3"  {% if not post == 'admin' %}hidden {% endif %}>
             <label>Должность</label>
             <input type="hidden" id="io_post" value="{{ current_post }}">
-            <select class=" col-auto" required id="post_select" name="post">
+            <select class=" col-auto"  id="post_select" name="post">
+                    <option></option>
                          {% for post in post_list.items %}
                             <option value="{{ post.0 }}">{{ post.1 }}</option>
                         {% endfor %}

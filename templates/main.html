@@ -98,7 +98,7 @@
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>
                 {% endif %}
 
-                <div class="dropup">
+                <div class="dropdown">
                     <a class="btn m-1 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">...</a>
                       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
                         <li><a class="dropdown-item" href="{% url 'copy_app' a.app_today.id %}">Копировать на следующий день</a></li>
