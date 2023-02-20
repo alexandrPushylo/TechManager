@@ -37,7 +37,7 @@
                 <h6 class="card-text"><b>{{ a.priority }})</b> {{ a.app_for_day.construction_site.address }} ({{a.app_for_day.construction_site.foreman.user.last_name}})</h6>
             {% endif %}
                 {% if a.description %}
-                <textarea class="form-control app_description" readonly>{{ a.description }}</textarea>
+                <textarea class="app_description form-control app_description" readonly>{{ a.description }}</textarea>
                 {% endif %}
 
             {% endfor %}
