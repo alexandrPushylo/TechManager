@@ -32,7 +32,7 @@
             {% for v in applications %}
                 <div class=" mb-3" id="vehicle_list">
                     <label  class= "fw-bold start-50">{{ v.priority }}){% if v.app_for_day.construction_site.address %} - {{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman }}){% endif %}</label>
-                    <textarea class="form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ v.description }}</textarea>
+                    <textarea class="app_description form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ v.description }}</textarea>
                 </div>
             {% endfor %}
         </ul>
