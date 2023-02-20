@@ -69,9 +69,7 @@
               {% for v in a.apps_tech %}
                   <div class="row">
                 <div class="card-text fs-6 col-auto
-                        {% if v.technic_driver.technic.name.name in conflicts_vehicles_list %}
-                        text-danger
-                        {% elif v.id in conf_app_id_list %}
+                        {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
                             ">{{ v.technic_driver.technic.name }}</div>
                 <div id="{{ v.technic_driver.driver.driver.user.id }}" class="card-text fs-6 col-auto driver_name_link

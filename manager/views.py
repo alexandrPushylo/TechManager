@@ -270,10 +270,14 @@ def conflict_resolution_view(request, day):
     out['conflicts_list'] = conflict_list
     out['work_TD_list'] = get_work_TD_list(current_day)
 
+    conflicts_vehicles_list_id = get_conflicts_vehicles_list(current_day, get_id=True)
+    out['conflicts_vehicles_list_id'] = conflicts_vehicles_list_id
+
     today_technic_applications_list = []
     for v in conflict_list:
         today_technic_applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
-                                                                       technic_driver__technic__name__name=v).values(
+                                                                       technic_driver__technic__name__name=v,
+                                                                       technic_driver__status=True).values(
             'id',
             'technic_driver__driver__driver__user__last_name',
             'description',
@@ -700,7 +704,7 @@ def show_applications_view(request, day, id_user=None):
                                                       ))
 
         out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day)
-        out['work_TD_list'] = get_work_TD_list(current_day)
+        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
         if ApplicationToday.objects.filter(date=current_day,
                                            status=ApplicationStatus.objects.get(
                                                status=STATUS_AP['submitted'])).count() != 0:
@@ -816,10 +820,13 @@ def show_today_applications(request, day):
     for _drv, _tech in driver_technic:
         desc = app_tech_day.filter(technic_driver__driver__driver__user__last_name=_drv,
                                    technic_driver__technic__name__name=_tech).order_by('priority')
-        if (_drv, _tech, desc) not in app_list:
-            app_list.append((_drv, _tech, desc))
+        _id_list = [_[0] for _ in desc.values_list('id')]
+        if (_drv, _tech, desc, _id_list) not in app_list:
+            app_list.append((_drv, _tech, desc, _id_list))
+
     out["today_technic_applications"] = app_list
     out["priority_list"] = get_priority_list(current_day)
+    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
     if request.method == 'POST':
         prior_id_list = request.POST.getlist('prior_id')
@@ -1142,7 +1149,7 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
     return out
 
 
-def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False):   #applicationtech
+def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_id=False):   #applicationtech
     '''
         c_in - количество тех. которое может быть заказано, прежде чем попасть в список
         all - сравнение с всей в том числе нероботающей техникой
@@ -1157,8 +1164,11 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False):   #
         for f in Technic.objects.all():
             out[f.name.name] = TechnicDriver.objects.filter(status=True, date=current_day,
                                                             technic__name__name=f.name.name).count()
+    excl_const_site = ConstructionSite.objects.get(address=None, foreman=None)
+    # exclude_tech_list = ApplicationTechnic.objects.filter(app_for_day=current_day,
+    #                                                       app_for_day__construction_site=excl_const_site)
 
-    app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+    app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
     app_list_submit_approv = app_list_today.filter(Q(app_for_day__status=ApplicationStatus.objects.get(
                                                            status=STATUS_AP['submitted'])) |
                                                    Q(app_for_day__status=ApplicationStatus.objects.get(
@@ -1175,6 +1185,14 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False):   #
                 l.append((i, _c))
             else:
                 l.append(i)
+
+    if get_id:
+        l_id = []
+        for _app in app_list_today:
+            if _app.technic_driver.technic.name.name in l:
+                l_id.append(_app.id)
+        return l_id
+
     return l
 
 

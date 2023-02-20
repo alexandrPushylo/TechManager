@@ -26,9 +26,11 @@
 
                 <div class="  " id="vehicle_list">
                     <label class="ms-1 fw-bold"
-                            {% if v.1 in conflicts_list %}
+                            {% for c in v.3 %}
+                            {% if c in conflicts_vehicles_list_id %}
                                 style="color: red"
                             {% endif %}
+                           {% endfor %}
                     >{{ v.0 }} ({{ v.1 }})  </label>
                         {% for d in v.2 %}
 
