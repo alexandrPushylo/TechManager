@@ -31,9 +31,12 @@
                                 style="color: red"
                             {% endif %}
                            {% endfor %}
-                    >{{ v.0 }} ({{ v.1 }})  </label>
-                        {% for d in v.2 %}
+                    >   {% if v.0 %}{{ v.0 }}
+                        {% else %}Проверьте табель
+                        {% endif %}
+                        ({{ v.1 }})  </label>
 
+                        {% for d in v.2 %}
                         <div class=" conteiner-fluid form-floating row mt-1 ">
                         <input type="hidden" name="prior_id" value="{{ d.id }}"/>
                             <div class="input-group form-floating p-0">

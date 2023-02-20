@@ -34,5 +34,8 @@ $('.btn_driver_panel').click(function () {
 })
 
 $('.driver_name_link').click(function () {
-    location.href = '/personal_application/'+$('.io_current_day').val()+'/'+this.id;
+    if(this.id){
+        location.href = '/personal_application/'+$('.io_current_day').val()+'/'+this.id;
+    }
+
 })

@@ -75,7 +75,11 @@
                 <div id="{{ v.technic_driver.driver.driver.user.id }}" class="card-text fs-6 col-auto driver_name_link
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
-                            ">({{ v.technic_driver.driver.driver }})
+                            {% if not v.technic_driver.driver.driver %}
+                                text-warning">(Проверьте табель)
+                            {% else %}
+                                ">({{ v.technic_driver.driver.driver }})
+                            {% endif %}
                 </div>
                     </div>
 
