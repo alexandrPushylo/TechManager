@@ -16,7 +16,9 @@
             <div class="btn-group ">
 
                 <a href="{% url 'edit_construction_sites' constr_site.id %}" class="btn btn-outline-primary m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
+                {% if post == 'admin' %}
                 <a href="{% url 'delete_construction_sites' constr_site.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
+                {% endif %}
                 <a href="{% url 'change_status_construction_site' constr_site.id %}"
                     {% if constr_site.status.status == 'Открыт' %}class="btn btn-outline-danger col-auto m-1" aria-current="page"> Скрыть
                     {% else %}class="btn btn-outline-success col-auto m-1" aria-current="page"> Отобразить
