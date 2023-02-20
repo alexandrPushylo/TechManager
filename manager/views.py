@@ -656,6 +656,8 @@ def clear_application_view(request, id_application):
 
 
 def show_applications_view(request, day, id_user=None):
+    if get_current_post(request.user):
+        return HttpResponseRedirect('/')
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     current_day = convert_str_to_date(day)
