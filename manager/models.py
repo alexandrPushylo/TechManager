@@ -180,3 +180,9 @@ class Variable(models.Model):
     class Meta:
         verbose_name = "Переменная"
         verbose_name_plural = "Переменные"
+
+
+class TeleBot(models.Model):
+    user_bot = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='id пользователя')
+    id_chat = models.CharField(max_length=128, verbose_name='id chat')
+    def __str__(self): return f"{self.user_bot.last_name} - [{self.id_chat}]"

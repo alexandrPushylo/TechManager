@@ -6,6 +6,7 @@ from manager.models import StaffAdmin, StaffForeman, StaffMaster, StaffDriver, S
 from manager.models import Technic, TechnicName, TechnicType
 from manager.models import WorkDayTabel
 from manager.models import Variable
+from manager.models import TeleBot
 
 # Register your models here.
 admin.site.register(ApplicationTechnic)
@@ -33,5 +34,5 @@ admin.site.register(TechnicName)
 admin.site.register(TechnicType)
 
 admin.site.register(Variable)
-
+admin.site.register(TeleBot)
 
