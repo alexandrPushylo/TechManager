@@ -176,7 +176,14 @@ class Variable(models.Model):
     value = models.CharField(max_length=512, null=True, blank=True, verbose_name='Значение переменной')
     flag = models.BooleanField(default=False, verbose_name='Флаг переменной')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self): return f'{self.name} {self.value} [{self.flag}]'
     class Meta:
         verbose_name = "Переменная"
         verbose_name_plural = "Переменные"
+
+
+class TeleBot(models.Model):
+    user_bot = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='id пользователя')
+    id_chat = models.CharField(max_length=128, verbose_name='id chat')
+    def __str__(self): return f"{self.user_bot.last_name} - [{self.id_chat}]"

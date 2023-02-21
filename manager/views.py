@@ -12,6 +12,7 @@ from manager.models import StaffAdmin, StaffForeman, StaffMaster, StaffDriver, S
 from manager.models import Technic, TechnicName, TechnicType
 from manager.models import WorkDayTabel
 from manager.models import Variable
+from manager.models import TeleBot
 
 # from manager.forms import CreateNewApplicationForm
 
@@ -30,6 +31,10 @@ from manager.utilities import get_week
 from manager.utilities import timedelta
 from manager.utilities import choice as rand_choice
 from manager.utilities import convert_str_to_date
+
+from manager.utilities import get_json
+from manager.utilities import get_id_chat
+from manager.utilities import BOT
 # ----------------
 
 # ----------PREPARE--------------
@@ -888,7 +893,7 @@ def create_new_application(request, id_application):
 
     _tech_drv = []
     for _tech_name in tech_name_list:
-        t_d = tech_driver_list.filter(technic__name=_tech_name, driver__isnull=False).values_list('id','driver__driver__user__last_name').order_by('driver__driver__user__last_name')
+        t_d = tech_driver_list.filter(technic__name=_tech_name, driver__isnull=False, status=True, driver__status=True).values_list('id','driver__driver__user__last_name').order_by('driver__driver__user__last_name')
         _n = _tech_name.name.replace(' ', '').replace('.', '')
         if (_n, _tech_name.name, t_d) not in _tech_drv:
             _tech_drv.append((_n, _tech_name.name, t_d))
@@ -919,7 +924,7 @@ def create_new_application(request, id_application):
         work_TD_list_F_saved = get_work_TD_list(current_application.date, 0, True)
         for n, _id in enumerate(id_tech_drv_list):
             if _id == '' and driver_list[n] == '':
-                _td = tech_driver_list.filter(technic__name__name=vehicle_list[n]).values_list(
+                _td = tech_driver_list.filter(technic__name__name=vehicle_list[n], driver__isnull=False).values_list(
                     'id', 'driver__driver__user__last_name')
                 if _td.exclude(id__in=work_TD_list_F_saved).count() == 0:   #if not free td
                     _td_ch = rand_choice(_td)
@@ -927,23 +932,15 @@ def create_new_application(request, id_application):
                     driver_list[n] = _td_ch[1]
 
                 else:
-                    id_tech_drv_list[n] = _td.exclude(id__in=work_TD_list_F_saved).first()[0]
-                    driver_list[n] = _td.exclude(id__in=work_TD_list_F_saved).first()[1]
+                    _tmp = rand_choice(_td.exclude(id__in=work_TD_list_F_saved))
+                    id_tech_drv_list[n] = _tmp[0]
+                    driver_list[n] = _tmp[1]
                     work_TD_list_F_saved.append(id_tech_drv_list[n])
 
         _len__id_app_list = len(id_app_tech)
         for i, _id in enumerate(id_app_tech):
             l_of_v = ApplicationTechnic.objects.get(id=int(_id))
             v_d_app = TechnicDriver.objects.get(id=id_tech_drv_list[i])
-                # driver__driver__user__last_name=driver_list[i],
-                # technic__name__name=vehicle_list[i],
-                # date=current_date,
-                # status=True)
-            # v_d_app = TechnicDriver.objects.get(
-            #     driver__driver__user__last_name=driver_list[i],
-            #     technic__name__name=vehicle_list[i],
-            #     date=current_date,
-            #     status=True)
 
             l_of_v.technic_driver = v_d_app
             l_of_v.description = description_app_list[i]
@@ -1138,8 +1135,11 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved']))
     )
     if F_saved: #if ApplicationTechnic have status = 'saved'
-        tech_app_status = tech_app_status.filter(
+        tech_app_status = ApplicationTechnic.objects.filter(
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])))
+
 
     app_list_day = tech_app_status.filter(app_for_day__date=current_day)
     app_list_priority = app_list_day#.filter(priority=1)
@@ -1165,10 +1165,9 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
     else:
         for f in Technic.objects.all():
             out[f.name.name] = TechnicDriver.objects.filter(status=True, date=current_day,
-                                                            technic__name__name=f.name.name).count()
-    excl_const_site = ConstructionSite.objects.get(address=None, foreman=None)
-    # exclude_tech_list = ApplicationTechnic.objects.filter(app_for_day=current_day,
-    #                                                       app_for_day__construction_site=excl_const_site)
+                                                            technic__name__name=f.name.name,
+                                                            driver__status=True).count()#################
+    # excl_const_site = ConstructionSite.objects.get(address=None, foreman=None)
 
     app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
     app_list_submit_approv = app_list_today.filter(Q(app_for_day__status=ApplicationStatus.objects.get(
@@ -1194,7 +1193,6 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
             if _app.technic_driver.technic.name.name in l:
                 l_id.append(_app.id)
         return l_id
-
     return l
 
 
@@ -1376,4 +1374,31 @@ def set_var(name, value=None, flag=False):
     _var.save()
     return _var
 
+def connect_bot_view(request, id_user):
+    out = {}
+    get_prepare_data(out, request)
+    current_user = User.objects.get(id=id_user)
+    out['current_user'] = current_user
+    telebot, _ = TeleBot.objects.get_or_create(user_bot=current_user)
+    if not _:
+        _result = get_json()
+        key = f"kp{id_user}"
+        id_chat = get_id_chat(key=key, result=_result)
+        if id_chat:
+            telebot.id_chat = id_chat
+            telebot.save()
+
+
+    out['telebot'] = telebot
+
+
+    return render(request, 'bot_connect.html', out)
+
+def test_bot(request, id_user):
+    tel_bot = TeleBot.objects.get(user_bot=id_user)
+    id_chat = tel_bot.id_chat
+
+    BOT.send_message(id_chat, 'test message')
+
+    return HttpResponseRedirect(f'/connect_bot_view/{id_user}')
 

@@ -1,5 +1,8 @@
 from datetime import date, timedelta, datetime
 from random import choice
+import telebot
+import requests
+from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
 #---------------------------------------------------
 
 ONE_DAY = timedelta(days=1)
@@ -12,6 +15,8 @@ dict_Staff = {'admin': 'Администратор', 'foreman': 'Прораб', 
 status_application = {'absent': 'Отсутствует', 'saved': 'Сохранена', 'submitted': 'Подана', 'approved': 'Одобрена', 'send': 'Отправлена'}
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 
+TELE_URL = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
+BOT = telebot.TeleBot(TOKEN, parse_mode=None)
 #--FUNCTIONS-------------------------------------------------
 
 def get_day_in_days(day: date, count_days: int):
@@ -41,4 +46,16 @@ def convert_str_to_date(str_date: str) -> date:
         return _day
     except:
         print('Error date')
+
+def get_json():
+    get_data = requests.get(TELE_URL)
+    data_json = get_data.json()
+    STATUS = data_json['ok']
+    result = data_json['result']
+    return result
+
+def get_id_chat(key, result):
+    for upd in result:
+        if upd['message']['text'] == key:
+            return (upd['message']['chat']['id'])
 

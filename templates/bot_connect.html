@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container container-fluid mx-auto row">
+    <div class="container mt-1 col-auto " >
+        <div class="row">
+        <div class="card shadow-lg" style="width: 20rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
+          <div class="card-body " >
+            <form  id="edit_bot_form"  method="post">{% csrf_token %}
+
+        <input type="hidden" id="io_id_user" name="id_user" value="{{ current_user.id }}">
+        <p class="col-auto">
+            <label class="col-auto">{{ current_user.last_name }} {{ current_user.first_name }}</label><br>
+        </p>
+
+        <p class="col-auto">
+            <label for="type_tech_select">Идентификатор</label><br>
+            <input type="text" class="form-control col-auto" readonly name="identif" value="kp{{ current_user.id }}">
+        </p>
+
+        <p class="col-auto">
+            <label>Идентификационный ключ</label>
+            <input type="text" class="form-control col-auto" {% if telebot.id_chat %} readonly{% endif %} name="id_chat" value="{{ telebot.id_chat }}">
+        </p>
+        <p>
+            <a href="{% url 'connect_bot' current_user.id %}" class="btn btn-primary btn-sm  col-auto m-1" aria-current="page">Получить ключ</a>
+            <a href="{% url 'test_bot' current_user.id %}" class="btn btn-outline-primary btn-sm  col-auto m-1" aria-current="page">Тест</a>
+            <a href="{% url 'edit_staff' current_user.id %}" class="btn btn-success btn-sm  col-auto m-1" aria-current="page">Ok</a>
+        </p>
+    </form>
+          </div>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/edit_technic.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+
+  <a href="{% url 'edit_staff' current_user.id %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+{#  <button form="edit_bot_form" type="submit" class="btn btn-success m-1">Сохранить</button>#}
+
+</div>
+{% endblock %}
