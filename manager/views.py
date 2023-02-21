@@ -745,7 +745,9 @@ def show_applications_view(request, day, id_user=None):
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
     if is_employee_supply(current_user):
-        app_for_day = ApplicationToday.objects.filter(date=current_day)
+        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
+                                                      date=current_day,
+                                                      construction_site__address='Снабжение')
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
 
