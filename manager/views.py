@@ -766,6 +766,7 @@ def show_applications_view(request, day, id_user=None):
         if appTech.count() == 0:
             appToday.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     out['count_app_list'] = get_count_app_for_driver(current_day)
+
     if id_user:
         return render(request, "extend/admin_application_foreman.html", out)
     else:
@@ -1086,6 +1087,7 @@ def send_all_applications(request, day):
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
             app.save()
         send_task_for_drv(day)#####################
+        send_status_app_for_foreman(day)#######
     return HttpResponseRedirect(f'/applications/{day}')
 
 
@@ -1437,3 +1439,27 @@ def send_task_for_drv(current_day):
             mss += f"{s.description}\n\n"
 
         send_message(drv.driver.user.id, mss)
+
+def send_status_app_for_foreman(current_day):
+    out = []
+    _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+    id_list = []
+    _id_foreman_list = [_[0] for _ in StaffForeman.objects.all().values_list('user_id')]
+    _id_master_list = [_[0] for _ in StaffMaster.objects.all().values_list('user_id')]
+    _id_supply_list = [_[0] for _ in StaffSupply.objects.all().values_list('user_id')]####
+    id_list.extend(_id_foreman_list)
+    id_list.extend(_id_master_list)
+    _app = ApplicationToday.objects.filter(date=current_day, status=_status)
+
+
+    for _id in id_list:
+        _a = _app.filter(construction_site__foreman__user_id=_id)
+        if _a:
+            out.append((_id, _a))
+
+    for _id, app in out:
+        mss = f"{current_day}\n\n"
+        for a in app:
+            mss += f"Заявка на [ {a.construction_site.address} ] одобрена\n"
+
+        send_message(_id, mss)
