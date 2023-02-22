@@ -30,7 +30,9 @@
         </p>
         <p>
             <a href="{% url 'connect_bot' current_user.id %}" class="btn btn-primary btn-sm  col-auto m-1" aria-current="page">Получить ключ</a>
+            {% if telebot.id_chat %}
             <a href="{% url 'test_bot' current_user.id %}" class="btn btn-outline-primary btn-sm  col-auto m-1" aria-current="page">Тест</a>
+            {% endif %}
             <a href="{% url 'edit_staff' current_user.id %}" class="btn btn-success btn-sm  col-auto m-1" aria-current="page">Ok</a>
         </p>
     </form>
