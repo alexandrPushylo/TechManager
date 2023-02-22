@@ -76,9 +76,9 @@
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
                             {% if not v.technic_driver.driver.driver %}
-                                text-warning">(Проверьте табель)
+                                text-warning">(Водитель не назначен)
                             {% else %}
-                    "> ({{ v.technic_driver.driver.driver }}){% if post == 'foreman' or post == 'master' %} [<b>{{ v.priority }}</b>]{% endif %}
+                    "> ({{ v.technic_driver.driver.driver }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
                             {% endif %}
                 </div>
                     </div>
