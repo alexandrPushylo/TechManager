@@ -61,7 +61,7 @@
 
 
           <div class="card-body mt-1" >
-            <h6 class="card-title fw-bold text-warning" >{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.user.last_name %}({{ a.app_today.construction_site.foreman.user.last_name }}){% endif %}</h6>
+            <h6 class="card-title {% if style_font %}{{ style_font.value }}{% else %}{% endif %} fw-bold text-center" >{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.user.last_name %}({{ a.app_today.construction_site.foreman.user.last_name }}){% endif %}</h6>
             <h6 class="card-title" >{{a.app_today.date}}</h6>
           {% if a.apps_tech %}
           <hr style="border-width: medium; border-color: green">

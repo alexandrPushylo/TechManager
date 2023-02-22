@@ -738,8 +738,8 @@ def show_applications_view(request, day, id_user=None):
         if request.POST.get('panel'):
             _flag = request.POST.get('panel')
             _flag = str(_flag).capitalize()
-            set_var(f'panel_{request.user.id}', value=request.user.id, flag=_flag)
-        out['var_drv_panel'] = get_var(f'panel_{request.user.id}')
+            set_var('hidden_panel', value=request.user.id, flag=_flag, user=request.user)
+        out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
     if is_foreman(current_user):
         _foreman = StaffForeman.objects.get(user=current_user).user
@@ -756,6 +756,7 @@ def show_applications_view(request, day, id_user=None):
                                                       construction_site__address='Снабжение')
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
+    out['style_font'] = get_var('style_font', user=request.user)
 
     out['today_applications_list'] = []
     for appToday in app_for_day.order_by('construction_site__address'):
@@ -1379,9 +1380,9 @@ def prepare_driver_table(day):
 # ---------------------------------------------------------------
 
 
-def get_var(var, value=False, flag=False):
+def get_var(var, value=False, flag=False, user=None):
     try:
-        _var = Variable.objects.get(name=var)
+        _var = Variable.objects.get(name=var, user=user)
         if flag and not value:
             return _var.flag
         elif value and flag:
@@ -1394,8 +1395,8 @@ def get_var(var, value=False, flag=False):
         return None
 
 
-def set_var(name, value=None, flag=False):
-    _var, _ = Variable.objects.get_or_create(name=name)
+def set_var(name, value=None, flag=False, user=None):
+    _var, _ = Variable.objects.get_or_create(name=name,user=user)
     _var.value = value
     _var.flag = flag
     _var.save()
