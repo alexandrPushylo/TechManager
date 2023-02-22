@@ -55,10 +55,7 @@ def get_json():
     return result
 
 def get_id_chat(key, result):
-    try:
-        for upd in result:
-            if upd['message']['text'] == key:
+    for upd in result:
+        if upd.get('message'):
+            if upd.get('message').get('text') == key:
                 return (upd['message']['chat']['id'])
-    except:
-        return None
-
