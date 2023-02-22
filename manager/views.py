@@ -738,8 +738,8 @@ def show_applications_view(request, day, id_user=None):
         if request.POST.get('panel'):
             _flag = request.POST.get('panel')
             _flag = str(_flag).capitalize()
-            set_var(f'panel_{request.user.id}', value=request.user.id, flag=_flag)
-        out['var_drv_panel'] = get_var(f'panel_{request.user.id}')
+            set_var('hidden_panel', value=request.user.id, flag=_flag, user=request.user)
+        out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
     if is_foreman(current_user):
         _foreman = StaffForeman.objects.get(user=current_user).user
@@ -756,6 +756,7 @@ def show_applications_view(request, day, id_user=None):
                                                       construction_site__address='Снабжение')
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
+    out['style_font'] = get_var('style_font', user=request.user)
 
     out['today_applications_list'] = []
     for appToday in app_for_day.order_by('construction_site__address'):
@@ -1023,50 +1024,57 @@ def signup_view(request):
 
     if request.method == 'POST':
         username = request.POST['username']
-        password = request.POST['password']
-        first_name = request.POST['first_name']
-        telephone = request.POST['telephone']
-        last_name = request.POST['last_name']
-        post = request.POST.get('post')
-        foreman = request.POST.get('foreman')
+        if User.objects.filter(username=username).count() == 0:
 
-        new_user = User.objects.create_user(username=username, password=password,
-                                            first_name=first_name, last_name=last_name,
-                                            is_staff=False, is_superuser=False)
-        if post:
-            if request.POST['post'] == 'master':
-                foreman = StaffForeman.objects.get(user=request.POST['foreman'])
-                staff = StaffMaster.objects.create(user=new_user)
-                staff.foreman = foreman
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'admin':
-                staff = StaffAdmin.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'foreman':
-                staff = StaffForeman.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'driver':
-                staff = StaffDriver.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'mechanic':
-                staff = StaffMechanic.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'employee_supply':
-                staff = StaffSupply.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-        new_user.save()
+            password = request.POST['password']
+            first_name = request.POST['first_name']
+            telephone = request.POST['telephone']
+            last_name = request.POST['last_name']
+            post = request.POST.get('post')
+            foreman = request.POST.get('foreman')
 
-        if request.user.is_anonymous:
-            login(request, new_user)
-        if not post:
-            return HttpResponseRedirect('/')
-        return HttpResponseRedirect('/show_staff/')
+            new_user = User.objects.create_user(username=username, password=password,
+                                                first_name=first_name, last_name=last_name,
+                                                is_staff=False, is_superuser=False)
+            if post:
+                if request.POST['post'] == 'master':
+                    foreman = StaffForeman.objects.get(user=request.POST['foreman'])
+                    staff = StaffMaster.objects.create(user=new_user)
+                    staff.foreman = foreman
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'admin':
+                    staff = StaffAdmin.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'foreman':
+                    staff = StaffForeman.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'driver':
+                    staff = StaffDriver.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'mechanic':
+                    staff = StaffMechanic.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'employee_supply':
+                    staff = StaffSupply.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+            new_user.save()
+
+
+            if request.user.is_anonymous:
+                login(request, new_user)
+
+            if not post:
+                return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/show_staff/')
+        else:
+            out['message_status'] = True
+            out['message'] = 'Такой пользователь уже существует'
     return render(request, 'signup.html', out)
 
 
@@ -1372,9 +1380,9 @@ def prepare_driver_table(day):
 # ---------------------------------------------------------------
 
 
-def get_var(var, value=False, flag=False):
+def get_var(var, value=False, flag=False, user=None):
     try:
-        _var = Variable.objects.get(name=var)
+        _var = Variable.objects.get(name=var, user=user)
         if flag and not value:
             return _var.flag
         elif value and flag:
@@ -1387,8 +1395,8 @@ def get_var(var, value=False, flag=False):
         return None
 
 
-def set_var(name, value=None, flag=False):
-    _var, _ = Variable.objects.get_or_create(name=name)
+def set_var(name, value=None, flag=False, user=None):
+    _var, _ = Variable.objects.get_or_create(name=name,user=user)
     _var.value = value
     _var.flag = flag
     _var.save()
