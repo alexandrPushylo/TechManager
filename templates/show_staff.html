@@ -25,7 +25,14 @@
       <td>{{ user.first_name }}</td>
       <td>{{ post }}</td>
       <td>{{ tel.telephone }}</td>
-      <td>{{ user.last_login }}</td>
+      <td>{% for id_chat in telecon %}
+          {% if id_chat.user_bot.id == user.id %}
+              <i class="fa-solid fa-paper-plane"></i> |
+          {% endif %}
+          {% endfor %}
+          {{ user.last_login }}
+
+      </td>
     </tr>
     {% endfor %}
   </tbody>
