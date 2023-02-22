@@ -759,7 +759,9 @@ def show_applications_view(request, day, id_user=None):
     out['today_applications_list'] = []
     for appToday in app_for_day.order_by('construction_site__address'):
         appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
+
         out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech})
+
         if appTech.count() == 0:
             appToday.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     out['count_app_list'] = get_count_app_for_driver(current_day)
@@ -1401,16 +1403,12 @@ def connect_bot_view(request, id_user):
 
 
     out['telebot'] = telebot
-
-
     return render(request, 'bot_connect.html', out)
 
 def test_bot(request, id_user):
     tel_bot = TeleBot.objects.get(user_bot=id_user)
     id_chat = tel_bot.id_chat
-
     BOT.send_message(id_chat, 'test message')
-
     return HttpResponseRedirect(f'/connect_bot_view/{id_user}')
 
 def send_message(id_user, message):
