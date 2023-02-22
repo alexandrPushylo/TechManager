@@ -1204,9 +1204,13 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
 
 def get_count_app_for_driver(current_day):
     out = []
-    _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+    _status_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
+    _status_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
     _tech_drv = [_[0] for _ in TechnicDriver.objects.filter(date=current_day, status=True, driver__status=True).values_list('id')]
-    _app = [_[0] for _ in ApplicationTechnic.objects.filter(app_for_day__date=current_day, app_for_day__status=_status).values_list('technic_driver_id')]
+    _app = [_[0] for _ in ApplicationTechnic.objects.filter(Q(app_for_day__date=current_day),
+                                                            Q(app_for_day__status=_status_approved) |
+                                                            Q(app_for_day__status=_status_send)
+                                                            ).values_list('technic_driver_id')]
     for _td in set(_tech_drv):
         _coun = _app.count(_td)
         out.append((_td, _coun))
