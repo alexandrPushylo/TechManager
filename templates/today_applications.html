@@ -16,9 +16,24 @@
     <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
-
+<div></div>
 <div class="container-lg  mx-auto mt-4">
-      <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
+
+
+
+    <div class="btn-group dropend">
+    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i></button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 0 %}">Все</a></li>
+            {% for forem in foreman_list %}
+            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day forem.id %}">{{ forem.user.last_name }} {{ forem.user.first_name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+
+
+    <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
       {% for v in today_technic_applications %}
     <div class="card shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
       <div class="card-body">

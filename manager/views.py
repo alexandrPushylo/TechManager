@@ -741,6 +741,7 @@ def show_applications_view(request, day, id_user=None):
             set_var('hidden_panel', value=request.user.id, flag=_flag, user=request.user)
         out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
+
     if is_foreman(current_user):
         _foreman = StaffForeman.objects.get(user=current_user).user
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman__user=_foreman, date=current_day)
@@ -755,6 +756,7 @@ def show_applications_view(request, day, id_user=None):
                                                       date=current_day,
                                                       construction_site__address='Снабжение')
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+
 
     out['style_font'] = get_var('style_font', user=request.user)
 
@@ -799,28 +801,40 @@ def show_application_for_driver(request, day, id_user):
         return render(request, 'extend/admin_app_for_driver.html', out)
     return render(request, 'applications_for_driver.html', out)
 
-def show_today_applications(request, day):
+def show_today_applications(request, day, id_foreman=None):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     current_day = convert_str_to_date(day)
     out = {}
     get_prepare_data(out, request, current_day)
-
     out["date_of_target"] = current_day
+    foreman_list = StaffForeman.objects.all()
+    out['foreman_list'] = foreman_list
+
     if is_admin(request.user):
-        today_technic_applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
-    elif is_master(request.user):
-        foreman = StaffMaster.objects.get(user=request.user).foreman
-        today_technic_applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
-    elif is_foreman(request.user):
-        today_technic_applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
 
+    _filter = get_var('filter_today_app', value=True, user=request.user)
+
+
+    if id_foreman == 0:
+        _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+        set_var('filter_today_app', value=None, user=request.user)
+    elif id_foreman:
+        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman_id=id_foreman,
+                                                 app_for_day__date=current_day)
+        if id_foreman != _filter:
+            set_var('filter_today_app', value=id_foreman, user=request.user)
     else:
-        today_technic_applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+        if _filter:
+            _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman_id=_filter,
+                                                     app_for_day__date=current_day)
+        else:
+            _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
 
-    app_tech_day = ApplicationTechnic.objects.filter(
-        Q(app_for_day__date=current_day),
+
+    app_tech_day = _app.filter(
+        # Q(app_for_day__date=current_day),
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))

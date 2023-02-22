@@ -96,6 +96,8 @@ urlpatterns = [
     path('logout', logout_view, name="logout"),
 
     path('today_app/<str:day>', show_today_applications, name="show_today_applications"),
+    path('today_app/<str:day>/<int:id_foreman>', show_today_applications, name="show_today_applications"),
+
     path('info_app/<int:id_application>', show_info_application, name="show_info_application"),
     path('new_app/<int:id_application>', create_new_application, name="add_application"),
     path('clear_app/<int:id_application>', clear_application_view, name='clear_application'),
