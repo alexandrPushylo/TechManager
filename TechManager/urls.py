@@ -112,6 +112,7 @@ urlpatterns = [
     path('send_all_applications/<str:day>', send_all_applications, name='send_all_applications'),
     path('approv_all_applications/<str:day>', approv_all_applications, name='approv_all_applications'),
     path('submitted_all_applications/<str:day>', submitted_all_applications, name='submitted_all_applications'),
+
     path('connect_bot_view/<int:id_user>', connect_bot_view, name='connect_bot'),
     path('test_bot/<int:id_user>', test_bot, name='test_bot'),
 

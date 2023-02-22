@@ -60,7 +60,6 @@
 
         <li><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></li>
         {% if user.username == 'admin' %}
-        <li><a class="dropdown-item" href="{% url 'connect_bot' user.id %}">!!!</a></li>
         {% endif %}
     </ul>
 </div>
