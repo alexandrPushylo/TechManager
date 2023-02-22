@@ -1082,6 +1082,7 @@ def send_all_applications(request, day):
         for app in current_applications:
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
             app.save()
+        send_task_for_drv(day)#####################
     return HttpResponseRedirect(f'/applications/{day}')
 
 
@@ -1412,3 +1413,28 @@ def test_bot(request, id_user):
 
     return HttpResponseRedirect(f'/connect_bot_view/{id_user}')
 
+def send_message(id_user, message):
+    if TeleBot.objects.filter(user_bot=id_user).count()!=0:
+        chat_id = TeleBot.objects.get(user_bot=id_user)
+        if chat_id:
+            BOT.send_message(chat_id.id_chat, message)
+
+
+def send_task_for_drv(current_day):
+    out = []
+    _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+    _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
+
+    for _id_drv in _driver_list:
+        _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
+                                                 technic_driver__driver__driver__user=_id_drv.driver.user.id,
+                                                 app_for_day__status=_status).order_by('priority')
+        out.append((_id_drv, _app))
+
+    for drv, app in out:
+        mss = f"{drv.driver.user.last_name} {drv.driver.user.first_name}\nЗаявка на {current_day}\n\n"
+        for s in app:
+            mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
+            mss += f"{s.description}\n\n"
+
+        send_message(drv.driver.user.id, mss)
