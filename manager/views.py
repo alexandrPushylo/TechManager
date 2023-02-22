@@ -1023,50 +1023,57 @@ def signup_view(request):
 
     if request.method == 'POST':
         username = request.POST['username']
-        password = request.POST['password']
-        first_name = request.POST['first_name']
-        telephone = request.POST['telephone']
-        last_name = request.POST['last_name']
-        post = request.POST.get('post')
-        foreman = request.POST.get('foreman')
+        if User.objects.filter(username=username).count() == 0:
 
-        new_user = User.objects.create_user(username=username, password=password,
-                                            first_name=first_name, last_name=last_name,
-                                            is_staff=False, is_superuser=False)
-        if post:
-            if request.POST['post'] == 'master':
-                foreman = StaffForeman.objects.get(user=request.POST['foreman'])
-                staff = StaffMaster.objects.create(user=new_user)
-                staff.foreman = foreman
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'admin':
-                staff = StaffAdmin.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'foreman':
-                staff = StaffForeman.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'driver':
-                staff = StaffDriver.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'mechanic':
-                staff = StaffMechanic.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-            elif request.POST['post'] == 'employee_supply':
-                staff = StaffSupply.objects.create(user=new_user)
-                staff.telephone = request.POST.get('telephone')
-                staff.save()
-        new_user.save()
+            password = request.POST['password']
+            first_name = request.POST['first_name']
+            telephone = request.POST['telephone']
+            last_name = request.POST['last_name']
+            post = request.POST.get('post')
+            foreman = request.POST.get('foreman')
 
-        if request.user.is_anonymous:
-            login(request, new_user)
-        if not post:
-            return HttpResponseRedirect('/')
-        return HttpResponseRedirect('/show_staff/')
+            new_user = User.objects.create_user(username=username, password=password,
+                                                first_name=first_name, last_name=last_name,
+                                                is_staff=False, is_superuser=False)
+            if post:
+                if request.POST['post'] == 'master':
+                    foreman = StaffForeman.objects.get(user=request.POST['foreman'])
+                    staff = StaffMaster.objects.create(user=new_user)
+                    staff.foreman = foreman
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'admin':
+                    staff = StaffAdmin.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'foreman':
+                    staff = StaffForeman.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'driver':
+                    staff = StaffDriver.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'mechanic':
+                    staff = StaffMechanic.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+                elif request.POST['post'] == 'employee_supply':
+                    staff = StaffSupply.objects.create(user=new_user)
+                    staff.telephone = request.POST.get('telephone')
+                    staff.save()
+            new_user.save()
+
+
+            if request.user.is_anonymous:
+                login(request, new_user)
+
+            if not post:
+                return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/show_staff/')
+        else:
+            out['message_status'] = True
+            out['message'] = 'Такой пользователь уже существует'
     return render(request, 'signup.html', out)
 
 
