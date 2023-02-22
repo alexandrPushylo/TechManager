@@ -410,6 +410,7 @@ def show_staff_view(request):
             _post = None
         _tel = get_current_post(_user)
         _user_post.append((_user, _post, _tel))
+    out['telecon'] = TeleBot.objects.all()
     out['user_post'] = _user_post
     out['staff_list'] = staff_list
     return render(request, 'show_staff.html', out)
