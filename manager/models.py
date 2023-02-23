@@ -5,6 +5,25 @@ from django.contrib.auth.models import User
 
 
 #------------------------------STAFF-----------------------------------------------------------------------------------
+class PostName(models.Model):
+    name_post = models.CharField(max_length=128, verbose_name='Название должности')
+    def __str__(self): return self.name_post
+    class Meta:
+        verbose_name = 'Название должности'
+        verbose_name_plural = 'Название должностей'
+
+
+class Post(models.Model):
+    user_post = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Сотрудник', related_name='user_post')
+    post_name = models.ForeignKey(PostName, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Название должности')
+    telephone = models.CharField(max_length=20, null=True, blank=True, verbose_name="Телефон")
+    supervisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Руководитель', related_name='supervisor')
+    def __str__(self): return f"{self.user_post.last_name} - {self.post_name.name_post}"
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+
 class StaffAdmin(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     telephone = models.CharField(max_length=20, null=True, blank=True, verbose_name="Телефон")
