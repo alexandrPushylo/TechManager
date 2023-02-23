@@ -57,6 +57,7 @@ from manager.views import foreman_app_list_view
 
 from manager.views import append_in_hos_tech
 from manager.views import copy_app_view
+from manager.views import setting_view
 
 from manager.views import connect_bot_view
 from manager.views import test_bot
@@ -115,6 +116,7 @@ urlpatterns = [
     path('approv_all_applications/<str:day>', approv_all_applications, name='approv_all_applications'),
     path('submitted_all_applications/<str:day>', submitted_all_applications, name='submitted_all_applications'),
 
+    path('setting/', setting_view, name='settings_page'),
     path('connect_bot_view/<int:id_user>', connect_bot_view, name='connect_bot'),
     path('test_bot/<int:id_user>', test_bot, name='test_bot'),
 
