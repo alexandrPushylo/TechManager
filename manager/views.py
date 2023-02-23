@@ -490,7 +490,9 @@ def tabel_driver_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
+
     prepare_driver_table(day)
+
     driver_today_tabel = DriverTabel.objects.filter(date=current_day)
     out['driver_list'] = driver_today_tabel.order_by('driver__user__last_name')
 
@@ -578,37 +580,12 @@ def Technic_Driver_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
+
     if DriverTabel.objects.filter(date=current_day, status=True).count() == 0:
         prepare_driver_table(day)
 
-    work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
-    if work_driver_list.count()==0:
-        return HttpResponse('work_driver_list is empty')
-    tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY)
-
     if TechnicDriver.objects.filter(date=current_day).count() == 0:
-        if get_CH_day(day) == 'next_day':
-            for _tech in Technic.objects.all():
-                _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__user__last_name', 'status')
-                driver = _drv[0][0]
-                status = _drv[0][1]
-
-                c_drv = work_driver_list.filter(driver__user__last_name=driver)
-
-                if c_drv.count() != 0:
-                    TechnicDriver.objects.create(technic=_tech,
-                                                 driver=DriverTabel.objects.get(date=current_day, driver__user__last_name = driver),
-                                                 date=current_day,
-                                                 status=status)
-                else:
-
-                    TechnicDriver.objects.create(technic=_tech,
-                                                 driver=None,
-                                                 date=current_day,
-                                                 status=status)
-        else:
-            for tech in Technic.objects.all():
-                TechnicDriver.objects.create(technic=tech, date=TODAY, status=True)
+        prepare_technic_driver_table(day)
     else:
         technic_driver_list = TechnicDriver.objects.filter(date=current_day)
 
@@ -624,6 +601,7 @@ def Technic_Driver_view(request, day):
                     _td.driver = None
                     _td.save()
 
+    work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     technic_driver_list = TechnicDriver.objects.filter(date=current_day)
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
     out['work_driver_list'] = work_driver_list.order_by('driver__user__last_name')
@@ -893,10 +871,10 @@ def create_new_application(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     out = {}
-
     current_user = request.user
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
+    check_table(str(current_date))
     get_prepare_data(out, request, current_day=current_date)
     out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site
@@ -1391,6 +1369,36 @@ def prepare_driver_table(day):
                 DriverTabel.objects.create(driver=drv, date=current_day)
 
 
+def prepare_technic_driver_table(day):
+    current_day = convert_str_to_date(day)
+    work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
+    tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY)
+
+    if get_CH_day(day) == 'next_day':
+        for _tech in Technic.objects.all():
+            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__user__last_name', 'status')
+            driver = _drv[0][0]
+            status = _drv[0][1]
+
+            c_drv = work_driver_list.filter(driver__user__last_name=driver)
+
+            if c_drv.count() != 0:
+                TechnicDriver.objects.create(technic=_tech,
+                                             driver=DriverTabel.objects.get(date=current_day,
+                                                                            driver__user__last_name=driver),
+                                             date=current_day,
+                                             status=status)
+            else:
+
+                TechnicDriver.objects.create(technic=_tech,
+                                             driver=None,
+                                             date=current_day,
+                                             status=status)
+    else:
+        for tech in Technic.objects.all():
+            TechnicDriver.objects.create(technic=tech, date=TODAY, status=True)
+
+
 # ---------------------------------------------------------------
 
 
@@ -1512,3 +1520,12 @@ def setting_view(request):
 
     return render(request, 'setting_page.html', out)
 
+
+def check_table(day):
+    date = convert_str_to_date(day)
+
+    if DriverTabel.objects.filter(date=date).count() == 0:
+        prepare_driver_table(day)
+
+    if TechnicDriver.objects.filter(date=date).count() == 0:
+        prepare_technic_driver_table(day)
