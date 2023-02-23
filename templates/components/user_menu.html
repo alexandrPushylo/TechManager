@@ -5,7 +5,10 @@
     <ul class="dropdown-menu dropdown-menu-end dropdown-menu">
 
         {% if post == 'admin' %}
-            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+            <li class="btn-group w-100">
+                <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
+                <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
+            </li>
             <hr>
             <ul class="small">База данных
                 <li><a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
@@ -27,12 +30,18 @@
 
 
         {% elif post == 'foreman' or post == 'master' %}
-            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+            <li class="btn-group w-100">
+                <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
+                <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
+            </li>
             <hr>
             <li><a class="dropdown-item fw-bolder" href="{% url 'construction_sites' %}">Объекты</a></li>
 
         {% elif post == 'mechanic' %}
-            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+            <li class="btn-group w-100">
+                <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
+                <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
+            </li>
             <hr>
             <ul class="small">База данных
                 <li><a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
@@ -46,13 +55,22 @@
 
 
         {% elif post == 'employee_supply' %}
-            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+            <li class="btn-group w-100">
+                <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
+                <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
+            </li>
 
 
         {% elif post == 'driver' %}
-            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+            <li class="btn-group w-100">
+                <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
+                <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
+            </li>
         {% else %}
-            <li><a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a></li>
+            <li class="btn-group w-100">
+                <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
+                <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
+            </li>
 
         {% endif %}
 

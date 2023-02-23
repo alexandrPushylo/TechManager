@@ -1489,3 +1489,26 @@ def send_status_app_for_foreman(current_day):
             mss += f"Заявка на [ {a.construction_site.address} ] одобрена\n"
 
         send_message(_id, mss)
+
+def setting_view(request):
+    out = {}
+    get_prepare_data(out, request)
+    current_user = request.user
+    setting_list = Variable.objects.filter(user=current_user)
+    out['setting_list'] = setting_list
+    if request.method == 'POST':
+        setting_id_list = request.POST.getlist('setting_id')
+        if setting_id_list:
+            for n, _id in enumerate(setting_id_list, 1):
+                var = Variable.objects.get(id=_id, user=current_user)
+                value = request.POST.get(f"setting_value_{n}")
+                if request.POST.get(f"setting_flag_{n}"):
+                    flag = True
+                else:
+                    flag = False
+                var.value = value
+                var.flag = flag
+                var.save()
+
+    return render(request, 'setting_page.html', out)
+
