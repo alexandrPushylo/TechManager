@@ -20,8 +20,8 @@ class Post(models.Model):
     supervisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Руководитель', related_name='supervisor')
     def __str__(self): return f"{self.user_post.last_name} - {self.post_name.name_post}"
     class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'Категория сотрудника'
+        verbose_name_plural = 'Категории сотрудников'
 
 
 class StaffAdmin(models.Model):
