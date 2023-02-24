@@ -984,9 +984,10 @@ def signin_view(request):
 def del_staff(request, id_staff):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
+
     user = User.objects.get(id=id_staff)
-    if get_current_post(user):
-        get_current_post(user).delete()
+    post = Post.objects.get(user_post=user)
+    post.delete()
     user.delete()
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
