@@ -1215,11 +1215,7 @@ def get_current_post(user):
     elif is_mechanic(user):
         post = 'mechanic'
     elif is_employee_supply(user):
-        current_staff, post = StaffSupply.objects.get(user=user), 'employee_supply'
-    else:
-        current_staff, post = None, None
-    if key:
-        return post
+        post = 'employee_supply'
     else:
         post = None
 
