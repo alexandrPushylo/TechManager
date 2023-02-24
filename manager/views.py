@@ -228,14 +228,14 @@ def conflict_correction_view(request, day, id_applications):
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
-    out['tech_app_list'] = tech_app_list.order_by('technic_driver__driver__driver__user__last_name')
+    out['tech_app_list'] = tech_app_list.order_by('technic_driver__driver__driver__last_name')
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, 1)
     out['work_TD_list'] = get_work_TD_list(current_day, 0)
     # out["uniq_name_of_vehicles"] = TechnicName.objects.all().order_by('name')
 
     vehicle_and_driver = TechnicDriver.objects.filter(date=current_day, driver__isnull=False, status=True).values_list(
         'technic__name__name',
-        'driver__driver__user__last_name',
+        'driver__driver__last_name',
         'id'
     )
     out['vehicle_and_driver'] = vehicle_and_driver
