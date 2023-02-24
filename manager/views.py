@@ -1088,6 +1088,7 @@ def send_all_applications(request, day):
             app.save()
         send_task_for_drv(day)#####################
         send_status_app_for_foreman(day)#######
+        send_message_for_admin(day)
     return HttpResponseRedirect(f'/applications/{day}')
 
 
@@ -1497,6 +1498,13 @@ def send_status_app_for_foreman(current_day):
             mss += f"Заявка на [ {a.construction_site.address} ] одобрена\n"
 
         send_message(_id, mss)
+
+
+def send_message_for_admin(current_day):
+    admin_id_list = Post.objects.filter(post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
+    mess = f"Заявки на {current_day}\n\n отправлены"
+    for _id in admin_id_list:
+        send_message(_id, mess)
 
 def setting_view(request):
     out = {}
