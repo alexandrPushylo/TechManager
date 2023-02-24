@@ -284,12 +284,12 @@ def conflict_resolution_view(request, day):
                                                                        technic_driver__technic__name__name=v,
                                                                        technic_driver__status=True).values(
             'id',
-            'technic_driver__driver__driver__user__last_name',
+            'technic_driver__driver__driver__last_name',
             'description',
-            'app_for_day__construction_site__foreman__user__last_name',
+            'app_for_day__construction_site__foreman__last_name',
             'app_for_day__construction_site__address',
             'technic_driver_id'
-        ).order_by('app_for_day__construction_site__foreman__user__last_name')
+        ).order_by('app_for_day__construction_site__foreman__last_name')
         today_technic_applications_list.append((v, today_technic_applications))
     out['today_technic_applications'] = today_technic_applications_list
 
