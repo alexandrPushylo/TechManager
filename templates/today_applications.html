@@ -22,11 +22,12 @@
 
 
     <div class="btn-group dropend">
-    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i></button>
+    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i> Фильтр</button>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 0 %}">Все</a></li>
+            <hr>
             {% for forem in foreman_list %}
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day forem.id %}">{{ forem.user.last_name }} {{ forem.user.first_name }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day forem.user_post.id %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a></li>
             {% endfor %}
         </ul>
     </div>
@@ -65,8 +66,8 @@
                                 {% endif %}
 
                                 <textarea {% if post != 'admin' %} readonly {% endif %} class="form-control app_description" aria-label="With textarea" id="floatingInputValue" name="descr">{{ d.description }}</textarea>
-                                 {% if d.app_for_day.construction_site.foreman.user.last_name %}
-                                <label for="floatingInputValue" class="fw-bold text-nowrap" style="color: black; margin-left: 60px; margin-top: -10px">{{ d.app_for_day.construction_site.foreman.user.last_name }} ({{ d.app_for_day.construction_site.address }})</label>
+                                 {% if d.app_for_day.construction_site.foreman.last_name %}
+                                <label for="floatingInputValue" class="fw-bold text-nowrap" style="color: black; margin-left: 60px; margin-top: -10px">{{ d.app_for_day.construction_site.foreman.last_name }} ({{ d.app_for_day.construction_site.address }})</label>
                                 {% endif %}
                             </div>
                         </div>

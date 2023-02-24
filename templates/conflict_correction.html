@@ -28,7 +28,7 @@
                     </select>
 
 
-                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.driver.driver.user.last_name }}">
+                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.driver.driver.last_name }}">
 
 
                     <select class=" col-4 input_driver" id="input_driver_{{ forloop.counter }}" name="driver_{{ v.id }}">
@@ -51,7 +51,7 @@
                         <span class="input-group-text mt-2">
                         <input type="number" id="priority_{{ v.id }}" name="priority_{{ v.id }}" class="  col-auto  " value="{{ v.priority }}" style="max-width: 50px; margin-left: -5px;"/></span>
                         <textarea class="form-control app_description mt-2" aria-label="With textarea" id="floatingInputValue" name="description_{{ v.id }}" rows="1">{{ v.description }}</textarea>
-                        <label for="floatingInputValue" class="fw-bold " style="color: black; margin-left: 100px; margin-top: 0px">{{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman.user.last_name }})</label>
+                        <label for="floatingInputValue" class="fw-bold " style="color: black; margin-left: 100px; margin-top: 0px">{{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman.last_name }})</label>
                     </div>
                 </div>
 

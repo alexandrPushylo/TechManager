@@ -28,7 +28,7 @@
                     <input name="io_id_tech_driver" type="hidden" value="{{ v.technic_driver.id }}" id="io_id_tech_driver_{{forloop.counter}}">
 
                     <input name="io_technic" type="text" id="io_technic_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.technic.name }}">
-                    <input name="io_driver" type="text" id="io_driver_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.driver.driver.user.last_name }}">
+                    <input name="io_driver" type="text" id="io_driver_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.driver.driver.last_name }}">
                     <button role="button" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
                     <button role="button" class="btn btn-danger col-auto btn_del_io"><i class="fa-solid fa-trash"></i></button>
                 </div>
