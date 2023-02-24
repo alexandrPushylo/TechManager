@@ -763,7 +763,7 @@ def show_application_for_driver(request, day, id_user):
     out["date_of_target"] = current_day.strftime('%d %B')
 
     applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
-                                                     technic_driver__driver__driver__user=current_user,
+                                                     technic_driver__driver__driver=current_user,
                                                      app_for_day__status=ApplicationStatus.objects.get(
                                                          status=STATUS_AP['send'])).order_by('priority')
 
