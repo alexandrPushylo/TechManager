@@ -780,7 +780,7 @@ def show_today_applications(request, day, id_foreman=None):
     out = {}
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
-    foreman_list = StaffForeman.objects.all()
+    foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
     if is_admin(request.user):
@@ -793,7 +793,7 @@ def show_today_applications(request, day, id_foreman=None):
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
         set_var('filter_today_app', value=None, user=request.user)
     elif id_foreman:
-        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman_id=id_foreman,
+        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman=id_foreman,#TODO:POST
                                                  app_for_day__date=current_day)
         if id_foreman != _filter:
             set_var('filter_today_app', value=id_foreman, user=request.user)
@@ -811,12 +811,12 @@ def show_today_applications(request, day, id_foreman=None):
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
     )
-    driver_technic = app_tech_day.values_list('technic_driver__driver__driver__user__last_name',
+    driver_technic = app_tech_day.values_list('technic_driver__driver__driver__last_name',
                                               'technic_driver__technic__name__name').order_by(
-        'technic_driver__driver__driver__user__last_name').distinct()
+        'technic_driver__driver__driver__last_name').distinct()
     app_list = []
     for _drv, _tech in driver_technic:
-        desc = app_tech_day.filter(technic_driver__driver__driver__user__last_name=_drv,
+        desc = app_tech_day.filter(technic_driver__driver__driver__last_name=_drv,
                                    technic_driver__technic__name__name=_tech).order_by('priority')
         _id_list = [_[0] for _ in desc.values_list('id')]
         if (_drv, _tech, desc, _id_list) not in app_list:
