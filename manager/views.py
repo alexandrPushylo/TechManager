@@ -306,9 +306,9 @@ def show_construction_sites_view(request):
     if is_admin(request.user):
         construction_sites_list = all_constr_site_list
     elif is_foreman(request.user):
-        construction_sites_list = all_constr_site_list.filter(foreman=StaffForeman.objects.get(user=request.user))
+        construction_sites_list = all_constr_site_list.filter(foreman=request.user)
     elif is_master(request.user):
-        foreman = StaffMaster.objects.get(user=request.user).foreman
+        foreman = Post.objects.get(user_post=request.user).supervisor
         construction_sites_list = all_constr_site_list.filter(foreman=foreman)
     else:
         return HttpResponseRedirect('/')
