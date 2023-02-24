@@ -1445,17 +1445,17 @@ def send_task_for_drv(current_day):
 
     for _id_drv in _driver_list:
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
-                                                 technic_driver__driver__driver__user=_id_drv.driver.user.id,
+                                                 technic_driver__driver__driver=_id_drv.driver.id,
                                                  app_for_day__status=_status).order_by('priority')
         out.append((_id_drv, _app))
 
     for drv, app in out:
-        mss = f"{drv.driver.user.last_name} {drv.driver.user.first_name}\nЗаявка на {current_day}\n\n"
+        mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {current_day}\n\n"
         for s in app:
             mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
             mss += f"{s.description}\n\n"
 
-        send_message(drv.driver.user.id, mss)
+        send_message(drv.driver.id, mss)
 
 def send_status_app_for_foreman(current_day):
     out = []
