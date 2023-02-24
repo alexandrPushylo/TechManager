@@ -531,7 +531,7 @@ def tabel_workday_view(request, ch_week):
     last_week = list(get_week(_day, 'l'))
     current_week = list(get_week(_day))
 
-    if WorkDayTabel.objects.filter(date=current_week[0]).count()==0:
+    if WorkDayTabel.objects.filter(date=current_week[0]).count() == 0:
         for n, day in enumerate(current_week, 1):
             if n in (6, 7):
                 WorkDayTabel.objects.create(date=day, status=False)
