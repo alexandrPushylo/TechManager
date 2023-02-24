@@ -428,8 +428,7 @@ def edit_staff_view(request, id_staff):
     out['post_list'] = post_list
     foreman_list = StaffForeman.objects.values_list('user_id', 'user__last_name', 'user__first_name')
     out['foreman_list'] = foreman_list
-    current_post = get_current_post(current_user, key=True)
-    out['current_post'] = get_current_post(current_user, key=True)
+
     if is_master(current_user):
         out['current_foreman'] = StaffMaster.objects.get(user=current_user).foreman.user.id
 
@@ -644,8 +643,7 @@ def clear_application_view(request, id_application):
 
 
 def show_applications_view(request, day, id_user=None):
-    if not get_current_post(request.user):
-        return HttpResponseRedirect('/')
+
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     current_day = convert_str_to_date(day)
@@ -1217,17 +1215,17 @@ def get_count_app_for_driver(current_day):
         out.append((_td, _coun))
     return out
 
-def get_current_post(user, key=False):
+def get_current_post(user):
     if is_admin(user):
-        current_staff, post = StaffAdmin.objects.get(user=user), 'admin'
+        post = 'admin'
     elif is_foreman(user):
-        current_staff, post = StaffForeman.objects.get(user=user), 'foreman'
+        post = 'foreman'
     elif is_master(user):
-        current_staff, post = StaffMaster.objects.get(user=user), 'master'
+        post = 'master'
     elif is_driver(user):
-        current_staff, post = StaffDriver.objects.get(user=user), 'driver'
+        post = 'driver'
     elif is_mechanic(user):
-        current_staff, post = StaffMechanic.objects.get(user=user), 'mechanic'
+        post = 'mechanic'
     elif is_employee_supply(user):
         current_staff, post = StaffSupply.objects.get(user=user), 'employee_supply'
     else:
@@ -1235,7 +1233,10 @@ def get_current_post(user, key=False):
     if key:
         return post
     else:
-        return current_staff
+        post = None
+
+    return post
+
 
 def is_admin(user):
     if StaffAdmin.objects.filter(user=user):
@@ -1304,7 +1305,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['TODAY'] = f'{TODAY.day} {MONTH[TODAY.month-1]}'
     out["DAY"] = f'{current_day.day} {MONTH[current_day.month-1]}'
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
-    out["post"] = get_current_post(request.user, key=True)
+    out["post"] = get_current_post(request.user)
     return out
 
 
