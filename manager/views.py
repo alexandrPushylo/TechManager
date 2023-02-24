@@ -1227,37 +1227,37 @@ def get_current_post(user):
 
 
 def is_admin(user):
-    if StaffAdmin.objects.filter(user=user):
+    if Post.objects.filter(user_post=user, post_name__name_post=POST_USER['admin']):
         return True
     return False
 
 
 def is_foreman(user):
-    if StaffForeman.objects.filter(user=user):
+    if Post.objects.filter(user_post=user, post_name__name_post=POST_USER['foreman']):
         return True
     return False
 
 
 def is_master(user):
-    if StaffMaster.objects.filter(user=user):
+    if Post.objects.filter(user_post=user, post_name__name_post=POST_USER['master']):
         return True
     return False
 
 
 def is_driver(user):
-    if StaffDriver.objects.filter(user=user):
+    if Post.objects.filter(user_post=user, post_name__name_post=POST_USER['driver']):
         return True
     return False
 
 
 def is_mechanic(user):
-    if StaffMechanic.objects.filter(user=user):
+    if Post.objects.filter(user_post=user, post_name__name_post=POST_USER['mechanic']):
         return True
     return False
 
 
 def is_employee_supply(user):
-    if StaffSupply.objects.filter(user=user):
+    if Post.objects.filter(user_post=user, post_name__name_post=POST_USER['employee_supply']):
         return True
     return False
 
