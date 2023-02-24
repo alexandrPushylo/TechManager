@@ -10,15 +10,15 @@
            <div class="card-body">
             <h6 class="card-title" style="text-align: center">{{constr_site.address}}
                 <br>
-                Прораб: {{ constr_site.foreman.user.last_name }} {{ constr_site.foreman.user.first_name }}</h6>
+                Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}</h6>
             <hr style="border-width: medium; border-color: {% if constr_site.status.status == 'Открыт'  %}green{% else %}red{% endif %}">
 
             <div class="btn-group ">
 
                 <a href="{% url 'edit_construction_sites' constr_site.id %}" class="btn btn-outline-primary m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
-                {% if post == 'admin' %}
+{#                {% if post == 'admin' %}#}
                 <a href="{% url 'delete_construction_sites' constr_site.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
-                {% endif %}
+{#                {% endif %}#}
                 <a href="{% url 'change_status_construction_site' constr_site.id %}"
                     {% if constr_site.status.status == 'Открыт' %}class="btn btn-outline-danger col-auto m-1" aria-current="page"> Скрыть
                     {% else %}class="btn btn-outline-success col-auto m-1" aria-current="page"> Отобразить
@@ -36,7 +36,7 @@
           <div class="card-body">
             <h6 class="card-title" style="text-align: center">{{constr_site.address}}
                 <br>
-                Прораб: {{ constr_site.foreman.user.last_name }} {{ constr_site.foreman.user.first_name }}</h6>
+                Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}</h6>
             <hr style="border-width: medium; border-color: {% if constr_site.status.status == 'Открыт'  %}green{% else %}red{% endif %}">
 
             <div class="btn-group ">
