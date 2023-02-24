@@ -188,10 +188,10 @@ def foreman_app_list_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
-    foreman_list = StaffForeman.objects.filter()
+    foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     app_list = []
     for _fman in foreman_list:
-        _app = ApplicationToday.objects.filter(date=current_day, construction_site__foreman=_fman)
+        _app = ApplicationToday.objects.filter(date=current_day, construction_site__foreman=_fman.user_post)
         app_list.append((_fman, _app))
 
     out['app_list'] = app_list
