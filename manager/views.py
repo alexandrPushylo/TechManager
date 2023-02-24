@@ -406,8 +406,8 @@ def show_staff_view(request):
     staff_list = User.objects.all().order_by('last_name')
     _user_post = []
     for _user in staff_list:
-        if get_current_post(_user, key=True):
-            _post = dict_Staff[get_current_post(_user, key=True)]
+        if get_current_post(_user):
+            _post = POST_USER[get_current_post(_user)]
         else:
             _post = None
         _tel = get_current_post(_user)
