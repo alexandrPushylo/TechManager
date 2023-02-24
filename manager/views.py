@@ -1467,17 +1467,17 @@ def send_task_for_drv(current_day):
 def send_status_app_for_foreman(current_day):
     out = []
     _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
-    id_list = []
-    _id_foreman_list = [_[0] for _ in StaffForeman.objects.all().values_list('user_id')]
-    _id_master_list = [_[0] for _ in StaffMaster.objects.all().values_list('user_id')]
-    _id_supply_list = [_[0] for _ in StaffSupply.objects.all().values_list('user_id')]####
-    id_list.extend(_id_foreman_list)
-    id_list.extend(_id_master_list)
+    id_list = Post.objects.filter(
+        Q(post_name__name_post=POST_USER['foreman']) |
+        Q(post_name__name_post=POST_USER['master']) |
+        Q(post_name__name_post=POST_USER['employee_supply'])
+    ).values_list('user_post_id', flat=True)
+
     _app = ApplicationToday.objects.filter(date=current_day, status=_status)
 
 
     for _id in id_list:
-        _a = _app.filter(construction_site__foreman__user_id=_id)
+        _a = _app.filter(construction_site__foreman_id=_id)
         if _a:
             out.append((_id, _a))
 
