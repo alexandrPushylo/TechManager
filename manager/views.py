@@ -368,13 +368,14 @@ def add_construction_sites_view(request):
     get_prepare_data(out, request)
 
     if is_admin(request.user):
-        staff_list = StaffForeman.objects.filter().values_list('id', 'user__username', 'user__first_name')
+        staff_list = Post.objects.filter(
+            post_name__name_post=POST_USER['foreman']).values_list('user_post_id', 'user_post__last_name', 'user_post__first_name')
     elif is_foreman(request.user):
-
-        staff_list = StaffForeman.objects.filter(user=request.user).values_list('id', 'user__username', 'user__first_name')
+        staff_list = Post.objects.filter(user_post=request.user,
+            post_name__name_post=POST_USER['foreman']).values_list('user_post_id', 'user_post__last_name',
+                                                                   'user_post__first_name')
     elif is_master(request.user):
-        foreman = StaffMaster.objects.get(user=request.user).foreman.user
-        staff_list = StaffForeman.objects.filter(user=foreman).values_list('id', 'user__username', 'user__first_name')
+        staff_list = Post.objects.filter(user_post=request.user).values_list('supervisor_id', 'supervisor__last_name', 'supervisor__first_name')
     else:
         return HttpResponseRedirect('/')
 
@@ -383,7 +384,8 @@ def add_construction_sites_view(request):
         construction_sites = ConstructionSite.objects.create()
         construction_sites.address = request.POST['construction_site_address']
         if request.POST.get('foreman'):
-            construction_sites.foreman = StaffForeman.objects.get(id=request.POST['foreman'])
+            foreman_id = request.POST.get('foreman')
+            construction_sites.foreman = User.objects.get(id=foreman_id)
         else:
             construction_sites.foreman = None
         construction_sites.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
