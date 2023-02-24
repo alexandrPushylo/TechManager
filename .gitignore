@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 TechManager/settings.py
 .idea
+*.sqlite3
