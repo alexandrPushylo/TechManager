@@ -18,7 +18,7 @@
         <ul class="container-fluid" >
             {% for v in list_of_vehicles %}
                 <div class=" mb-3" id="vehicle_list">
-                    <label >{{ v.technic_driver.technic.name }}  ({{ v.technic_driver.driver.driver.user.last_name }})</label>
+                    <label >{{ v.technic_driver.technic.name }}  ({{ v.technic_driver.driver.driver.last_name }})</label>
                     <textarea class="form-control app_description" disabled rows="1">{{ v.description }}</textarea>
                 </div>
             {% endfor %}
