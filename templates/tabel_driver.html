@@ -28,7 +28,7 @@
       <th scope="col">Работает</th>
       <th scope="col">Фамилия</th>
       <th scope="col">Имя</th>
-      <th scope="col">Телефон</th>
+{#      <th scope="col">Телефон</th>#}
       <th scope="col" hidden>id</th>
 
     </tr>
@@ -39,9 +39,9 @@
       <th scope="row">{{ forloop.counter }}</th>
         <td><input {% if driver.status  %} checked {% endif %}
               id="inp_{{ forloop.counter }}" type="checkbox" name="staff_status_{{ forloop.counter }}"/></td>
-      <td>{{ driver.driver.user.last_name }}</td>
-      <td>{{ driver.driver.user.first_name }}</td>
-      <td>{{ driver.driver.telephone }}</td>
+      <td>{{ driver.driver.last_name }}</td>
+      <td>{{ driver.driver.first_name }}</td>
+{#      <td>{{ driver.driver.telephone }}</td>#}
       <td hidden><input id="drv_id_{{ forloop.counter }}" type="hidden" name="staff_id" value="{{ driver.id }}"></td>
 
     </tr>

@@ -493,7 +493,7 @@ def tabel_driver_view(request, day):
     prepare_driver_table(day)
 
     driver_today_tabel = DriverTabel.objects.filter(date=current_day)
-    out['driver_list'] = driver_today_tabel.order_by('driver__user__last_name')
+    out['driver_list'] = driver_today_tabel.order_by('driver__last_name')
 
 
     if request.POST.get('id_drv'):
