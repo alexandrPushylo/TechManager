@@ -14,10 +14,11 @@
             <label>Прораб:</label>
             <input  type="hidden" id="foreman_id"  value="{{ construction_sites.foreman.id }}"/>
             <select class=" col-auto" id="foreman_select" name="foreman">
-                        <option value=""></option>
+
                         {% for staff in staff_list %}
                             <option value="{{ staff.0 }}">{{ staff.1 }} {{ staff.2 }}</option>
                         {% endfor %}
+{#                <option value=""></option>#}
             </select>
         </p>
 {#        <input class="btn btn-secondary position-absolute bottom-0 end-0 m-3" type="submit" value="Сохранить">#}
