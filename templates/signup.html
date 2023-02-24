@@ -30,8 +30,8 @@
             <label>Должность</label>
             <select class=" col-auto"  id="post_select" name="post">
                         <option selected></option>
-                        {% for k, v in post_list.items %}
-                            <option value="{{ k }}">{{ v }}</option>
+                        {% for post_name in post_list %}
+                            <option value="{{ post_name.id }}">{{ post_name.name_post }}</option>
                         {% endfor %}
             </select>
         </div>
@@ -39,9 +39,8 @@
             <label>Прораб</label>
             <input type="hidden" name="foreman" id="io_foreman">
             <select class=" col-auto" id="foreman_select">
-                        <option selected></option>
                         {% for foreman in foreman_list %}
-                            <option value="{{ foreman.0 }}">{{ foreman.1 }} {{ foreman.2 }}</option>
+                            <option value="{{ foreman.user_post.id }}">{{ foreman.user_post.last_name }} {{ foreman.user_post.first_name }}</option>
                         {% endfor %}
             </select>
         </div>
