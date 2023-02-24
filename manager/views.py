@@ -884,14 +884,14 @@ def create_new_application(request, id_application):
 
     _tech_drv = []
     for _tech_name in tech_name_list:
-        t_d = tech_driver_list.filter(technic__name=_tech_name, driver__isnull=False, status=True, driver__status=True).values_list('id','driver__driver__user__last_name').order_by('driver__driver__user__last_name')
+        t_d = tech_driver_list.filter(technic__name=_tech_name, driver__isnull=False, status=True, driver__status=True).values_list('id', 'driver__driver__last_name').order_by('driver__driver__last_name')
         _n = _tech_name.name.replace(' ', '').replace('.', '')
         if (_n, _tech_name.name, t_d) not in _tech_drv:
             _tech_drv.append((_n, _tech_name.name, t_d))
     out['D'] = _tech_drv
 
     _tech_drv2 = []
-    for _t_d in tech_driver_list.filter(driver__isnull=False).values_list('id', 'technic__name__name','driver__driver__user__last_name').order_by('driver__driver__user__last_name'):
+    for _t_d in tech_driver_list.filter(driver__isnull=False).values_list('id', 'technic__name__name','driver__driver__last_name').order_by('driver__driver__last_name'):
         _srt_name = _t_d[1].replace(' ', '').replace('.', '')
         _des = (_t_d[0], _srt_name, _t_d[1], _t_d[2])
         if _des not in _tech_drv2:
@@ -916,7 +916,7 @@ def create_new_application(request, id_application):
         for n, _id in enumerate(id_tech_drv_list):
             if _id == '' and driver_list[n] == '':
                 _td = tech_driver_list.filter(technic__name__name=vehicle_list[n], driver__isnull=False).values_list(
-                    'id', 'driver__driver__user__last_name')
+                    'id', 'driver__driver__last_name')
                 if _td.exclude(id__in=work_TD_list_F_saved).count() == 0:   #if not free td
                     _td_ch = rand_choice(_td)
                     id_tech_drv_list[n] = _td_ch[0]
@@ -941,7 +941,7 @@ def create_new_application(request, id_application):
             n = len(vehicle_list) - _len__id_app_list
             for i in range(0, n):
                 tech_drv = TechnicDriver.objects.get(
-                    driver__driver__user__last_name=driver_list[_len__id_app_list + i],
+                    driver__driver__last_name=driver_list[_len__id_app_list + i],
                     technic__name__name=vehicle_list[_len__id_app_list + i],
                     date=current_date, status=True)#############
                 description = description_app_list[_len__id_app_list + i]
