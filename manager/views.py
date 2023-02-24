@@ -21,7 +21,7 @@ from manager.utilities import WEEKDAY
 from manager.utilities import TODAY
 from manager.utilities import TOMORROW
 from manager.utilities import MONTH
-from manager.utilities import dict_Staff
+from manager.utilities import dict_Staff as POST_USER
 from manager.utilities import status_application as STATUS_AP
 from manager.utilities import status_constr_site as STATUS_CS
 #-----------------
@@ -1432,7 +1432,7 @@ def test_bot(request, id_user):
     return HttpResponseRedirect(f'/connect_bot_view/{id_user}')
 
 def send_message(id_user, message):
-    if TeleBot.objects.filter(user_bot=id_user).count()!=0:
+    if TeleBot.objects.filter(user_bot=id_user).count() != 0:
         chat_id = TeleBot.objects.get(user_bot=id_user)
         if chat_id:
             BOT.send_message(chat_id.id_chat, message)
