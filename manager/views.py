@@ -158,7 +158,7 @@ def append_in_hos_tech(request, id_drv):
 
 
     constr_site, _ = ConstructionSite.objects.get_or_create(
-        address=None,
+        address='Спец. задание',
         foreman=None)
     constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
     constr_site.save()
