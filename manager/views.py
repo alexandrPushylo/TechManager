@@ -692,7 +692,7 @@ def show_applications_view(request, day, id_user=None):
             out['send_app_list'] = True
 
 
-        driver_table_list = DriverTabel.objects.filter(date=current_day).order_by('driver__user__last_name')
+        driver_table_list = DriverTabel.objects.filter(date=current_day).order_by('driver__last_name')
 
         l_out = []
         for _drv in driver_table_list:
@@ -712,22 +712,23 @@ def show_applications_view(request, day, id_user=None):
             set_var('hidden_panel', value=request.user.id, flag=_flag, user=request.user)
         out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
-
-    if is_foreman(current_user):
-        _foreman = StaffForeman.objects.get(user=current_user).user
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman__user=_foreman, date=current_day)
+    elif is_foreman(current_user):
+        # _foreman = StaffForeman.objects.get(user=current_user).user
+        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=current_user, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
-    if is_master(current_user):
-        _foreman = StaffMaster.objects.get(user=current_user).foreman
+
+    elif is_master(current_user):
+        _foreman = Post.objects.get(user_post=current_user).supervisor
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
-    if is_employee_supply(current_user):
+    elif is_employee_supply(current_user):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
                                                       date=current_day,
                                                       construction_site__address='Снабжение')
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
-
+    else:
+        return HttpResponseRedirect('/')
 
     out['style_font'] = get_var('style_font', user=request.user)
 
