@@ -43,14 +43,14 @@
     <td class="row_{{ forloop.counter }}"><input {% if tech_drv.status  %} checked {% endif %}
               id="inp_{{ forloop.counter }}" type="checkbox" name="tech_status_{{ forloop.counter }}"/></td>
 
-    <td class="row_{{ forloop.counter }}">{{ tech_drv.technic.name }} ({{ tech_drv.technic.attached_driver.user.last_name}})</td>
+    <td class="row_{{ forloop.counter }}">{{ tech_drv.technic.name }} ({{ tech_drv.technic.attached_driver.last_name}})</td>
     <td class="row_{{ forloop.counter }}">[{{ tech_drv.technic.id_information }}]</td>
 
     <td><input type="hidden" id="io_drv_{{forloop.counter}}" value="{{ tech_drv.driver.id }}"/>
             <select id="select_drv_{{forloop.counter}}" name="select_drv">
               <option selected value=""></option>
               {% for drv in work_driver_list %}
-                <option value="{{ drv.id }}">{{drv.driver.user.last_name}} {{drv.driver.user.first_name}}</option>
+                <option value="{{ drv.id }}">{{drv.driver.last_name}} {{drv.driver.first_name}}</option>
               {% endfor %}
             </select>
     </td>

@@ -604,7 +604,7 @@ def Technic_Driver_view(request, day):
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     technic_driver_list = TechnicDriver.objects.filter(date=current_day)
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
-    out['work_driver_list'] = work_driver_list.order_by('driver__user__last_name')
+    out['work_driver_list'] = work_driver_list.order_by('driver__last_name')
 
     if request.POST.getlist('tech_drv_id'):
         driver_list = request.POST.getlist('select_drv')
@@ -1376,7 +1376,7 @@ def prepare_technic_driver_table(day):
 
     if get_CH_day(day) == 'next_day':
         for _tech in Technic.objects.all():
-            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__user__last_name', 'status')
+            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__last_name', 'status')
             driver = _drv[0][0]
             status = _drv[0][1]
 
