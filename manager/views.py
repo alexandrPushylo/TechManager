@@ -210,7 +210,7 @@ def driver_app_list_view(request, day):
         app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
     current_driver_list = DriverTabel.objects.filter(status=True,
                                                      date=current_day,
-                                                     technicdriver__status=True).distinct().order_by('driver__user__last_name')
+                                                     technicdriver__status=True).distinct().order_by('driver__last_name')
     app_list = []
     for drv in current_driver_list:
         _app = current_app_tech.filter(technic_driver__driver=drv).order_by('priority')
