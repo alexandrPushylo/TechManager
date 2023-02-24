@@ -1338,7 +1338,7 @@ def get_CH_day(day):
 def prepare_driver_table(day):
     current_day = day
     ch_day = get_CH_day(day)
-    driver_list = StaffDriver.objects.all()
+    driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     if DriverTabel.objects.filter(date=current_day).count() == 0:
         if ch_day == 'next_day':
             try:
