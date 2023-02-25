@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% block choosedate %}
+    <div class="container">
+        <div class="btn-group position-relative start-50 top-0 translate-middle ">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'supply_today_app' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+            {% else %}
+                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'supply_today_app' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+            {% endif %}
+        </div>
+    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
+    </div>
+    {% endblock %}
+<div></div>
+<div class="container-lg  mx-auto mt-4">
+
+    <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
+      {% for v in today_technic_applications %}
+    <div class="card shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+        <ul class="container-fluid" >
+
+                <div class="  " id="vehicle_list">
+                    <label class="ms-1 fw-bold"
+                            {% for c in v.3 %}
+                            {% if c in conflicts_vehicles_list_id %}
+                                style="color: red"
+                            {% endif %}
+                           {% endfor %}
+                    >   {% if v.0 %}{{ v.0 }}
+                        {% else %}Проверьте табель
+                        {% endif %}
+                        ({{ v.1 }})  </label>
+
+                        {% for d in v.2 %}
+                        <div class=" conteiner-fluid form-floating row mt-1 ">
+                        <input type="hidden" name="prior_id" value="{{ d.id }}"/>
+                            <div class="input-group form-floating p-0">
+
+
+                                <span class="input-group-text {% if d.id in priority_list %} border border-2 border-primary{% endif %}">
+                                <input type="number" min="1" id="priority_{{ d.id }}" name="priority"
+                               class="priority   col-auto  " value="{{ d.priority }}" style="max-width: 50px; margin-left: -5px;"/>
+                                </span>
+
+
+
+                                <textarea class="form-control app_description" aria-label="With textarea" id="floatingInputValue" name="descr">{{ d.description }}</textarea>
+
+                            </div>
+                        </div>
+                      {% endfor %}
+                </div>
+        </ul>
+      </div>
+    </div>
+      {% endfor %}
+      </form>
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/supply_today_app.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+
+    <a href="{% url 'supply_app' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
+    <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить изменения">
+
+</div>
+{% endblock %}

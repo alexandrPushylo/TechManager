@@ -44,6 +44,58 @@ from manager.utilities import BOT
 
 # ------FUNCTION VIEW----------------------
 
+def supply_today_app_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
+                                               construction_site__address='Снабжение')
+    _app = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
+
+
+
+    app_tech_day = _app.filter(
+        # Q(app_for_day__date=current_day),
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])) |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+    )
+    driver_technic = app_tech_day.values_list('technic_driver__driver__driver__last_name',
+                                              'technic_driver__technic__name__name').order_by(
+        'technic_driver__driver__driver__last_name').distinct()
+    app_list = []
+    for _drv, _tech in driver_technic:
+        desc = app_tech_day.filter(technic_driver__driver__driver__last_name=_drv,
+                                   technic_driver__technic__name__name=_tech).order_by('priority')
+        _id_list = [_[0] for _ in desc.values_list('id')]
+        if (_drv, _tech, desc, _id_list) not in app_list:
+            app_list.append((_drv, _tech, desc, _id_list))
+
+    out["today_technic_applications"] = app_list
+    out["priority_list"] = get_priority_list(current_day)
+    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+
+    if request.method == 'POST':
+        prior_id_list = request.POST.getlist('prior_id')
+        priority_list = request.POST.getlist('priority')
+        description_list = request.POST.getlist('descr')
+
+        for id_p, pr, desc in zip(prior_id_list, priority_list, description_list):
+            app = ApplicationTechnic.objects.get(id=id_p)
+            app.priority = pr
+            app.description = desc
+            app.save()
+
+        out['message_status'] = True
+        out['message'] = 'Сохранено'
+
+
+
+    return render(request, 'supply_today_app.html', out)
+
+
 def move_supply_app(request, day, id_app):
     cur_app_today = ApplicationToday.objects.get(id=id_app)
     current_day = convert_str_to_date(day)
