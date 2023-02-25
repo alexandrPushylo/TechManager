@@ -836,11 +836,11 @@ def show_applications_view(request, day, id_user=None):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
-    elif is_employee_supply(current_user):
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
-                                                      date=current_day,
-                                                      construction_site__address='Снабжение')
-        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+    # elif is_employee_supply(current_user):
+    #     app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
+    #                                                   date=current_day,
+    #                                                   construction_site__address='Снабжение')
+    #     out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
     else:
         return HttpResponseRedirect('/')
 
@@ -907,7 +907,7 @@ def show_today_applications(request, day, id_foreman=None):
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
         set_var('filter_today_app', value=None, user=request.user)
     elif id_foreman:
-        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman=id_foreman,#TODO:POST
+        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman=id_foreman,
                                                  app_for_day__date=current_day)
         if id_foreman != _filter:
             set_var('filter_today_app', value=id_foreman, user=request.user)
@@ -969,7 +969,7 @@ def show_info_application(request, id_application):
     get_prepare_data(out, request, current_day=current_application.date)
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    out["list_of_vehicles"] = list_of_vehicles
+    out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
     if is_admin(request.user):
         return render(request, 'extend/admin_show_inf_app.html', out)
     return render(request, "show_info_application.html", out)
@@ -1013,7 +1013,7 @@ def create_new_application(request, id_application):
     out['D2'] = _tech_drv2
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    out["list_of_vehicles"] = list_of_vehicles
+    out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
     if request.method == "POST":  # ----------------POST
         print(request.POST)
