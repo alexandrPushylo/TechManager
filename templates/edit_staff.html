@@ -33,21 +33,22 @@
         </div>
 
         <div class="mt-3"  {% if not post == 'admin' %}hidden {% endif %}>
+
             <label>Должность</label>
-            <input type="hidden" id="io_post" value="{{ current_post }}">
+            <input type="hidden" id="io_post" value="{{ current_post.post_name.id }}">
             <select class=" col-auto"  id="post_select" name="post">
                     <option></option>
-                         {% for post in post_list.items %}
-                            <option value="{{ post.0 }}">{{ post.1 }}</option>
+                         {% for post in post_list %}
+                            <option value="{{ post.id }}">{{ post.name_post }}</option>
                         {% endfor %}
             </select>
         </div>
         <div class="mt-3 cl_foreman"  {% if not post == 'admin' %}hidden {% endif %}>
             <label>Прораб</label>
-            <input type="hidden" name="foreman" id="io_foreman" value="{{ current_foreman }}">
+            <input type="hidden" name="foreman" id="io_foreman" value="{{ current_foreman.id }}">
             <select  class=" col-auto" id="foreman_select">
                         {% for foreman in foreman_list %}
-                            <option value="{{ foreman.0 }}">{{ foreman.1 }} {{ foreman.2 }}</option>
+                            <option value="{{ foreman.user_post.id }}">{{ foreman.user_post.last_name }} {{ foreman.user_post.first_name }}</option>
                         {% endfor %}
             </select>
         </div>

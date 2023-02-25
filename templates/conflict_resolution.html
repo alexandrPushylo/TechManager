@@ -39,12 +39,12 @@
                     {% endif %}{% endfor %}
                     <hr>
                     {% for d in v.1 %}
-                        <label>{{ d.app_for_day__construction_site__address }} ({{ d.app_for_day__construction_site__foreman__user__last_name }})</label>
+                        <label>{{ d.app_for_day__construction_site__address }} ({{ d.app_for_day__construction_site__foreman__last_name }})</label>
                         <div class="form-floating">
 
 
                             <textarea class="form-control app_description mb-2" id="floatingInputValue" readonly rows="1">{{ d.description }}</textarea>
-                        <label  class="fw-bold ms-5"{% if d.technic_driver__driver__driver__user__last_name %} >{{ d.technic_driver__driver__driver__user__last_name }} {% if d.technic_driver_id in work_TD_list %}<i class="fa-sharp fa-solid fa-circle-exclamation"></i> {% endif %}
+                        <label  class="fw-bold ms-5"{% if d.technic_driver__driver__driver__last_name %} >{{ d.technic_driver__driver__driver__last_name }} {% if d.technic_driver_id in work_TD_list %}<i class="fa-sharp fa-solid fa-circle-exclamation"></i> {% endif %}
                             {% else %}  style="color: red"> Водитель не назначен
 
                         {% endif %}</label>

@@ -25,16 +25,16 @@
           <div class="card-body">
               <h5 class="card-title fw-bold" style="text-align: center">
 
-                  <a href="{% url 'application_for_driver' cw_day drv.driver.user.id %}" class="btn btn-link" aria-current="page">
-                      <b>{{drv.driver.user.last_name}} {{drv.driver.user.first_name}}</b>
+                  <a href="{% url 'application_for_driver' cw_day drv.driver.id %}" class="btn btn-link" aria-current="page">
+                      <b>{{drv.driver.last_name}} {{drv.driver.first_name}}</b>
                   </a>
               </h5>
 
             {% for a in app %}
                 <hr>
-            {% if a.app_for_day.construction_site.foreman.user.last_name %}
+            {% if a.app_for_day.construction_site.foreman.last_name %}
               <h6 class="card-text fw-bold">{{ a.technic_driver.technic.name.name }}</h6>
-                <h6 class="card-text"><b>{{ a.priority }})</b> {{ a.app_for_day.construction_site.address }} ({{a.app_for_day.construction_site.foreman.user.last_name}})</h6>
+                <h6 class="card-text"><b>{{ a.priority }})</b> {{ a.app_for_day.construction_site.address }} ({{a.app_for_day.construction_site.foreman.last_name}})</h6>
             {% endif %}
                 {% if a.description %}
                 <textarea class="app_description form-control app_description" readonly>{{ a.description }}</textarea>

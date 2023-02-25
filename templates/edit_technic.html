@@ -59,7 +59,7 @@
             <select class=" col-auto" required id="att_drv_tech_select" name="att_drv_tech">
                 <option></option>
                          {% for drv in attach_drv %}
-                            <option value="{{ drv.id }}">{{ drv.user.last_name}} {{ drv.user.first_name }}</option>
+                            <option value="{{ drv.user_post.id }}">{{ drv.user_post.last_name}} {{ drv.user_post.first_name }}</option>
                         {% endfor %}
             </select>
         <a class="related-widget-wrapper-link add-related" id="add_id_attached_driver"

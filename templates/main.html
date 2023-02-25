@@ -61,7 +61,7 @@
 
 
           <div class="card-body mt-1" >
-            <h6 class="card-title {% if style_font %}{{ style_font.value }}{% else %}{% endif %} fw-bold text-center" >{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.user.last_name %}({{ a.app_today.construction_site.foreman.user.last_name }}){% endif %}</h6>
+            <h6 class="card-title  fw-bold text-center {% if style_font %}{{ style_font.value }}{% endif %}" >{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.last_name %}({{ a.app_today.construction_site.foreman.last_name }}){% endif %}</h6>
             <h6 class="card-title" >{{a.app_today.date}}</h6>
           {% if a.apps_tech %}
           <hr style="border-width: medium; border-color: green">
@@ -72,7 +72,7 @@
                         {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
                             ">{{ v.technic_driver.technic.name }}</div>
-                <div id="{{ v.technic_driver.driver.driver.user.id }}" class="card-text fs-6 col-auto driver_name_link
+                <div id="{{ v.technic_driver.driver.driver.id }}" class="card-text fs-6 col-auto driver_name_link
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
                             {% if not v.technic_driver.driver.driver %}
@@ -130,7 +130,7 @@
                     {% elif count == 0 %}
                     {% elif not count == 0 %} text-success
                     {% endif %}
-                    ">{{drv.driver.user.last_name}}</div>
+                    ">{{drv.driver.last_name}}</div>
                     <div class=" small ">
 
                         {% if tech_drv %}
