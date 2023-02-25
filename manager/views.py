@@ -44,6 +44,26 @@ from manager.utilities import BOT
 
 # ------FUNCTION VIEW----------------------
 
+def move_supply_app(request, day, id_app):
+    cur_app_today = ApplicationToday.objects.get(id=id_app)
+    current_day = convert_str_to_date(day)
+    _save_status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+    # print(cur_app_today)
+    app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
+                                               construction_site__address='Снабжение')
+    supply_list = Post.objects.filter(
+        post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
+    cur_app_tech = ApplicationTechnic.objects.filter(app_for_day=cur_app_today,
+                                                     technic_driver__technic__supervisor__in=supply_list)
+    for _app_tech in cur_app_tech:
+        _app_tech.description = f'{_app_tech.app_for_day.construction_site.address} ({_app_tech.app_for_day.construction_site.foreman.last_name})\n{_app_tech.description}'
+        _app_tech.app_for_day = app_for_day
+        _app_tech.save()
+        app_for_day.status = _save_status
+        app_for_day.save()
+    return HttpResponseRedirect(f'/supply_app/{day}')
+
+
 def supply_app_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)

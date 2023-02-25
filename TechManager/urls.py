@@ -31,6 +31,7 @@ from manager.views import conflict_resolution_view
 from manager.views import conflict_correction_view
 
 from manager.views import supply_app_view
+from manager.views import move_supply_app
 from manager.views import approv_all_applications
 from manager.views import submitted_all_applications
 from manager.views import send_all_applications
@@ -112,6 +113,7 @@ urlpatterns = [
     path('driver_app_list/<str:day>', driver_app_list_view, name='driver_app_list'),
     path('foreman_app_list/<str:day>', foreman_app_list_view, name='foreman_app_list'),
     path('supply_app/<str:day>', supply_app_view, name='supply_app'),
+    path('move_supply_app/<str:day>/<int:id_app>', move_supply_app, name='move_supply_app'),
 
     path('success_app/<int:id_application>', success_application, name='success_application'),
     path('send_all_applications/<str:day>', send_all_applications, name='send_all_applications'),
