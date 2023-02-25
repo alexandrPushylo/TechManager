@@ -1110,6 +1110,9 @@ def send_all_applications(request, day):
             app.save()
         send_task_for_drv(day)#####################
         send_status_app_for_foreman(day)#######
+        message = f"Заявки на {current_day} отправлены"
+        BOT.send_message(385035447, message)
+        BOT.send_message(765428154, message)
     return HttpResponseRedirect(f'/applications/{day}')
 
 
