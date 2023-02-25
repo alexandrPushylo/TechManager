@@ -1384,7 +1384,7 @@ def show_start_page(request):
         elif is_mechanic(request.user):
             return HttpResponseRedirect(f"tech_list/{get_current_day('last_day')}")
         elif is_employee_supply(request.user):
-            return HttpResponseRedirect(f"applications/{get_current_day('next_day')}")
+            return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
         else:
             return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
 
