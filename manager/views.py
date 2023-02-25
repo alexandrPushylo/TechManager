@@ -44,6 +44,49 @@ from manager.utilities import BOT
 
 # ------FUNCTION VIEW----------------------
 
+def supply_app_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    current_user = request.user
+    get_prepare_data(out, request, current_day)
+
+    app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
+                                               construction_site__address='Снабжение')
+    out['app_today'] = app_for_day
+
+    apps_tech = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
+    out['apps_tech'] = apps_tech.order_by('technic_driver__technic__name__name')
+    ##-------------------------------------------
+    supply_list = Post.objects.filter(
+        post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
+
+    app_today_list = ApplicationToday.objects.filter(
+        Q(date=current_day),
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))).exclude(id=app_for_day.id)
+
+    tech_drv = TechnicDriver.objects.filter(date=current_day,
+                                            status=True,
+                                            driver__status=True,
+                                            technic__supervisor__in=supply_list).values_list('id', flat=True)
+
+    app_technic = ApplicationTechnic.objects.filter(app_for_day__in=app_today_list, technic_driver__in=tech_drv)
+
+    out['count_app_list'] = get_count_app_for_driver(current_day)
+    out['today_applications_list'] = []
+
+    for _app_today in app_today_list:
+        appTech = app_technic.filter(app_for_day=_app_today)
+        if appTech:
+            out['today_applications_list'].append((_app_today, appTech))
+
+
+
+
+    return render(request, 'extend/supply_app.html', out)
+
+
 
 def del_technic(request, id_tech):
     if is_admin(request.user) or is_mechanic(request.user):
