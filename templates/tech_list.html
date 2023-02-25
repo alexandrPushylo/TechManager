@@ -1,21 +1,5 @@
 {% extends 'main.html' %}
 {% block content %}
-{#{% block choosedate %}#}
-{#    <div class="container mt-3">#}
-{#    <h3 class="text-center">{{ current_user.last_name }} {{ current_user.first_name }}</h3>#}
-{#        <h3 class="text-center m-0">#}
-{#            {% if cw_day == nw_day %}#}
-{#                <a href="{% url 'tech_list'  lw_day %}" class="btn " aria-current="page">{{ lw_day }} <<</a>#}
-{#                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>#}
-{#            {% else %}#}
-{#                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>#}
-{#                <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light" aria-current="page">>> {{ nw_day }}</a>#}
-{#            {% endif %}#}
-{##}
-{#        </h3>#}
-{#    </div>#}
-{#    {% endblock %}#}
-
 
     {% block choosedate %}
     <div class="container-fluid  ">
@@ -44,7 +28,7 @@
         {% endif %}
             " style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
           <div class="card-body">
-              <h6 class="card-text fw-bold">{{ tdl.technic.name.name }} ({{ tdl.technic.attached_driver.user.last_name }})</h6>
+              <h6 class="card-text fw-bold">{{ tdl.technic.name.name }} ({{ tdl.technic.attached_driver.last_name }})</h6>
               <h6 class="card-text">[ {{ tdl.technic.id_information }} ]</h6>
               <h6 class="card-text">{{ tdl.technic.description }}</h6>
               <hr>
