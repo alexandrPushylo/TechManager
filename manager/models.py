@@ -48,7 +48,9 @@ class Technic(models.Model):
     id_information = models.CharField(max_length=256, null=True, blank=True, verbose_name="Идентификационная информация")
     tech_type = models.ForeignKey(TechnicType, on_delete=models.SET_NULL, null=True, verbose_name='Тип техники')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
-    attached_driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Прикрепленный водитель')
+    attached_driver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Прикрепленный водитель', related_name='attached_driver')
+    supervisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Руководитель',
+                                   related_name='tech_supervisor')
     def __str__(self): return f"{self.name} [{self.id_information}] - {self.description} -- {self.attached_driver}"
     class Meta:
         verbose_name = "Единица техники"
@@ -119,6 +121,7 @@ class ApplicationToday(models.Model):
 
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.ForeignKey(ApplicationStatus, on_delete=models.SET_NULL, null=True, verbose_name="Статус заявки")
+    var_aptd = models.CharField(max_length=256, null=True, blank=True)
     def __str__(self): return f"{self.construction_site} [{self.date}] - {self.status}"
     class Meta:
         verbose_name = "Заявка на объект"
@@ -130,6 +133,7 @@ class ApplicationTechnic(models.Model):
     technic_driver = models.ForeignKey(TechnicDriver, on_delete=models.SET_NULL, null=True, verbose_name = 'Техника-Водитель')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
     priority = models.DecimalField(max_digits=3, decimal_places=0, default=1, verbose_name='Приоритет заявки')
+    var_aptech = models.CharField(max_length=256, null=True, blank=True)
     def __str__(self): return f"{self.app_for_day} {self.technic_driver}"
     class Meta:
         verbose_name = "Заявка на технику"
