@@ -92,7 +92,7 @@ def supply_today_app_view(request, day):
         out['message'] = 'Сохранено'
 
 
-
+        return HttpResponseRedirect(request.path)
     return render(request, 'supply_today_app.html', out)
 
 
@@ -108,8 +108,15 @@ def move_supply_app(request, day, id_app):
     cur_app_tech = ApplicationTechnic.objects.filter(app_for_day=cur_app_today,
                                                      technic_driver__technic__supervisor__in=supply_list)
     for _app_tech in cur_app_tech:
+        if _app_tech.var_aptech == 'supply_ok':
+            continue
+        _id = _app_tech.id
+        _app_tech.var_aptech = 'supply_ok'
+        _app_tech.save()
+        _app_tech.pk = None
         _app_tech.description = f'{_app_tech.app_for_day.construction_site.address} ({_app_tech.app_for_day.construction_site.foreman.last_name})\n{_app_tech.description}'
         _app_tech.app_for_day = app_for_day
+        _app_tech.var_aptech = _id
         _app_tech.save()
         app_for_day.status = _save_status
         app_for_day.save()
@@ -152,9 +159,6 @@ def supply_app_view(request, day):
         appTech = app_technic.filter(app_for_day=_app_today)
         if appTech:
             out['today_applications_list'].append((_app_today, appTech))
-
-
-
 
     return render(request, 'extend/supply_app.html', out)
 
@@ -403,7 +407,7 @@ def conflict_resolution_view(request, day):
             'app_for_day__construction_site__foreman__last_name',
             'app_for_day__construction_site__address',
             'technic_driver_id'
-        ).order_by('app_for_day__construction_site__foreman__last_name')
+        ).order_by('app_for_day__construction_site__foreman__last_name').exclude(var_aptech='supply_ok')
         today_technic_applications_list.append((v, today_technic_applications))
     out['today_technic_applications'] = today_technic_applications_list
 
@@ -745,7 +749,18 @@ def clear_application_view(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     current_application = ApplicationToday.objects.get(id=id_application)
-    ApplicationTechnic.objects.filter(app_for_day=current_application).delete()
+    app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
+
+    for _app in app_tech:
+        if _app.var_aptech:
+            try:
+                _a_tmp = ApplicationTechnic.objects.get(id=_app.var_aptech)
+                _a_tmp.var_aptech = None
+                _a_tmp.save()
+            except:
+                pass
+        _app.delete()
+
     current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     current_application.save()
     return HttpResponseRedirect(f'/applications/{current_application.date}')
@@ -836,11 +851,11 @@ def show_applications_view(request, day, id_user=None):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
-    # elif is_employee_supply(current_user):
-    #     app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
-    #                                                   date=current_day,
-    #                                                   construction_site__address='Снабжение')
-    #     out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+    elif is_employee_supply(current_user):  #TODO:del
+        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
+                                                      date=current_day,
+                                                      construction_site__address='Снабжение')
+        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
     else:
         return HttpResponseRedirect('/')
 
@@ -924,7 +939,8 @@ def show_today_applications(request, day, id_foreman=None):
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
-    )
+    ).exclude(var_aptech='supply_ok')
+
     driver_technic = app_tech_day.values_list('technic_driver__driver__driver__last_name',
                                               'technic_driver__technic__name__name').order_by(
         'technic_driver__driver__driver__last_name').distinct()
@@ -1023,8 +1039,18 @@ def create_new_application(request, id_application):
         driver_list = request.POST.getlist('io_driver')###
         description_app_list = request.POST.getlist('description_app_list')
 
+        ##------------delete--------------
+
         for i in get_difference(set([i[0] for i in list_of_vehicles.filter().values_list('id')]), set(int(i) for i in id_app_tech)):
-            ApplicationTechnic.objects.filter(app_for_day=current_application, id=i).delete()
+            _app = ApplicationTechnic.objects.get(app_for_day=current_application, id=i)
+            if _app.var_aptech:
+                try:
+                    _a_tmp = ApplicationTechnic.objects.get(id=_app.var_aptech)
+                    _a_tmp.var_aptech = None
+                    _a_tmp.save()
+                except: pass
+            _app.delete()
+        ##--------------------------------
 
         work_TD_list_F_saved = get_work_TD_list(current_application.date, 0, True)
         for n, _id in enumerate(id_tech_drv_list):
@@ -1220,15 +1246,19 @@ def get_priority_list(current_day):
     return ApplicationTechnic_id
     """
     l = []
-    app_tech = ApplicationTechnic.objects.filter(app_for_day__date=current_day).values_list('priority', 'technic_driver_id', 'id').order_by('technic_driver_id')
+    app_tech = ApplicationTechnic.objects.filter(
+        app_for_day__date=current_day).values_list('priority', 'technic_driver_id', 'id').order_by('technic_driver_id').exclude(
+        var_aptech='supply_ok')
     ll = [(int(a[0]), a[1]) for a in app_tech]
     for _app in set(ll):
         count = ll.count(_app)
         if count > 1:
             _l = [q[0] for q in ApplicationTechnic.objects.filter(app_for_day__date=current_day,
                                                     priority=_app[0],
-                                                    technic_driver_id=_app[1]).distinct().values_list('id')]
+                                                    technic_driver_id=_app[1]).exclude(
+        var_aptech='supply_ok').distinct().values_list('id')]
             l.extend(_l)
+    print(l)
     return l
 
 
@@ -1273,7 +1303,11 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
                                                             driver__status=True).count()#################
     # excl_const_site = ConstructionSite.objects.get(address=None, foreman=None)
 
-    app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
+    # app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
+    app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(
+        Q(technic_driver__status=False) |
+        Q(var_aptech='supply_ok'))
+
     app_list_submit_approv = app_list_today.filter(Q(app_for_day__status=ApplicationStatus.objects.get(
                                                            status=STATUS_AP['submitted'])) |
                                                    Q(app_for_day__status=ApplicationStatus.objects.get(
@@ -1384,7 +1418,8 @@ def show_start_page(request):
         elif is_mechanic(request.user):
             return HttpResponseRedirect(f"tech_list/{get_current_day('last_day')}")
         elif is_employee_supply(request.user):
-            return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
+            # return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
+            return HttpResponseRedirect(f"applications/{get_current_day('next_day')}")
         else:
             return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
 

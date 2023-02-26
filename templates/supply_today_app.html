@@ -26,16 +26,7 @@
         <ul class="container-fluid" >
 
                 <div class="  " id="vehicle_list">
-                    <label class="ms-1 fw-bold"
-                            {% for c in v.3 %}
-                            {% if c in conflicts_vehicles_list_id %}
-                                style="color: red"
-                            {% endif %}
-                           {% endfor %}
-                    >   {% if v.0 %}{{ v.0 }}
-                        {% else %}Проверьте табель
-                        {% endif %}
-                        ({{ v.1 }})  </label>
+                    <label class="ms-1 fw-bold">{{ v.1 }}</label>
 
                         {% for d in v.2 %}
                         <div class=" conteiner-fluid form-floating row mt-1 ">
