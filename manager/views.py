@@ -44,6 +44,125 @@ from manager.utilities import BOT
 
 # ------FUNCTION VIEW----------------------
 
+def supply_today_app_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
+                                               construction_site__address='Снабжение')
+    _app = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
+
+
+
+    app_tech_day = _app.filter(
+        # Q(app_for_day__date=current_day),
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])) |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+    )
+    driver_technic = app_tech_day.values_list('technic_driver__driver__driver__last_name',
+                                              'technic_driver__technic__name__name').order_by(
+        'technic_driver__driver__driver__last_name').distinct()
+    app_list = []
+    for _drv, _tech in driver_technic:
+        desc = app_tech_day.filter(technic_driver__driver__driver__last_name=_drv,
+                                   technic_driver__technic__name__name=_tech).order_by('priority')
+        _id_list = [_[0] for _ in desc.values_list('id')]
+        if (_drv, _tech, desc, _id_list) not in app_list:
+            app_list.append((_drv, _tech, desc, _id_list))
+
+    out["today_technic_applications"] = app_list
+    out["priority_list"] = get_priority_list(current_day)
+    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+
+    if request.method == 'POST':
+        prior_id_list = request.POST.getlist('prior_id')
+        priority_list = request.POST.getlist('priority')
+        description_list = request.POST.getlist('descr')
+
+        for id_p, pr, desc in zip(prior_id_list, priority_list, description_list):
+            app = ApplicationTechnic.objects.get(id=id_p)
+            app.priority = pr
+            app.description = desc
+            app.save()
+
+        out['message_status'] = True
+        out['message'] = 'Сохранено'
+
+
+        return HttpResponseRedirect(request.path)
+    return render(request, 'supply_today_app.html', out)
+
+
+def move_supply_app(request, day, id_app):
+    cur_app_today = ApplicationToday.objects.get(id=id_app)
+    current_day = convert_str_to_date(day)
+    _save_status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+    # print(cur_app_today)
+    app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
+                                               construction_site__address='Снабжение')
+    supply_list = Post.objects.filter(
+        post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
+    cur_app_tech = ApplicationTechnic.objects.filter(app_for_day=cur_app_today,
+                                                     technic_driver__technic__supervisor__in=supply_list)
+    for _app_tech in cur_app_tech:
+        if _app_tech.var_aptech == 'supply_ok':
+            continue
+        _id = _app_tech.id
+        _app_tech.var_aptech = 'supply_ok'
+        _app_tech.save()
+        _app_tech.pk = None
+        _app_tech.description = f'{_app_tech.app_for_day.construction_site.address} ({_app_tech.app_for_day.construction_site.foreman.last_name})\n{_app_tech.description}'
+        _app_tech.app_for_day = app_for_day
+        _app_tech.var_aptech = _id
+        _app_tech.save()
+        app_for_day.status = _save_status
+        app_for_day.save()
+    return HttpResponseRedirect(f'/supply_app/{day}')
+
+
+def supply_app_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    current_user = request.user
+    get_prepare_data(out, request, current_day)
+
+    app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
+                                               construction_site__address='Снабжение')
+    out['app_today'] = app_for_day
+
+    apps_tech = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
+    out['apps_tech'] = apps_tech.order_by('technic_driver__technic__name__name')
+    ##-------------------------------------------
+    supply_list = Post.objects.filter(
+        post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
+
+    app_today_list = ApplicationToday.objects.filter(
+        Q(date=current_day),
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))).exclude(id=app_for_day.id)
+
+    tech_drv = TechnicDriver.objects.filter(date=current_day,
+                                            status=True,
+                                            driver__status=True,
+                                            technic__supervisor__in=supply_list).values_list('id', flat=True)
+
+    app_technic = ApplicationTechnic.objects.filter(app_for_day__in=app_today_list, technic_driver__in=tech_drv)
+
+    out['count_app_list'] = get_count_app_for_driver(current_day)
+    out['today_applications_list'] = []
+
+    for _app_today in app_today_list:
+        appTech = app_technic.filter(app_for_day=_app_today)
+        if appTech:
+            out['today_applications_list'].append((_app_today, appTech))
+
+    return render(request, 'extend/supply_app.html', out)
+
+
 
 def del_technic(request, id_tech):
     if is_admin(request.user) or is_mechanic(request.user):
@@ -288,7 +407,7 @@ def conflict_resolution_view(request, day):
             'app_for_day__construction_site__foreman__last_name',
             'app_for_day__construction_site__address',
             'technic_driver_id'
-        ).order_by('app_for_day__construction_site__foreman__last_name')
+        ).order_by('app_for_day__construction_site__foreman__last_name').exclude(var_aptech='supply_ok')
         today_technic_applications_list.append((v, today_technic_applications))
     out['today_technic_applications'] = today_technic_applications_list
 
@@ -630,7 +749,18 @@ def clear_application_view(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     current_application = ApplicationToday.objects.get(id=id_application)
-    ApplicationTechnic.objects.filter(app_for_day=current_application).delete()
+    app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
+
+    for _app in app_tech:
+        if _app.var_aptech:
+            try:
+                _a_tmp = ApplicationTechnic.objects.get(id=_app.var_aptech)
+                _a_tmp.var_aptech = None
+                _a_tmp.save()
+            except:
+                pass
+        _app.delete()
+
     current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     current_application.save()
     return HttpResponseRedirect(f'/applications/{current_application.date}')
@@ -721,7 +851,7 @@ def show_applications_view(request, day, id_user=None):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
 
-    elif is_employee_supply(current_user):
+    elif is_employee_supply(current_user):  #TODO:del
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
                                                       date=current_day,
                                                       construction_site__address='Снабжение')
@@ -792,7 +922,7 @@ def show_today_applications(request, day, id_foreman=None):
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
         set_var('filter_today_app', value=None, user=request.user)
     elif id_foreman:
-        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman=id_foreman,#TODO:POST
+        _app = ApplicationTechnic.objects.filter(app_for_day__construction_site__foreman=id_foreman,
                                                  app_for_day__date=current_day)
         if id_foreman != _filter:
             set_var('filter_today_app', value=id_foreman, user=request.user)
@@ -809,7 +939,8 @@ def show_today_applications(request, day, id_foreman=None):
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
-    )
+    ).exclude(var_aptech='supply_ok')
+
     driver_technic = app_tech_day.values_list('technic_driver__driver__driver__last_name',
                                               'technic_driver__technic__name__name').order_by(
         'technic_driver__driver__driver__last_name').distinct()
@@ -854,7 +985,7 @@ def show_info_application(request, id_application):
     get_prepare_data(out, request, current_day=current_application.date)
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    out["list_of_vehicles"] = list_of_vehicles
+    out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
     if is_admin(request.user):
         return render(request, 'extend/admin_show_inf_app.html', out)
     return render(request, "show_info_application.html", out)
@@ -898,7 +1029,7 @@ def create_new_application(request, id_application):
     out['D2'] = _tech_drv2
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    out["list_of_vehicles"] = list_of_vehicles
+    out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
     if request.method == "POST":  # ----------------POST
         print(request.POST)
@@ -908,8 +1039,18 @@ def create_new_application(request, id_application):
         driver_list = request.POST.getlist('io_driver')###
         description_app_list = request.POST.getlist('description_app_list')
 
+        ##------------delete--------------
+
         for i in get_difference(set([i[0] for i in list_of_vehicles.filter().values_list('id')]), set(int(i) for i in id_app_tech)):
-            ApplicationTechnic.objects.filter(app_for_day=current_application, id=i).delete()
+            _app = ApplicationTechnic.objects.get(app_for_day=current_application, id=i)
+            if _app.var_aptech:
+                try:
+                    _a_tmp = ApplicationTechnic.objects.get(id=_app.var_aptech)
+                    _a_tmp.var_aptech = None
+                    _a_tmp.save()
+                except: pass
+            _app.delete()
+        ##--------------------------------
 
         work_TD_list_F_saved = get_work_TD_list(current_application.date, 0, True)
         for n, _id in enumerate(id_tech_drv_list):
@@ -1105,15 +1246,19 @@ def get_priority_list(current_day):
     return ApplicationTechnic_id
     """
     l = []
-    app_tech = ApplicationTechnic.objects.filter(app_for_day__date=current_day).values_list('priority', 'technic_driver_id', 'id').order_by('technic_driver_id')
+    app_tech = ApplicationTechnic.objects.filter(
+        app_for_day__date=current_day).values_list('priority', 'technic_driver_id', 'id').order_by('technic_driver_id').exclude(
+        var_aptech='supply_ok')
     ll = [(int(a[0]), a[1]) for a in app_tech]
     for _app in set(ll):
         count = ll.count(_app)
         if count > 1:
             _l = [q[0] for q in ApplicationTechnic.objects.filter(app_for_day__date=current_day,
                                                     priority=_app[0],
-                                                    technic_driver_id=_app[1]).distinct().values_list('id')]
+                                                    technic_driver_id=_app[1]).exclude(
+        var_aptech='supply_ok').distinct().values_list('id')]
             l.extend(_l)
+    print(l)
     return l
 
 
@@ -1158,7 +1303,11 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
                                                             driver__status=True).count()#################
     # excl_const_site = ConstructionSite.objects.get(address=None, foreman=None)
 
-    app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
+    # app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
+    app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(
+        Q(technic_driver__status=False) |
+        Q(var_aptech='supply_ok'))
+
     app_list_submit_approv = app_list_today.filter(Q(app_for_day__status=ApplicationStatus.objects.get(
                                                            status=STATUS_AP['submitted'])) |
                                                    Q(app_for_day__status=ApplicationStatus.objects.get(
@@ -1269,6 +1418,7 @@ def show_start_page(request):
         elif is_mechanic(request.user):
             return HttpResponseRedirect(f"tech_list/{get_current_day('last_day')}")
         elif is_employee_supply(request.user):
+            # return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
             return HttpResponseRedirect(f"applications/{get_current_day('next_day')}")
         else:
             return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")

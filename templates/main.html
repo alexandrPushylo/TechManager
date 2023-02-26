@@ -67,7 +67,7 @@
           <hr style="border-width: medium; border-color: green">
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
               {% for v in a.apps_tech %}
-                  <div class="row">
+                  <div class="row {% if v.var_aptech == 'supply_ok' %}bg-warning{% endif %}">
                 <div class="card-text fs-6 col-auto
                         {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
