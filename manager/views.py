@@ -1101,6 +1101,8 @@ def create_new_application(request, id_application):
 
 
 def signin_view(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/')
     out = {
         'TODAY': TODAY,
         'WEEKDAY_TODAY': WEEKDAY[TODAY.weekday()],
