@@ -5,6 +5,7 @@ from django.db.models import Q
 
 from django.contrib.auth.models import User
 
+from manager.models import CloneApplicationTechnic
 from manager.models import ApplicationTechnic, ApplicationStatus, ApplicationToday
 from manager.models import ConstructionSite, ConstructionSiteStatus
 from manager.models import TechnicDriver, DriverTabel

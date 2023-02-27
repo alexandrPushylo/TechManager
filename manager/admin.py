@@ -7,8 +7,10 @@ from manager.models import Technic, TechnicName, TechnicType
 from manager.models import WorkDayTabel
 from manager.models import Variable
 from manager.models import TeleBot
+from manager.models import CloneApplicationTechnic
 
 # Register your models here.
+admin.site.register(CloneApplicationTechnic)
 admin.site.register(ApplicationTechnic)
 admin.site.register(ApplicationStatus)
 admin.site.register(ApplicationToday)
