@@ -859,7 +859,7 @@ def show_applications_view(request, day, id_user=None):
     else:
         return HttpResponseRedirect('/')
 
-    out['style_font'] = get_var('style_font', user=request.user)
+    out['style_font_color'] = get_var('style_font_color', user=request.user)
 
     out['today_applications_list'] = []
     for appToday in app_for_day.order_by('construction_site__address'):
