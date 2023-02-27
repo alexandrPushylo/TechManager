@@ -2,26 +2,10 @@
 
 {% block content %}
 
-
-{#    {% block choosedate %}#}
-{#    <div class="container">#}
-{#        <div class="btn-group position-relative start-50 top-0 translate-middle ">#}
-{#            {% if cw_day == nw_day %}#}
-{#                <a href="{% url 'tabel_driver' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>#}
-{#                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>#}
-{#            {% else %}#}
-{#                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>#}
-{#                <a href="{% url 'tabel_driver' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>#}
-{#            {% endif %}#}
-{#        </div>#}
-{#    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>#}
-{#    </div>#}
-{#    {% endblock %}#}
-
 <div class="container-sm m-3 mx-auto">
       <div><div class="fw-bold fs-4">Настройки</div><hr>
     <form method="post" id="setting_form" enctype="multipart/form-data">{% csrf_token %}
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -38,7 +22,7 @@
     <tr id="row_{{ forloop.counter }}" class="setting_row" >
       <th scope="row">{{ forloop.counter }}</th>
       <td>{{ setting.name }}</td>
-      <td><input type="text" name="setting_value_{{ forloop.counter }}" value="{{ setting.value }}" /></td>
+      <td><input class="form-control" type="text" name="setting_value_{{ forloop.counter }}" value="{{ setting.value }}" /></td>
         <td><input {% if setting.flag %} checked {% endif %}
               id="inp_{{ forloop.counter }}" type="checkbox" name="setting_flag_{{ forloop.counter }}"/></td>
       <td>{{ setting.description }}</td>
