@@ -133,11 +133,25 @@ class ApplicationTechnic(models.Model):
     technic_driver = models.ForeignKey(TechnicDriver, on_delete=models.SET_NULL, null=True, verbose_name = 'Техника-Водитель')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
     priority = models.DecimalField(max_digits=3, decimal_places=0, default=1, verbose_name='Приоритет заявки')
-    var_aptech = models.CharField(max_length=256, null=True, blank=True)
+    var_aptech = models.CharField(max_length=256, null=True, blank=True)#TODO:del
+    var_check = models.BooleanField(default=False, verbose_name='Проверена')
     def __str__(self): return f"{self.app_for_day} {self.technic_driver}"
     class Meta:
         verbose_name = "Заявка на технику"
         verbose_name_plural = "Заявки на технику"
+
+
+class CloneApplicationTechnic(models.Model):
+    id_original_ap = models.DecimalField(max_digits=9, decimal_places=0, null=True, blank=True, verbose_name='Ид оригинала')
+    ID_app_for_day = models.DecimalField(max_digits=9, decimal_places=0, null=True, blank=True, verbose_name="Ид заявки на объект")
+    ID_technic_driver = models.DecimalField(max_digits=9, decimal_places=0, null=True, blank=True, verbose_name="Ид техника-водитель")
+    description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
+    priority = models.DecimalField(max_digits=3, decimal_places=0, default=1, verbose_name='Приоритет заявки')
+    var_check = models.BooleanField(default=False, verbose_name='Проверена')
+    def __str__(self): return f'[{self.id_original_ap}]-[{self.ID_app_for_day}][{self.ID_technic_driver}]'
+    class Meta:
+        verbose_name = 'Снимок заявки на технику'
+        verbose_name_plural = 'Снимоки заявки на технику'
 
 
 class Variable(models.Model):

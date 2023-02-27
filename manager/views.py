@@ -5,6 +5,7 @@ from django.db.models import Q
 
 from django.contrib.auth.models import User
 
+from manager.models import CloneApplicationTechnic
 from manager.models import ApplicationTechnic, ApplicationStatus, ApplicationToday
 from manager.models import ConstructionSite, ConstructionSiteStatus
 from manager.models import TechnicDriver, DriverTabel
@@ -100,7 +101,6 @@ def move_supply_app(request, day, id_app):
     cur_app_today = ApplicationToday.objects.get(id=id_app)
     current_day = convert_str_to_date(day)
     _save_status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-    # print(cur_app_today)
     app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
                                                construction_site__address='Снабжение')
     supply_list = Post.objects.filter(
@@ -383,7 +383,7 @@ def conflict_correction_view(request, day, id_applications):
             if request.POST.get(f"vehicle_{app_id}"):
                 app.technic_driver = TechnicDriver.objects.get(
                     date=current_day,
-                    driver__driver__user__last_name=request.POST.get(f"driver_{app_id}"),
+                    driver__driver__last_name=request.POST.get(f"driver_{app_id}"),
                     technic__name__name=request.POST.get(f"vehicle_{app_id}"),
                     status=True)
                 app.description = request.POST.get(f"description_{app_id}")
@@ -1290,7 +1290,6 @@ def get_priority_list(current_day):
                                                     technic_driver_id=_app[1]).exclude(
         var_aptech='supply_ok').distinct().values_list('id')]
             l.extend(_l)
-    print(l)
     return l
 
 
