@@ -188,6 +188,9 @@ def edit_technic_view(request, id_tech=None):
     _attach_drv = Post.objects.filter(post_name__name_post=POST_USER['driver'])#.values_list('user_post', flat=True)
     out['attach_drv'] = _attach_drv.order_by('user_post__last_name')
 
+    _director_drv_list = User.objects.all()
+    out['director_drv'] = _director_drv_list.order_by('last_name')
+
     _name_technic = TechnicName.objects.all()
     out['name_technic'] = _name_technic.order_by('name')
 
@@ -207,17 +210,29 @@ def edit_technic_view(request, id_tech=None):
         _t_type = request.POST.get('type_tech')
         t_type = TechnicType.objects.get(id=_t_type)
 
-        _t_attr_drv = request.POST.get('att_drv_tech')
-        t_attr_drv = User.objects.get(id=_t_attr_drv)
+        if request.POST.get('att_drv_tech'):
+            _t_attr_drv = request.POST.get('att_drv_tech')
+            t_attr_drv = User.objects.get(id=_t_attr_drv)
+        else:
+            t_attr_drv = None
+
 
         t_desc = request.POST.get('description')
         t_iden_inf = request.POST.get('iden_inf')
+
+        if request.POST.get('director_drv_tech'):
+            _t_direct = request.POST.get('director_drv_tech')
+            t_direct = User.objects.get(id=_t_direct)
+
+        else:
+            t_direct = None
 
         _technic.name = t_name
         _technic.tech_type = t_type
         _technic.attached_driver = t_attr_drv
         _technic.description = t_desc
         _technic.id_information = t_iden_inf
+        _technic.supervisor = t_direct
         _technic.save()
 
         return HttpResponseRedirect('/technic_list/')

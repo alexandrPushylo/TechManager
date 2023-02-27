@@ -56,19 +56,28 @@
         <p class="col-auto">
             <label>Прикрепленный водитель</label>
             <input type="hidden" id="io_att_drv" value="{{ tech.attached_driver.id }}">
-            <select class=" col-auto" required id="att_drv_tech_select" name="att_drv_tech">
+            <select class=" col-auto" id="att_drv_tech_select" name="att_drv_tech">
                 <option></option>
                          {% for drv in attach_drv %}
                             <option value="{{ drv.user_post.id }}">{{ drv.user_post.last_name}} {{ drv.user_post.first_name }}</option>
                         {% endfor %}
             </select>
-        <a class="related-widget-wrapper-link add-related" id="add_id_attached_driver"
-            data-popup="yes"
-            href="/admin/manager/staffdriver/add/?_to_field=id&amp;_popup=1"
-            title="Добавить ещё один объект типа 'Водитель'">
-            <img src="/static/admin/img/icon-addlink.svg" alt="Добавить">
-            </a>
+
         </p>
+
+        <p class="col-auto">
+            <label>Прикрепленный руководитель</label>
+            <input type="hidden" id="io_director_drv" value="{{ tech.supervisor.id }}">
+            <select class=" col-auto" id="director_drv_tech_select" name="director_drv_tech">
+                <option></option>
+                         {% for drv in director_drv %}
+                            <option value="{{ drv.id }}">{{ drv.last_name}} {{ drv.first_name }}</option>
+                        {% endfor %}
+            </select>
+
+        </p>
+
+
     </form>
           </div>
         </div>
