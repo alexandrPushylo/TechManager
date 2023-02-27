@@ -383,7 +383,7 @@ def conflict_correction_view(request, day, id_applications):
             if request.POST.get(f"vehicle_{app_id}"):
                 app.technic_driver = TechnicDriver.objects.get(
                     date=current_day,
-                    driver__driver__user__last_name=request.POST.get(f"driver_{app_id}"),
+                    driver__driver__last_name=request.POST.get(f"driver_{app_id}"),
                     technic__name__name=request.POST.get(f"vehicle_{app_id}"),
                     status=True)
                 app.description = request.POST.get(f"description_{app_id}")
