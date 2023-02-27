@@ -1048,7 +1048,6 @@ def create_new_application(request, id_application):
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
     if request.method == "POST":  # ----------------POST
-        print(request.POST)
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
         vehicle_list = request.POST.getlist('io_technic')
@@ -1601,7 +1600,7 @@ def test_bot(request, id_user):
 def send_message(id_user, message):
     if TeleBot.objects.filter(user_bot=id_user).count() != 0:
         chat_id = TeleBot.objects.get(user_bot=id_user)
-        if chat_id:
+        if chat_id and chat_id.id_chat:
             BOT.send_message(chat_id.id_chat, message)
 
 
