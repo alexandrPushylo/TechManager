@@ -1514,12 +1514,12 @@ def prepare_technic_driver_table(day):
             driver = _drv[0][0]
             status = _drv[0][1]
 
-            c_drv = work_driver_list.filter(driver__user__last_name=driver)
+            c_drv = work_driver_list.filter(driver__last_name=driver)
 
             if c_drv.count() != 0:
                 TechnicDriver.objects.create(technic=_tech,
                                              driver=DriverTabel.objects.get(date=current_day,
-                                                                            driver__user__last_name=driver),
+                                                                            driver__last_name=driver),
                                              date=current_day,
                                              status=status)
             else:
