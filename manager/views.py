@@ -820,17 +820,33 @@ def show_applications_view(request, day, id_user=None):
                                                status=STATUS_AP['approved'])).count() != 0:
             out['send_app_list'] = True
 
+        driver_table_list = DriverTabel.objects.filter(date=current_day)
 
-        driver_table_list = DriverTabel.objects.filter(date=current_day).order_by('driver__last_name')
+        var_sort_driver_panel = get_var('var_sort_driver_panel', user=request.user)
+        if var_sort_driver_panel and var_sort_driver_panel.value:
+            dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
+
+        else:
+            dr_tab_l_ord = driver_table_list.order_by('driver__last_name')
 
         l_out = []
-        for _drv in driver_table_list:
-            app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
-            tech_drv = TechnicDriver.objects.filter(driver=_drv)
-            attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-            count = app.count()
+        try:
+            for _drv in dr_tab_l_ord:
+                app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
+                tech_drv = TechnicDriver.objects.filter(driver=_drv)
+                attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
+                count = app.count()
+                if not _drv in [_[0] for _ in l_out]:
+                    l_out.append((_drv, count, attach_drv, tech_drv))
+        except:
+            for _drv in driver_table_list.order_by('driver__last_name'):
+                app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
+                tech_drv = TechnicDriver.objects.filter(driver=_drv)
+                attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
+                count = app.count()
+                if not _drv in [_[0] for _ in l_out]:
+                    l_out.append((_drv, count, attach_drv, tech_drv))
 
-            l_out.append((_drv, count, attach_drv, tech_drv))
         out["DRV_LIST"] = l_out
 
         out["priority_list"] = get_priority_list(current_day)
