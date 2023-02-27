@@ -101,7 +101,6 @@ def move_supply_app(request, day, id_app):
     cur_app_today = ApplicationToday.objects.get(id=id_app)
     current_day = convert_str_to_date(day)
     _save_status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-    # print(cur_app_today)
     app_for_day = ApplicationToday.objects.get(construction_site__foreman=None, date=current_day,
                                                construction_site__address='Снабжение')
     supply_list = Post.objects.filter(
@@ -1291,7 +1290,6 @@ def get_priority_list(current_day):
                                                     technic_driver_id=_app[1]).exclude(
         var_aptech='supply_ok').distinct().values_list('id')]
             l.extend(_l)
-    print(l)
     return l
 
 
