@@ -128,6 +128,8 @@ def move_supply_app(request, day, id_app):
 
 
 def supply_app_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     current_day = convert_str_to_date(day)
     current_user = request.user
