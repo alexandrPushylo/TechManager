@@ -159,7 +159,6 @@ def supply_app_view(request, day):
         appTech = app_technic.filter(app_for_day=_app_today)
         if appTech:
             out['today_applications_list'].append((_app_today, appTech))
-
     return render(request, 'extend/supply_app.html', out)
 
 
@@ -341,7 +340,7 @@ def driver_app_list_view(request, day):
     current_app_tech = ApplicationTechnic.objects.filter(
         technic_driver__status=True,
         app_for_day__date=current_day,
-        app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+        app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send'])).exclude(var_aptech='supply_ok')
     current_driver_list = DriverTabel.objects.filter(status=True,
                                                      date=current_day,
                                                      technicdriver__status=True).distinct().order_by('driver__last_name')
@@ -778,8 +777,8 @@ def clear_application_view(request, id_application):
 
     current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     current_application.save()
-    return HttpResponseRedirect(f'/applications/{current_application.date}')
-
+    # return HttpResponseRedirect(f'/applications/{current_application.date}')
+    return HttpResponseRedirect('/')
 
 def show_applications_view(request, day, id_user=None):
 
@@ -925,7 +924,7 @@ def show_application_for_driver(request, day, id_user):
     applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
                                                      technic_driver__driver__driver=current_user,
                                                      app_for_day__status=ApplicationStatus.objects.get(
-                                                         status=STATUS_AP['send'])).order_by('priority')
+                                                         status=STATUS_AP['send'])).order_by('priority').exclude(var_aptech='supply_ok')
 
     out['applications'] = applications
 
@@ -1125,7 +1124,8 @@ def create_new_application(request, id_application):
         else:
             current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
         current_application.save()
-
+        if is_employee_supply(request.user):
+            return HttpResponseRedirect(f'/supply_app/{current_date}')
         return HttpResponseRedirect(f'/applications/{current_date}')
     return render(request, "create_application.html", out)
 
@@ -1244,7 +1244,7 @@ def send_all_applications(request, day):
         send_task_for_drv(day)#####################
         send_status_app_for_foreman(day)#######
         send_message_for_admin(day)
-    return HttpResponseRedirect(f'/applications/{day}')
+    return HttpResponseRedirect('/')
 
 
 def approv_all_applications(request, day):
@@ -1257,7 +1257,7 @@ def approv_all_applications(request, day):
         for app in current_applications:
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
             app.save()
-    return HttpResponseRedirect(f'/applications/{day}')
+    return HttpResponseRedirect('/')
 
 
 def submitted_all_applications(request, day):
@@ -1270,7 +1270,7 @@ def submitted_all_applications(request, day):
         for app in current_applications:
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
             app.save()
-    return HttpResponseRedirect(f'/applications/{day}')
+    return HttpResponseRedirect('/')
 
 
 def get_priority_list(current_day):
@@ -1487,7 +1487,7 @@ def success_application(request, id_application):
     else:
         current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
     current_application.save()
-    return HttpResponseRedirect(f'/applications/{current_application.date}')
+    return HttpResponseRedirect('/')
 
 
 def get_current_day(selected_day: str):
