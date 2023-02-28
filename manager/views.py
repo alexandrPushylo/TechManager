@@ -108,19 +108,23 @@ def move_supply_app(request, day, id_app):
     cur_app_tech = ApplicationTechnic.objects.filter(app_for_day=cur_app_today,
                                                      technic_driver__technic__supervisor__in=supply_list)
     for _app_tech in cur_app_tech:
-        if _app_tech.var_aptech == 'supply_ok':
+        if _app_tech.var_check:
+        # if _app_tech.var_aptech == 'supply_ok':
             continue
         _id = _app_tech.id
-        _app_tech.var_aptech = 'supply_ok'
+        _app_tech.var_check = True
+        # _app_tech.var_aptech = 'supply_ok'
         _app_tech.save()
         _app_tech.pk = None
+        _app_tech.var_check = False
         _app_tech.description = f'{_app_tech.app_for_day.construction_site.address} ({_app_tech.app_for_day.construction_site.foreman.last_name})\n{_app_tech.description}'
         _app_tech.app_for_day = app_for_day
-        _app_tech.var_aptech = _id
+        # _app_tech.var_aptech = _id
+        _app_tech.var_ID_orig = _id
         _app_tech.save()
         app_for_day.status = _save_status
         app_for_day.save()
-    return HttpResponseRedirect(f'/supply_app/{day}')
+    return HttpResponseRedirect('/')
 
 
 def supply_app_view(request, day):
@@ -153,6 +157,7 @@ def supply_app_view(request, day):
     app_technic = ApplicationTechnic.objects.filter(app_for_day__in=app_today_list, technic_driver__in=tech_drv)
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
+    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True, includeSave=True)
     out['today_applications_list'] = []
 
     for _app_today in app_today_list:
@@ -340,7 +345,7 @@ def driver_app_list_view(request, day):
     current_app_tech = ApplicationTechnic.objects.filter(
         technic_driver__status=True,
         app_for_day__date=current_day,
-        app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send'])).exclude(var_aptech='supply_ok')
+        app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send'])).exclude(var_check=True)
     current_driver_list = DriverTabel.objects.filter(status=True,
                                                      date=current_day,
                                                      technicdriver__status=True).distinct().order_by('driver__last_name')
@@ -421,7 +426,7 @@ def conflict_resolution_view(request, day):
             'app_for_day__construction_site__foreman__last_name',
             'app_for_day__construction_site__address',
             'technic_driver_id'
-        ).order_by('app_for_day__construction_site__foreman__last_name').exclude(var_aptech='supply_ok')
+        ).order_by('app_for_day__construction_site__foreman__last_name').exclude(var_check=True)
         today_technic_applications_list.append((v, today_technic_applications))
     out['today_technic_applications'] = today_technic_applications_list
 
@@ -766,13 +771,12 @@ def clear_application_view(request, id_application):
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
 
     for _app in app_tech:
-        if _app.var_aptech:
-            try:
-                _a_tmp = ApplicationTechnic.objects.get(id=_app.var_aptech)
-                _a_tmp.var_aptech = None
-                _a_tmp.save()
-            except:
-                pass
+        try:
+            _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
+            _a_tmp.var_check = False
+            _a_tmp.save()
+        except:
+            pass
         _app.delete()
 
     current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
@@ -924,7 +928,7 @@ def show_application_for_driver(request, day, id_user):
     applications = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
                                                      technic_driver__driver__driver=current_user,
                                                      app_for_day__status=ApplicationStatus.objects.get(
-                                                         status=STATUS_AP['send'])).order_by('priority').exclude(var_aptech='supply_ok')
+                                                         status=STATUS_AP['send'])).order_by('priority').exclude(var_check=True)
 
     out['applications'] = applications
 
@@ -969,7 +973,7 @@ def show_today_applications(request, day, id_foreman=None):
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
-    ).exclude(var_aptech='supply_ok')
+    ).exclude(var_check=True)
 
     driver_technic = app_tech_day.values_list('technic_driver__driver__driver__last_name',
                                               'technic_driver__technic__name__name').order_by(
@@ -1072,12 +1076,11 @@ def create_new_application(request, id_application):
 
         for i in get_difference(set([i[0] for i in list_of_vehicles.filter().values_list('id')]), set(int(i) for i in id_app_tech)):
             _app = ApplicationTechnic.objects.get(app_for_day=current_application, id=i)
-            if _app.var_aptech:
-                try:
-                    _a_tmp = ApplicationTechnic.objects.get(id=_app.var_aptech)
-                    _a_tmp.var_aptech = None
-                    _a_tmp.save()
-                except: pass
+            try:
+                _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
+                _a_tmp.var_check = False
+                _a_tmp.save()
+            except: pass
             _app.delete()
         ##--------------------------------
 
@@ -1103,7 +1106,11 @@ def create_new_application(request, id_application):
             v_d_app = TechnicDriver.objects.get(id=id_tech_drv_list[i])
 
             l_of_v.technic_driver = v_d_app
-            l_of_v.description = description_app_list[i]
+            if l_of_v.description == description_app_list[i]:
+                l_of_v.description = description_app_list[i]
+            else:
+                l_of_v.description = description_app_list[i]
+                l_of_v.var_check = False
             l_of_v.save()
 
         if len(id_app_tech) < len(vehicle_list):
@@ -1280,7 +1287,7 @@ def get_priority_list(current_day):
     l = []
     app_tech = ApplicationTechnic.objects.filter(
         app_for_day__date=current_day).values_list('priority', 'technic_driver_id', 'id').order_by('technic_driver_id').exclude(
-        var_aptech='supply_ok')
+        var_check=True)
     ll = [(int(a[0]), a[1]) for a in app_tech]
     for _app in set(ll):
         count = ll.count(_app)
@@ -1288,7 +1295,7 @@ def get_priority_list(current_day):
             _l = [q[0] for q in ApplicationTechnic.objects.filter(app_for_day__date=current_day,
                                                     priority=_app[0],
                                                     technic_driver_id=_app[1]).exclude(
-        var_aptech='supply_ok').distinct().values_list('id')]
+        var_check=True).distinct().values_list('id')]
             l.extend(_l)
     return l
 
@@ -1316,7 +1323,7 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
     return out
 
 
-def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_id=False):   #applicationtech
+def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_id=False, includeSave = False):   #applicationtech
     '''
         c_in - количество тех. которое может быть заказано, прежде чем попасть в список
         all - сравнение с всей в том числе нероботающей техникой
@@ -1337,9 +1344,15 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
     # app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(technic_driver__status=False)
     app_list_today = ApplicationTechnic.objects.filter(app_for_day__date=current_day).exclude(
         Q(technic_driver__status=False) |
-        Q(var_aptech='supply_ok'))
+        Q(var_check=True))
 
-    app_list_submit_approv = app_list_today.filter(Q(app_for_day__status=ApplicationStatus.objects.get(
+    if includeSave:
+        app_list_submit_approv = app_list_today.filter(
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])))
+    else:
+        app_list_submit_approv = app_list_today.filter(Q(app_for_day__status=ApplicationStatus.objects.get(
                                                            status=STATUS_AP['submitted'])) |
                                                    Q(app_for_day__status=ApplicationStatus.objects.get(
                                                        status=STATUS_AP['approved']))
@@ -1626,13 +1639,16 @@ def send_task_for_drv(current_day):
     for _id_drv in _driver_list:
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day,
                                                  technic_driver__driver__driver=_id_drv.driver.id,
-                                                 app_for_day__status=_status).order_by('priority')
+                                                 app_for_day__status=_status).order_by('priority').exclude(var_check=True)
         out.append((_id_drv, _app))
 
     for drv, app in out:
         mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {current_day}\n\n"
         for s in app:
-            mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
+            if s.app_for_day.construction_site.address == 'Снабжение':
+                mss += f"\t{s.priority})\n"
+            else:
+                mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
             mss += f"{s.description}\n\n"
 
         send_message(drv.driver.id, mss)
@@ -1664,7 +1680,7 @@ def send_status_app_for_foreman(current_day):
 
 def send_message_for_admin(current_day):
     admin_id_list = Post.objects.filter(post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
-    mess = f"Заявки на {current_day}\n\n отправлены"
+    mess = f"Заявки на {current_day} отправлены"
     for _id in admin_id_list:
         send_message(_id, mess)
 
