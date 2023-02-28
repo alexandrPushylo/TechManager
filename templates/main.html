@@ -67,7 +67,7 @@
           <hr style="border-width: medium; border-color: green">
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
               {% for v in a.apps_tech %}
-                  <div class="row {% if v.var_aptech == 'supply_ok' %}bg-warning{% endif %}">
+                  <div class="row {% if v.var_check %}bg-warning{% endif %}">
                 <div class="card-text fs-6 col-auto
                         {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
@@ -78,7 +78,7 @@
                             {% if not v.technic_driver.driver.driver %}
                                 text-warning">(Водитель не назначен)
                             {% else %}
-                    "> ({{ v.technic_driver.driver.driver }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
+                    "> ({{ v.technic_driver.driver.driver }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 and not v.var_check %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
                             {% endif %}
                 </div>
                     </div>
