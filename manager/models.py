@@ -133,8 +133,8 @@ class ApplicationTechnic(models.Model):
     technic_driver = models.ForeignKey(TechnicDriver, on_delete=models.SET_NULL, null=True, verbose_name = 'Техника-Водитель')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
     priority = models.DecimalField(max_digits=3, decimal_places=0, default=1, verbose_name='Приоритет заявки')
-    var_aptech = models.CharField(max_length=256, null=True, blank=True)#TODO:del
     var_check = models.BooleanField(default=False, verbose_name='Проверена')
+    var_ID_orig = models.DecimalField(max_digits=9, decimal_places=0, null=True, blank=True, verbose_name='Ид ApplicationTechnic')
     def __str__(self): return f"{self.app_for_day} {self.technic_driver}"
     class Meta:
         verbose_name = "Заявка на технику"
