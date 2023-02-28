@@ -997,9 +997,9 @@ def show_today_applications(request, day, id_foreman=None):
             app.priority = pr
             app.description = desc
             app.save()
-        out['message_status'] = True
-        out['message'] = 'Сохранено'
-        # return HttpResponseRedirect(f'/today_app/{day}')
+        # out['message_status'] = True
+        # out['message'] = 'Сохранено'
+        return HttpResponseRedirect(f'/today_app/{day}')
     return render(request, "today_applications.html", out)
 
 
@@ -1449,8 +1449,8 @@ def show_start_page(request):
         elif is_mechanic(request.user):
             return HttpResponseRedirect(f"tech_list/{get_current_day('last_day')}")
         elif is_employee_supply(request.user):
-            # return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
-            return HttpResponseRedirect(f"applications/{get_current_day('next_day')}")
+            return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
+            # return HttpResponseRedirect(f"applications/{get_current_day('next_day')}")
         else:
             return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
 
