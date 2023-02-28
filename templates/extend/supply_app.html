@@ -57,7 +57,7 @@
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
               {% for v in apps_tech %}
                   <div class="row">
-                <div class="card-text fs-6 col-auto">{{ v.technic_driver.technic.name }}</div>
+                <div class="card-text fs-6 col-auto {% if v.id in conflicts_vehicles_list_id %}text-danger{% endif %}">{{ v.technic_driver.technic.name }}</div>
                 <div class="card-text fs-6 col-auto"> ({{ v.technic_driver.driver.driver }})
                 {% for count in count_app_list %}{% if v.technic_driver.id == count.0 %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
                 </div>
@@ -112,7 +112,7 @@
           <hr style="border-width: medium;">
 {#              <h6 class="card-text"><label><b>Список техники:</b></label> </h6>#}
                     {% for t in app.1 %}
-                  <div class="row {% if t.var_aptech in 'supply_ok' %}bg-warning{% endif %}">
+                  <div class="row {% if t.var_check %}bg-warning{% endif %}">
                 <div class="card-text fs-6 col-auto">{{ t.technic_driver.technic.name }} ({{ t.technic_driver.driver.driver }})</div>
                   </div>
 
