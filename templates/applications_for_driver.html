@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-{% block meta %}<meta http-equiv="refresh" content="10" >{% endblock %}
+
+{% if var_reload_drv_page.value %}{% block meta %}
+    <meta http-equiv="refresh" content="{{ var_reload_drv_page.value }}; URL={% url 'application_for_driver' lw_day current_user.id %}">
+{% endblock %}{% endif %}
+
 {% block content %}
 
     {% block choosedate %}
