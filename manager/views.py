@@ -745,8 +745,7 @@ def tabel_workday_view(request, ch_week):
         return HttpResponseRedirect('/')
 
     out = {}
-
-    if ch_week == 'next-week':
+    if ch_week == 'nextweek':
         _day = TODAY+timedelta(7)
         out['week_title'] = 'Следующая неделя'
         out['ch_week'] = ch_week
