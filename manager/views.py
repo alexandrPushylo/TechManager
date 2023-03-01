@@ -964,6 +964,16 @@ def show_applications_view(request, day, id_user=None):
 
         out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
+        saved_ap_list = ApplicationToday.objects.filter(
+            date=current_day,
+            status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+        ).order_by('construction_site__foreman__last_name')
+
+        if saved_ap_list.count() != 0:
+            out['inf_btn_status'] = True
+            out['inf_btn_content'] = 'Имеются не поданные заявки'
+            out['saved_ap_list'] = saved_ap_list
+
     elif is_foreman(current_user):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=current_user, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
