@@ -140,6 +140,7 @@ def supply_app_view(request, day):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
+    check_table(day)
     out = {}
     current_day = convert_str_to_date(day)
     current_user = request.user
@@ -896,23 +897,7 @@ def show_applications_view(request, day, id_user=None):
         current_user = request.user
 
     get_prepare_data(out, request, current_day)
-
-    construction_site_list = ConstructionSite.objects.filter(
-        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened']))
-
-    applications_today_list_all = ApplicationToday.objects.filter(date=current_day)
-
-    if applications_today_list_all.count() < construction_site_list.count():
-        for constr_site in construction_site_list:
-            _app, _ = ApplicationToday.objects.get_or_create(construction_site=constr_site, date=current_day)
-            if _:
-                _app.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
-                _app.save()
-    else:
-        if construction_site_list.count() < applications_today_list_all.count():
-            applications_today_list_all.exclude(construction_site__in=construction_site_list).delete()
-        else:
-            print("OK")
+    check_table(day)
 
     if is_admin(current_user):
         app_for_day = ApplicationToday.objects.filter(
@@ -1762,6 +1747,26 @@ def prepare_technic_driver_table(day):
             TechnicDriver.objects.create(technic=tech, date=TODAY, status=True)
 
 
+def prepare_application_today(day):
+    current_day = convert_str_to_date(day)
+    construction_site_list = ConstructionSite.objects.filter(
+        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened']))
+
+    applications_today_list_all = ApplicationToday.objects.filter(date=current_day)
+
+    if applications_today_list_all.count() < construction_site_list.count():
+        for constr_site in construction_site_list:
+            _app, _ = ApplicationToday.objects.get_or_create(construction_site=constr_site, date=current_day)
+            if _:
+                _app.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+                _app.save()
+    else:
+        if construction_site_list.count() < applications_today_list_all.count():
+            applications_today_list_all.exclude(construction_site__in=construction_site_list).delete()
+        else:
+            print("OK")
+
+
 # ---------------------------------------------------------------
 
 
@@ -1918,3 +1923,5 @@ def check_table(day):
 
     if TechnicDriver.objects.filter(date=date).count() == 0:
         prepare_technic_driver_table(day)
+
+    prepare_application_today(day)
