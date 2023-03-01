@@ -129,6 +129,7 @@ class ApplicationToday(models.Model):
 
 
 class ApplicationTechnic(models.Model):
+    id_group = models.DecimalField(max_digits=9, decimal_places=0, null=True, blank=True, verbose_name='Ид группы')
     app_for_day = models.ForeignKey(ApplicationToday, on_delete=models.CASCADE, verbose_name="Заявка на объект")
     technic_driver = models.ForeignKey(TechnicDriver, on_delete=models.SET_NULL, null=True, verbose_name = 'Техника-Водитель')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
