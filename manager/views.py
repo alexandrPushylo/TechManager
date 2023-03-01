@@ -362,6 +362,8 @@ def append_in_hos_tech(request, id_drv):
 
 
 def foreman_app_list_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
