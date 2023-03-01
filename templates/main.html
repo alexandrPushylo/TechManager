@@ -67,7 +67,7 @@
           <hr style="border-width: medium; border-color: green">
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
               {% for v in a.apps_tech %}
-                  <div class="row {% if v.var_check %}bg-warning{% endif %}">
+                  <div class="row " {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>
                 <div class="card-text fs-6 col-auto
                         {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
@@ -84,7 +84,7 @@
                     </div>
 
                   {% if v.description %}
-                <textarea class="form-control app_description" readonly>{{ v.description }}</textarea>
+                <textarea class="form-control app_description" readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
                 {%endif%}
                   <hr>
 
