@@ -29,7 +29,14 @@
     </div>
     {% endblock %}
 
-<div class="container container-fluid mx-auto row">
+    <div class="container container-fluid mx-auto row">
+
+    {% if inf_btn_status %}
+    <button type="button" class="btn btn-warning col-auto ms-3 position-absolute" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <i class="fa-sharp fa-solid fa-info"></i>
+    </button>
+    {% endif %}
+
     <div class="container mt-5 col-auto " >
         <div class="row">
         {% for a in today_applications_list %}
@@ -159,7 +166,26 @@
     {% endif %}
 
 </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ inf_btn_content }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {% for app in saved_ap_list %}
+                <div class="small">{% if app.construction_site.foreman.last_name %}{{ app.construction_site.foreman.last_name }} -- {% endif %}{{ app.construction_site.address }}</div>
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
 
+          </div>
+        </div>
+      </div>
+    </div>
 
 {% endblock %}
 
