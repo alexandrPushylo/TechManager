@@ -96,8 +96,8 @@
 {#        {% endfor %}#}
     </div>
     </div>
-
-<div class="driver_panel container col-auto position-fixed end-0 mt-0"style=" height: 90vh;">
+{% csrf_token %}
+<div class="foreman_panel container col-auto position-fixed end-0 top-0"style="margin-top: 5rem; height: 100vh;" {% if var_supply_panel.value == user.id|slugify and var_supply_panel.flag %} hidden="" {% endif %}>
         <div class="card-body  overflow-auto "style="height: 75%" >
 
             {% for app in today_applications_list %}
@@ -145,6 +145,6 @@
 
 <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 
-
+<button role="button" class="btn_panel btn btn-outline-light  col-auto position-absolute end-0 m-2"><i class="fa-solid fa-list"></i> </button>
 </div>
 {% endblock %}
