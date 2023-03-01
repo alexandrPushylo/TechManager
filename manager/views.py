@@ -1031,6 +1031,9 @@ def show_application_for_driver(request, day, id_user):
             status=STATUS_AP['send'])).order_by('priority').exclude(var_check=True)
     out['applications'] = applications
 
+    _var_reload_drv_page = get_var('reload_drv_page')
+    out["var_reload_drv_page"] = _var_reload_drv_page
+
     if is_admin(request.user) or is_master(request.user) or is_foreman(request.user):
         return render(request, 'extend/admin_app_for_driver.html', out)
 
