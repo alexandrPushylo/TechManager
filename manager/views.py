@@ -153,6 +153,13 @@ def supply_app_view(request, day):
 
     out['app_today'] = app_for_day
 
+    if request.POST.get('panel'):
+        _flag = request.POST.get('panel')
+        _flag = str(_flag).capitalize()
+        set_var('supply_panel', value=request.user.id, flag=_flag, user=request.user)
+
+    out['var_supply_panel'] = get_var('supply_panel', user=request.user)
+
     apps_tech = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
     out['apps_tech'] = apps_tech.order_by('technic_driver__technic__name__name')
 
@@ -1450,7 +1457,6 @@ def get_priority_list(current_day):
                 priority=_app[0],
                 technic_driver_id=_app[1]).exclude(var_check=True).distinct().values_list('id')]
             l.extend(_l)
-
     return l
 
 
