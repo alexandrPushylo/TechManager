@@ -170,7 +170,6 @@ def supply_app_view(request, day):
 
     app_today_list = ApplicationToday.objects.filter(
         Q(date=current_day),
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send'])) |
         Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
         Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))).exclude(id=app_for_day.id)
 
