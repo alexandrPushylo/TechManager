@@ -3,7 +3,7 @@ from random import choice
 import telebot
 import requests
 from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
-#---------------------------------------------------
+# ---------------------------------------------------
 
 ONE_DAY = timedelta(days=1)
 STATUS_APPLICATION = {"Подтвержден", "Не подтвержден", "Отменен"}
@@ -17,13 +17,16 @@ status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 
 TELE_URL = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
 BOT = telebot.TeleBot(TOKEN, parse_mode=None)
-#--FUNCTIONS-------------------------------------------------
+# --FUNCTIONS-------------------------------------------------
+
 
 def get_day_in_days(day: date, count_days: int):
     return day + timedelta(count_days)
 
+
 def get_difference(a: set, b: set):
     return list(a.difference(b))
+
 
 def get_week(c_date, week=None):
     if week == 'l':
@@ -39,6 +42,7 @@ def get_week(c_date, week=None):
         yield curr_date
         curr_date += ONE_DAY
 
+
 def convert_str_to_date(str_date: str) -> date:
     """конвертация str в datetime.date"""
     try:
@@ -47,12 +51,14 @@ def convert_str_to_date(str_date: str) -> date:
     except:
         print('Error date')
 
+
 def get_json():
     get_data = requests.get(TELE_URL)
     data_json = get_data.json()
     STATUS = data_json['ok']
     result = data_json['result']
     return result
+
 
 def get_id_chat(key, result):
     for upd in result:
