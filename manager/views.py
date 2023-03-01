@@ -1433,15 +1433,31 @@ def submitted_all_applications(request, day):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
-    if is_foreman(request.user) or is_master(request.user) or is_employee_supply(request.user):
-        current_day = convert_str_to_date(day)
-        current_applications = ApplicationToday.objects.filter(
-            status=ApplicationStatus.objects.get(status=STATUS_AP['saved']),
-            date=current_day)
+    current_day = convert_str_to_date(day)
 
-        for app in current_applications:
-            app.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
-            app.save()
+    if is_admin(request.user):
+        pass
+
+    elif is_foreman(request.user):
+        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=request.user, date=current_day)
+
+    elif is_master(request.user):
+        _foreman = Post.objects.get(user_post=request.user).supervisor
+        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
+
+    elif is_employee_supply(request.user):
+        app_for_day = ApplicationToday.objects.filter(
+            construction_site__foreman=None,
+            date=current_day,
+            construction_site__address='Снабжение')
+
+    current_applications = app_for_day.filter(
+        status=ApplicationStatus.objects.get(status=STATUS_AP['saved']),
+        date=current_day)
+
+    for app in current_applications:
+        app.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        app.save()
 
     return HttpResponseRedirect('/')
 
