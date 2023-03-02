@@ -1002,10 +1002,9 @@ def show_applications_view(request, day, id_user=None):
 
     for appToday in app_for_day.order_by('construction_site__address'):
         appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
-        out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech})
-
-        if appTech.count() == 0:
-            appToday.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+        appMater = ApplicationMeterial.objects.filter(
+            app_for_day=appToday).values_list('description', flat=True).first()
+        out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
 
