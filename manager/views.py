@@ -14,6 +14,7 @@ from manager.models import Technic, TechnicName, TechnicType
 from manager.models import WorkDayTabel
 from manager.models import Variable
 from manager.models import TeleBot
+from manager.models import ApplicationMeterial
 
 # from manager.forms import CreateNewApplicationForm
 
@@ -1162,8 +1163,8 @@ def create_new_application(request, id_application):
     work_tech_name_list = TechnicDriver.objects.filter(
         date=current_date,
         driver__isnull=False,
-        status=True).values_list('technic__name__name').distinct()
-    work_tech_name_list = [_[0] for _ in work_tech_name_list]
+        status=True).values_list('technic__name__name', flat=True).distinct()
+
     out['work_tech_name_list'] = work_tech_name_list
 
     _tech_drv = []
