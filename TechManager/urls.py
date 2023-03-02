@@ -102,6 +102,8 @@ urlpatterns = [
 
     path('today_app/<str:day>', show_today_applications, name="show_today_applications"),
     path('today_app/<str:day>/<int:id_foreman>', show_today_applications, name="show_today_applications"),
+    path('today_app/<str:day>/materials', show_today_applications, name="show_today_materials"),
+    path('today_app/<str:day>/materials/<int:id_foreman>', show_today_applications, name="show_today_materials"),
 
     path('info_app/<int:id_application>', show_info_application, name="show_info_application"),
     path('new_app/<int:id_application>', create_new_application, name="add_application"),

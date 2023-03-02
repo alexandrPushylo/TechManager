@@ -882,7 +882,10 @@ def clear_application_view(request, id_application):
         except:
             pass
         _app.delete()
-
+    try:
+        ApplicationMeterial.objects.get(app_for_day=current_application).delete()
+    except ApplicationMeterial.DoesNotExist:
+        pass
     current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     current_application.save()
 
@@ -999,10 +1002,9 @@ def show_applications_view(request, day, id_user=None):
 
     for appToday in app_for_day.order_by('construction_site__address'):
         appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
-        out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech})
-
-        if appTech.count() == 0:
-            appToday.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+        appMater = ApplicationMeterial.objects.filter(
+            app_for_day=appToday).values_list('description', flat=True).first()
+        out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
 
@@ -1051,8 +1053,36 @@ def show_today_applications(request, day, id_foreman=None):
     out = {}
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
+
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
+
+    if 'materials' in request.path:
+        _filter = get_var('filter_material_app', value=True, user=request.user)
+        if id_foreman == 0:
+            _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+            set_var('filter_material_app', value=None, user=request.user)
+
+        elif id_foreman:
+            _app = ApplicationMeterial.objects.filter(
+                app_for_day__construction_site__foreman=id_foreman,
+                app_for_day__date=current_day)
+
+            if id_foreman != _filter:
+                set_var('filter_material_app', value=id_foreman, user=request.user)
+        else:
+            if _filter:
+                _app = ApplicationMeterial.objects.filter(
+                    app_for_day__construction_site__foreman_id=_filter,
+                    app_for_day__date=current_day)
+            else:
+                _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+
+        out['materials_list'] = _app
+        return render(request, "extend/material_today_app.html", out)
+
+
+
 
     if is_admin(request.user):
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
@@ -1129,8 +1159,13 @@ def show_info_application(request, id_application):
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = current_application.date
     get_prepare_data(out, request, current_day=current_application.date)
+
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
+
+    list_of_materials = ApplicationMeterial.objects.filter(
+        app_for_day=current_application).values_list('description', flat=True).first()
+    out['list_of_materials'] = list_of_materials
 
     if is_admin(request.user):
         return render(request, 'extend/admin_show_inf_app.html', out)
@@ -1197,12 +1232,21 @@ def create_new_application(request, id_application):
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
+    try:
+        _materials = ApplicationMeterial.objects.get(app_for_day=current_application).description
+        out['material_list_raw'] = _materials
+    except ApplicationMeterial.DoesNotExist:
+        pass
+
+
+
     if request.method == "POST":
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
         vehicle_list = request.POST.getlist('io_technic')
         driver_list = request.POST.getlist('io_driver')
         description_app_list = request.POST.getlist('description_app_list')
+        materials = request.POST.get('desc_meterials')
 
         # ------------delete--------------TODO:list
 
@@ -1264,11 +1308,21 @@ def create_new_application(request, id_application):
                     technic_driver=tech_drv,
                     description=description).save()
 
-        if is_admin(request.user):
-            current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
+        if materials:
+            _material.description = materials
+            _material.save()
         else:
-            current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+            _material.delete()
+        if ApplicationTechnic.objects.filter(app_for_day=current_application).count() == 0 and \
+                ApplicationMeterial.objects.filter(app_for_day=current_application).count() == 0:
+            _status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+        elif is_admin(request.user):
+            _status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        else:
+            _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
 
+        current_application.status = _status
         current_application.save()
 
         if is_employee_supply(request.user):
