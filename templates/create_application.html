@@ -73,7 +73,7 @@
         <div class="container-fluid row">
 
 
-            <select class=" col-auto" id="input_tech_add">
+            <select class=" col-5" id="input_tech_add">
                 <option selected>---</option>
                 {% for v in D %}
                     {% if v.1 in work_tech_name_list %}
@@ -93,7 +93,7 @@
 
             {% endfor %}
 
-            <button role="button" class="btn btn-success   btn-sm  col-auto position-absolute end-0  me-3" id = "add_vehicle_btn">Добавить</button>
+            <button role="button" class="btn btn-success   btn-sm  col-auto ms-2 fs-5" id = "add_vehicle_btn">+</button>
         </div>
             <textarea class="form-control mt-3 app_description mx-auto" id="description_app_add" rows="3" placeholder="Пишите подробное описание"></textarea>
       </div>
