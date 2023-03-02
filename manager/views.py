@@ -882,7 +882,10 @@ def clear_application_view(request, id_application):
         except:
             pass
         _app.delete()
-
+    try:
+        ApplicationMeterial.objects.get(app_for_day=current_application).delete()
+    except ApplicationMeterial.DoesNotExist:
+        pass
     current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
     current_application.save()
 
