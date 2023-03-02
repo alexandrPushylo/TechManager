@@ -118,7 +118,6 @@ class ApplicationStatus(models.Model):
 class ApplicationToday(models.Model):
     construction_site = models.ForeignKey(ConstructionSite, on_delete=models.CASCADE,
                                           verbose_name="Строительный объект")
-
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.ForeignKey(ApplicationStatus, on_delete=models.SET_NULL, null=True, verbose_name="Статус заявки")
     var_aptd = models.CharField(max_length=256, null=True, blank=True)
@@ -171,3 +170,12 @@ class TeleBot(models.Model):
     user_bot = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='id пользователя')
     id_chat = models.CharField(max_length=128, verbose_name='id chat')
     def __str__(self): return f"{self.user_bot.last_name} - [{self.id_chat}]"
+
+
+class ApplicationMeterial(models.Model):
+    app_for_day = models.ForeignKey(ApplicationToday, on_delete=models.CASCADE, verbose_name="Заявка на объект")
+    description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
+    def __str__(self): return f"{self.app_for_day} - {self.description}"
+    class Meta:
+        verbose_name = 'Материал'
+        verbose_name_plural = 'Материалы'

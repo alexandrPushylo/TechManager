@@ -14,6 +14,7 @@ from manager.models import Technic, TechnicName, TechnicType
 from manager.models import WorkDayTabel
 from manager.models import Variable
 from manager.models import TeleBot
+from manager.models import ApplicationMeterial
 
 # from manager.forms import CreateNewApplicationForm
 
