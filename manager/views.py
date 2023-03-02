@@ -1053,6 +1053,7 @@ def show_today_applications(request, day, id_foreman=None):
     out = {}
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
+
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
@@ -1158,6 +1159,7 @@ def show_info_application(request, id_application):
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = current_application.date
     get_prepare_data(out, request, current_day=current_application.date)
+
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
