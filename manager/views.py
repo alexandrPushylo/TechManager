@@ -1161,6 +1161,10 @@ def show_info_application(request, id_application):
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
+    list_of_materials = ApplicationMeterial.objects.filter(
+        app_for_day=current_application).values_list('description', flat=True).first()
+    out['list_of_materials'] = list_of_materials
+
     if is_admin(request.user):
         return render(request, 'extend/admin_show_inf_app.html', out)
 

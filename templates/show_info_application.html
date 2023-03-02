@@ -23,8 +23,21 @@
                 </div>
             {% endfor %}
         </ul>
+
       </div>
     </div>
+
+    {% if list_of_materials %}
+    <div class="card shadow-lg mt-2" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+        <p class="card-text">
+            <b class="fs-5">Список материалов</b>
+        </p>
+        <hr>
+        <textarea class="form-control app_description" disabled rows="1">{{ list_of_materials }}</textarea>
+      </div>
+    </div>
+    {% endif %}
 
 </div>
 
