@@ -1054,6 +1054,33 @@ def show_today_applications(request, day, id_foreman=None):
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
+    if 'materials' in request.path:
+        _filter = get_var('filter_material_app', value=True, user=request.user)
+        if id_foreman == 0:
+            _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+            set_var('filter_material_app', value=None, user=request.user)
+
+        elif id_foreman:
+            _app = ApplicationMeterial.objects.filter(
+                app_for_day__construction_site__foreman=id_foreman,
+                app_for_day__date=current_day)
+
+            if id_foreman != _filter:
+                set_var('filter_material_app', value=id_foreman, user=request.user)
+        else:
+            if _filter:
+                _app = ApplicationMeterial.objects.filter(
+                    app_for_day__construction_site__foreman_id=_filter,
+                    app_for_day__date=current_day)
+            else:
+                _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+
+        out['materials_list'] = _app
+        return render(request, "extend/material_today_app.html", out)
+
+
+
+
     if is_admin(request.user):
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
 
