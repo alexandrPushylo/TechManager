@@ -1224,12 +1224,21 @@ def create_new_application(request, id_application):
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
+    try:
+        _materials = ApplicationMeterial.objects.get(app_for_day=current_application).description
+        out['material_list_raw'] = _materials
+    except ApplicationMeterial.DoesNotExist:
+        pass
+
+
+
     if request.method == "POST":
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
         vehicle_list = request.POST.getlist('io_technic')
         driver_list = request.POST.getlist('io_driver')
         description_app_list = request.POST.getlist('description_app_list')
+        materials = request.POST.get('desc_meterials')
 
         # ------------delete--------------TODO:list
 
@@ -1293,6 +1302,12 @@ def create_new_application(request, id_application):
 
         if is_admin(request.user):
             current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
+        if materials:
+            _material.description = materials
+            _material.save()
+        else:
+            _material.delete()
         else:
             current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
 
