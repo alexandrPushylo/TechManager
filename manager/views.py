@@ -1306,17 +1306,21 @@ def create_new_application(request, id_application):
                     technic_driver=tech_drv,
                     description=description).save()
 
-        if is_admin(request.user):
-            current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
         _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
         if materials:
             _material.description = materials
             _material.save()
         else:
             _material.delete()
+        if ApplicationTechnic.objects.filter(app_for_day=current_application).count() == 0 and \
+                ApplicationMeterial.objects.filter(app_for_day=current_application).count() == 0:
+            _status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+        elif is_admin(request.user):
+            _status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
         else:
-            current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+            _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
 
+        current_application.status = _status
         current_application.save()
 
         if is_employee_supply(request.user):
