@@ -94,9 +94,16 @@
                 <textarea class="form-control app_description" readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
                 {%endif%}
                   <hr>
-
               {% endfor %}
           {% endif %}
+
+          {% if a.app_mater %}
+              <div class="card-text"><label><b>Список материалов:</b></label> </div>
+              <textarea class="form-control app_description" readonly>{{ a.app_mater }}</textarea>
+              <hr>
+          {% endif %}
+
+
             <div class="btn-group ">
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>

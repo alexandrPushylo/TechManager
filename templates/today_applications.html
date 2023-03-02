@@ -94,5 +94,6 @@
         {% else %}
         <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
     {% endif %}
+    <a href="{% url 'show_today_materials' cw_day %}" class="btn btn-info col-auto m-1" aria-current="page">Материалы</a>
 </div>
 {% endblock %}

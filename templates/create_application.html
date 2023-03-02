@@ -64,7 +64,11 @@
         </div>
       </div>
     </div>
-  </form>
+
+
+
+
+
 
 {#------------------------------------------------------------------------------------------------------------------#}
 
@@ -95,33 +99,21 @@
 
             <button role="button" class="btn btn-success   btn-sm  col-auto ms-2 fs-5" id = "add_vehicle_btn">+</button>
         </div>
-            <textarea class="form-control mt-3 app_description mx-auto" id="description_app_add" rows="3" placeholder="Пишите подробное описание"></textarea>
+            <textarea class="form-control mt-3 app_description mx-auto" id="description_app_add" placeholder="Пишите подробное описание"></textarea>
       </div>
     </div>
 
-           <!-- Button trigger modal -->
-        <button type="button" class="btn btn-success position-relative start-50 translate-middle-x m-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-          #test#Добавить материалы
-        </button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">{{ construction_site.address }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                ...
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-success">Добавить</button>
-              </div>
-            </div>
-          </div>
+    <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+         <p class="card-text fs-5 fw-bold col-auto">Список материалов</p>
+         <hr>
+         <div >
+            <textarea readonly class="form-control app_description mx-auto" name="desc_meterials">{{ material_list_raw }}</textarea>
         </div>
+      </div>
+    </div>
+    </form>
+
 </div>
 
 {% endblock %}
