@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
+{% if var_cache %}
+{% block meta %}
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+{% endblock %}{% endif %}
+
 {% block indicator %}
 {% if post == 'admin' %}
     {% if conflicts_vehicles_list %}<a href="{% url 'conflict_resolution' cw_day %}" class="btn btn-sm btn-danger ">Недостаток техники</a>
