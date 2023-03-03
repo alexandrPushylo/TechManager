@@ -902,6 +902,10 @@ def show_applications_view(request, day, id_user=None):
 
     out = {"constr_site_list": []}
 
+    _var_cache = get_var('no_cache')
+    out["var_cache"] = _var_cache.flag
+
+
     if id_user:
         current_user = User.objects.get(id=id_user)
         out['current_user'] = current_user
