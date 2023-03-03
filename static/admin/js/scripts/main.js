@@ -39,3 +39,32 @@ $('.driver_name_link').click(function () {
     }
 
 })
+
+$('#btn_show_tech').click(function () {
+    sent('technics')
+    return false
+})
+
+$('#btn_show_all').click(function () {
+    sent('all')
+    return false
+})
+
+$('#btn_show_mater').click(function () {
+    sent('materials')
+})
+
+function sent(i) {
+        $.ajax({
+        type: 'POST',
+        mode: 'same-origin',
+        url: pathname,
+        data:{
+            csrfmiddlewaretoken: csrf,
+                filter: i
+            },
+        success: function() {
+            window.location.reload();
+            }
+        })
+}

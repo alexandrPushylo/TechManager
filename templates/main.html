@@ -13,7 +13,7 @@
 {% endif %}
 {% endblock %}
 
-{% block content %}
+{% block content %}{% csrf_token %}
     {% block choosedate %}
     <div class="container-fluid  ">
         <div class="btn-group position-relative start-50 top-0 translate-middle">
@@ -38,7 +38,7 @@
     {% endif %}
 
     <div class="container mt-5 col-auto " >
-        <div class="row">
+        <div class="row ms-2">
         {% for a in today_applications_list %}
         <div class="col-auto mb-3">
 
@@ -70,6 +70,7 @@
           <div class="card-body mt-1" >
             <h6 class="card-title  fw-bold text-center " style="color:{{ style_font_color.value }};">{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.last_name %}({{ a.app_today.construction_site.foreman.last_name }}){% endif %}</h6>
             <h6 class="card-title" >{{a.app_today.date}}</h6>
+          {% if var_filter_apps.value != 'materials' or var_filter_apps.value == 'all' %}
           {% if a.apps_tech %}
           <hr style="border-width: medium; border-color: green">
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
@@ -96,11 +97,14 @@
                   <hr>
               {% endfor %}
           {% endif %}
+          {% endif %}
 
-          {% if a.app_mater %}
+          {% if var_filter_apps.value != 'technics' or var_filter_apps.value == 'all' %}
+          {% if a.app_mater  %}
               <div class="card-text"><label><b>Список материалов:</b></label> </div>
               <textarea class="form-control app_description" readonly>{{ a.app_mater }}</textarea>
               <hr>
+          {% endif %}
           {% endif %}
 
 
@@ -131,7 +135,7 @@
     </div>
     </div>
 
-    {% if post == 'admin' %}{% csrf_token %}
+    {% if post == 'admin' %}
     <div class="driver_panel container col-auto   position-fixed end-0 "style="margin-top: -65px; height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
         <div class="card-body  overflow-auto "style="height: 90%" >
 
@@ -200,9 +204,18 @@
     <script src="{% static "admin/js/scripts/main.js" %}"></script>
 {% endblock %}
 
-{% block bottom_panel %}
-<div class="input-group d-flex justify-content-center align-items-center">
+{% block tab %}
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -5px;">
+    <button role="button" id="btn_show_tech"  style="text-orientation: upright; writing-mode: vertical-lr; " class="pe-4 btn  {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</button>
+    <button role="button" id="btn_show_all"   style="text-orientation: upright; writing-mode: vertical-lr;" class="pe-4 btn   {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</button>
+    <button role="button" id="btn_show_mater"   style="text-orientation: upright; writing-mode: vertical-lr;" class="pe-4 btn   {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</button>
 
+</div>
+{% endblock %}
+
+{% block bottom_panel %}
+
+<div class="input-group d-flex justify-content-center align-items-center">
     <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 </div>
     {% if post == 'admin' %}
