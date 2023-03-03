@@ -1947,17 +1947,22 @@ def send_task_for_drv(current_day):
 def send_status_app_for_foreman(current_day):
     out = []
     _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
-    id_list = Post.objects.filter(
-        Q(post_name__name_post=POST_USER['foreman']) |
-        Q(post_name__name_post=POST_USER['master']) |
-        Q(post_name__name_post=POST_USER['employee_supply'])
-    ).values_list('user_post_id', flat=True)
+
+    id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
+    id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
+
     _app = ApplicationToday.objects.filter(date=current_day, status=_status)
 
-    for _id in id_list:
-        _a = _app.filter(construction_site__foreman_id=_id)
+    for _id in id_foreman_list:
+        _a = _app.filter(construction_site__foreman=_id.user_post)
         if _a:
-            out.append((_id, _a))
+            out.append((_id.user_post.id, _a))
+
+    for _id in id_master_list:
+        _a = _app.filter(construction_site__foreman=_id.supervisor)
+        if _a:
+            out.append((_id.user_post.id, _a))
 
     for _id, app in out:
         mss = f"{current_day}\n\n"
