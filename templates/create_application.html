@@ -108,7 +108,7 @@
          <p class="card-text fs-5 fw-bold col-auto">Список материалов</p>
          <hr>
          <div >
-            <textarea readonly class="form-control app_description mx-auto" name="desc_meterials">{{ material_list_raw }}</textarea>
+            <textarea {% if user.username != 'admin' %} readonly {% endif %}  class="form-control app_description mx-auto" name="desc_meterials" placeholder="Временно не доступно">{{ material_list_raw }}</textarea>
         </div>
       </div>
     </div>
