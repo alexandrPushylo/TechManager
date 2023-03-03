@@ -911,6 +911,13 @@ def show_applications_view(request, day, id_user=None):
     get_prepare_data(out, request, current_day)
     check_table(day)
 
+    if request.POST.get('filter'):
+        # technics, all, materials
+        _filter = request.POST.get('filter')
+        set_var('filter_main_apps', value=_filter, user=request.user)
+    out['var_filter_apps'] = get_var('filter_main_apps', user=request.user)
+
+
     if is_admin(current_user):
         app_for_day = ApplicationToday.objects.filter(
             Q(date=current_day),
@@ -1947,17 +1954,22 @@ def send_task_for_drv(current_day):
 def send_status_app_for_foreman(current_day):
     out = []
     _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
-    id_list = Post.objects.filter(
-        Q(post_name__name_post=POST_USER['foreman']) |
-        Q(post_name__name_post=POST_USER['master']) |
-        Q(post_name__name_post=POST_USER['employee_supply'])
-    ).values_list('user_post_id', flat=True)
+
+    id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
+    id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
+
     _app = ApplicationToday.objects.filter(date=current_day, status=_status)
 
-    for _id in id_list:
-        _a = _app.filter(construction_site__foreman_id=_id)
+    for _id in id_foreman_list:
+        _a = _app.filter(construction_site__foreman=_id.user_post)
         if _a:
-            out.append((_id, _a))
+            out.append((_id.user_post.id, _a))
+
+    for _id in id_master_list:
+        _a = _app.filter(construction_site__foreman=_id.supervisor)
+        if _a:
+            out.append((_id.user_post.id, _a))
 
     for _id, app in out:
         mss = f"{current_day}\n\n"
