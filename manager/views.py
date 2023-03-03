@@ -911,6 +911,13 @@ def show_applications_view(request, day, id_user=None):
     get_prepare_data(out, request, current_day)
     check_table(day)
 
+    if request.POST.get('filter'):
+        # technics, all, materials
+        _filter = request.POST.get('filter')
+        set_var('filter_main_apps', value=_filter, user=request.user)
+    out['var_filter_apps'] = get_var('filter_main_apps', user=request.user)
+
+
     if is_admin(current_user):
         app_for_day = ApplicationToday.objects.filter(
             Q(date=current_day),
