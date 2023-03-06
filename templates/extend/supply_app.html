@@ -4,7 +4,7 @@
 
 {% block choosedate %}
     <div class="container">
-        <div class="btn-group position-relative start-50 translate-middle-x mt-1">
+        <div class="btn-group position-relative start-50 translate-middle-x">
             {% if cw_day == nw_day %}
                 <a href="{% url 'supply_app' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3"  type="date"   value="{{ cw_day }}"/>
@@ -13,6 +13,7 @@
                 <a href="{% url 'supply_app' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
+    <div class="position-absolute translate-middle-x  start-50  mb-3 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 
@@ -137,8 +138,8 @@
 
 {% block tab %}
 <div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
-    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>
-    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</a>
+    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm btn-outline-success active " aria-current="page">Техника</a>
+    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm   btn-outline-secondary" aria-current="page">Материалы</a>
 </div>
 {% endblock %}
 
