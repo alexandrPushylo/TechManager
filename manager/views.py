@@ -47,6 +47,36 @@ from manager.utilities import BOT
 # ------FUNCTION VIEW----------------------
 
 
+def notice_submitt(request, current_day):
+    out = []
+    _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+
+    id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
+    id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
+
+    _app = ApplicationToday.objects.filter(date=current_day, status=_status)
+
+    for _id in id_foreman_list:
+        _a = _app.filter(construction_site__foreman=_id.user_post)
+        if _a:
+            out.append((_id.user_post.id, _a))
+
+    for _id in id_master_list:
+        _a = _app.filter(construction_site__foreman=_id.supervisor)
+        if _a:
+            out.append((_id.user_post.id, _a))
+
+    for _id, app in out:
+        mss = f"НАПОМИНАНИЕ\n\n"
+        for a in app:
+            mss += f"У вас имеется не поданная заявка: [ {a.construction_site.address} ]\n"
+
+        send_message(_id, mss)
+    return HttpResponseRedirect('/')
+
+
+
 def edit_list_materials(request, id_application):
     out = {}
     current_application = ApplicationToday.objects.get(id=id_application)
@@ -86,10 +116,21 @@ def supply_materials_view(request, day):
     )
 
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
+
+    if request.POST.get('id_app_material'):
+        _id_m = request.POST.get('id_app_material')
+        _am = ApplicationMeterial.objects.get(id=_id_m)
+        if _am.status_checked:
+            _am.status_checked = False
+        else:
+            _am.status_checked = True
+        _am.save()
+
+
     out['materials_list'] = []
     for _app_t in current_application:
         try:
-            _app_m = app_material.get(app_for_day=_app_t).description
+            _app_m = app_material.get(app_for_day=_app_t)
             out['materials_list'].append((_app_t, _app_m))
         except ApplicationMeterial.DoesNotExist:
             pass
@@ -1065,7 +1106,7 @@ def show_applications_view(request, day, id_user=None):
     for appToday in app_for_day.order_by('construction_site__address'):
         appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
         appMater = ApplicationMeterial.objects.filter(
-            app_for_day=appToday).values_list('description', flat=True).first()
+            app_for_day=appToday, status_checked=True).values_list('description', flat=True).first()
         out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
@@ -1122,13 +1163,14 @@ def show_today_applications(request, day, id_foreman=None):
     if 'materials' in request.path:
         _filter = get_var('filter_material_app', value=True, user=request.user)
         if id_foreman == 0:
-            _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+            _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day, status_checked=True)
             set_var('filter_material_app', value=None, user=request.user)
 
         elif id_foreman:
             _app = ApplicationMeterial.objects.filter(
                 app_for_day__construction_site__foreman=id_foreman,
-                app_for_day__date=current_day)
+                app_for_day__date=current_day,
+                status_checked=True)
 
             if id_foreman != _filter:
                 set_var('filter_material_app', value=id_foreman, user=request.user)
@@ -1136,9 +1178,10 @@ def show_today_applications(request, day, id_foreman=None):
             if _filter:
                 _app = ApplicationMeterial.objects.filter(
                     app_for_day__construction_site__foreman_id=_filter,
+                    status_checked=True,
                     app_for_day__date=current_day)
             else:
-                _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+                _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day, status_checked=True)
 
         out['materials_list'] = _app
         return render(request, "extend/material_today_app.html", out)
@@ -1226,7 +1269,8 @@ def show_info_application(request, id_application):
     out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
 
     list_of_materials = ApplicationMeterial.objects.filter(
-        app_for_day=current_application).values_list('description', flat=True).first()
+        app_for_day=current_application,
+        status_checked=True).values_list('description', flat=True).first()
     out['list_of_materials'] = list_of_materials
 
     if is_admin(request.user):
