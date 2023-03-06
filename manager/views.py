@@ -58,7 +58,8 @@ def edit_list_materials(request, id_application):
     out['application_materials'] = cur_app_mater
 
     if request.method == 'POST':
-        if _id_app_mat := request.POST.get('id_app_materials'):
+        if request.POST.get('id_app_materials'):
+            _id_app_mat = request.POST.get('id_app_materials')
             _a = ApplicationMeterial.objects.get(id=_id_app_mat)
             if request.POST.get('desc_materials'):
                 _a.description = request.POST.get('desc_materials')
