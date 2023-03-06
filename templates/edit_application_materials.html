@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-sm mx-auto m-2 "  >
+  <form method="post" id="edit_materials_form" enctype="multipart/form-data">{% csrf_token %}
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="container-fluid">
+
+
+      <div class="card-header mt-1 bg-light">
+        <p class="card-text fs-5 fw-bold">{{ application_materials.app_for_day.construction_site.address }} ({{ application_materials.app_for_day.construction_site.foreman.last_name }})</p>
+        <p class="card-text ms-3 fw-bold">{{ date_of_target }}</p>
+      </div>
+      <div class="card-body w-100">
+         <p class="card-text fs-5 fw-bold ">Список материалов</p>
+         <div class="container" >
+            <input type="hidden" name="id_app_materials" value="{{ application_materials.id }}">
+            <textarea class="form-control app_description mx-auto" name="desc_materials">{{ application_materials.description }}</textarea>
+
+        </div>
+      </div>
+      </div>
+    </div>
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/edit_app_materials.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'supply_materials' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
+
+  <input form="edit_materials_form" class="btn btn-success  col-auto  m-1" type="submit" value="Сохранить">
+
+</div>
+
+{% endblock %}

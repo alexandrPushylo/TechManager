@@ -47,6 +47,31 @@ from manager.utilities import BOT
 # ------FUNCTION VIEW----------------------
 
 
+def edit_list_materials(request, id_application):
+    out = {}
+    current_application = ApplicationToday.objects.get(id=id_application)
+    current_day = current_application.date
+    get_prepare_data(out, request)
+    cur_app_mater = ApplicationMeterial.objects.get(app_for_day=current_application)
+
+    out['date_of_target'] = current_day
+    out['application_materials'] = cur_app_mater
+
+    if request.method == 'POST':
+        if _id_app_mat := request.POST.get('id_app_materials'):
+            _a = ApplicationMeterial.objects.get(id=_id_app_mat)
+            if descr := request.POST.get('desc_materials'):
+                _a.description = descr
+                _a.save()
+            else:
+                _a.delete()
+
+        return HttpResponseRedirect(f'/materials/{current_day}')
+
+    return render(request, 'edit_application_materials.html', out)
+
+
+
 def supply_materials_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
