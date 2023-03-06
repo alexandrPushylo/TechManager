@@ -47,6 +47,36 @@ from manager.utilities import BOT
 # ------FUNCTION VIEW----------------------
 
 
+def notice_submitt(request, current_day):
+    out = []
+    _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+
+    id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
+    id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
+
+    _app = ApplicationToday.objects.filter(date=current_day, status=_status)
+
+    for _id in id_foreman_list:
+        _a = _app.filter(construction_site__foreman=_id.user_post)
+        if _a:
+            out.append((_id.user_post.id, _a))
+
+    for _id in id_master_list:
+        _a = _app.filter(construction_site__foreman=_id.supervisor)
+        if _a:
+            out.append((_id.user_post.id, _a))
+
+    for _id, app in out:
+        mss = f"НАПОМИНАНИЕ\n\n"
+        for a in app:
+            mss += f"У вас имеется не поданная заявка: [ {a.construction_site.address} ]\n"
+
+        send_message(_id, mss)
+    return HttpResponseRedirect('/')
+
+
+
 def edit_list_materials(request, id_application):
     out = {}
     current_application = ApplicationToday.objects.get(id=id_application)
