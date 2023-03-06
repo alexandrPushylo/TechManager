@@ -47,6 +47,14 @@ from manager.utilities import BOT
 # ------FUNCTION VIEW----------------------
 
 
+def supply_materials_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    return render(request, 'extend/supply_app_materials.html', out)
+
+
 def supply_today_app_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)

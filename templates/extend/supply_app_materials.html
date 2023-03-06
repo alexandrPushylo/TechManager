@@ -1,4 +1,4 @@
-{% extends 'main.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 
@@ -6,16 +6,15 @@
     <div class="container">
         <div class="btn-group position-relative start-50 translate-middle-x mt-1">
             {% if cw_day == nw_day %}
-                <a href="{% url 'supply_app' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <a href="{% url 'supply_materials' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3"  type="date"   value="{{ cw_day }}"/>
             {% else %}
                 <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
-                <a href="{% url 'supply_app' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+                <a href="{% url 'supply_materials' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
     </div>
     {% endblock %}
-
 
 
 <div class="container container-fluid  row">
@@ -34,7 +33,7 @@
             {% endif %}
 
             "
-             style="width: 20rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
+             style="width: 25rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
 
           <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2
                 {% if  app_today.status.status  == 'Сохранена' %}
@@ -71,14 +70,14 @@
               {% endfor %}
           {% endif %}
             <div class="btn-group ">
-                <a href="{% url 'show_info_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
-                <a href="{% url 'add_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
-                <a href="{% url 'clear_application' app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
-                {% if  app_today.status.status  == 'Сохранена' or post  == 'admin' and app_today.status.status  == 'Подана' %}
-                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
-                {% elif post  == 'admin' and app_today.status.status  == 'Одобрена' %}
-                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>
-                {% endif %}
+{#                <a href="{% url 'show_info_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>#}
+{#                <a href="{% url 'add_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>#}
+{#                <a href="{% url 'clear_application' app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>#}
+{#                {% if  app_today.status.status  == 'Сохранена' or post  == 'admin' and app_today.status.status  == 'Подана' %}#}
+{#                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
+{#                {% elif post  == 'admin' and app_today.status.status  == 'Одобрена' %}#}
+{#                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>#}
+{#                {% endif %}#}
 
 {#                <div class="dropdown">#}
 {#                    <a class="btn m-1 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">...</a>#}
@@ -135,13 +134,6 @@
 
 {% endblock %}
 
-{% block tab %}
-<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
-    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>
-    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</a>
-</div>
-{% endblock %}
-
 {% block script %}{% load static %}
     <script src="{% static "admin/js/scripts/supply_app.js" %}"></script>
 {% endblock %}
@@ -152,6 +144,6 @@
 
 <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 
-<button role="button" class="btn_panel btn btn-outline-light  col-auto position-absolute  end-0"><i class="fa-solid fa-list"></i> </button>
+<button role="button" class="btn_panel btn btn-outline-light  col-auto position-absolute end-0 m-2"><i class="fa-solid fa-list"></i> </button>
 </div>
 {% endblock %}
