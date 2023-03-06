@@ -86,10 +86,21 @@ def supply_materials_view(request, day):
     )
 
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
+
+    if request.POST.get('id_app_material'):
+        _id_m = request.POST.get('id_app_material')
+        _am = ApplicationMeterial.objects.get(id=_id_m)
+        if _am.status_checked:
+            _am.status_checked = False
+        else:
+            _am.status_checked = True
+        _am.save()
+
+
     out['materials_list'] = []
     for _app_t in current_application:
         try:
-            _app_m = app_material.get(app_for_day=_app_t).description
+            _app_m = app_material.get(app_for_day=_app_t)
             out['materials_list'].append((_app_t, _app_m))
         except ApplicationMeterial.DoesNotExist:
             pass
