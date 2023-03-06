@@ -52,6 +52,23 @@ def supply_materials_view(request, day):
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
 
+    current_application = ApplicationToday.objects.filter(
+        Q(date=current_day),
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+    )
+
+    app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
+    out['materials_list'] = []
+    for _app_t in current_application:
+        try:
+            _app_m = app_material.get(app_for_day=_app_t).description
+            out['materials_list'].append((_app_t, _app_m))
+        except ApplicationMeterial.DoesNotExist:
+            pass
+
+
     return render(request, 'extend/supply_app_materials.html', out)
 
 
