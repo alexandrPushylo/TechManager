@@ -1524,6 +1524,8 @@ def send_all_applications(request, day):
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
             app.save()
 
+        set_var('status_sended_app', value=current_day, flag=True)
+
         send_task_for_drv(day)
         send_status_app_for_foreman(day)
         send_message_for_admin(day)
@@ -1576,6 +1578,15 @@ def submitted_all_applications(request, day):
     for app in current_applications:
         app.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
         app.save()
+    count_apps = current_applications.count()
+    if count_apps > 0:
+        try:
+            _var = Variable.objects.get(name='status_sended_app', value=current_day)
+            if _var.flag:
+                mess = f'Подана {count_apps} заявки(а) требующих рассмотрение!'
+                send_message_for_admin(current_day, mess)
+        except Variable.DoesNotExist:
+            pass
 
     return HttpResponseRedirect('/')
 
@@ -1802,6 +1813,7 @@ def success_application(request, id_application):
         return HttpResponseRedirect('/')
 
     current_application = ApplicationToday.objects.get(id=id_application)
+    current_day = current_application.date
 
     if is_admin(request.user):
         approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
@@ -1814,6 +1826,13 @@ def success_application(request, id_application):
             current_application.status = send
     else:
         current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        try:
+            _var = Variable.objects.get(name='status_sended_app', value=current_day)
+            if _var.flag:
+                mess = f'Подана заявка требующая рассмотрение!'
+                send_message_for_admin(current_day, mess)
+        except Variable.DoesNotExist:
+            pass
 
     current_application.save()
 
@@ -2033,10 +2052,13 @@ def send_status_app_for_foreman(current_day):
         send_message(_id, mss)
 
 
-def send_message_for_admin(current_day):
+def send_message_for_admin(current_day, messages=False):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
-    mess = f"Заявки на {current_day} отправлены"
+    if messages:
+        mess = messages
+    else:
+        mess = f"Заявки на {current_day} отправлены"
 
     for _id in admin_id_list:
         send_message(_id, mess)
