@@ -34,6 +34,7 @@ from manager.views import supply_app_view
 from manager.views import move_supply_app
 from manager.views import supply_today_app_view
 from manager.views import supply_materials_view
+from manager.views import edit_list_materials
 
 from manager.views import approv_all_applications
 from manager.views import submitted_all_applications
@@ -106,6 +107,7 @@ urlpatterns = [
     path('today_app/<str:day>/materials', show_today_applications, name="show_today_materials"),
     path('today_app/<str:day>/materials/<int:id_foreman>', show_today_applications, name="show_today_materials"),
     path('materials/<str:day>', supply_materials_view, name='supply_materials'),
+    path('edit_list_materials/<int:id_application>', edit_list_materials, name='edit_list_materials'),
 
     path('info_app/<int:id_application>', show_info_application, name="show_info_application"),
     path('new_app/<int:id_application>', create_new_application, name="add_application"),

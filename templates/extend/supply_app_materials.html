@@ -1,10 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'main.html' %}
 
 {% block content %}
 
 {% block choosedate %}
     <div class="container">
-        <div class="btn-group position-relative start-50 translate-middle-x mt-1">
+        <div class="btn-group position-relative start-50 translate-middle-x">
             {% if cw_day == nw_day %}
                 <a href="{% url 'supply_materials' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3"  type="date"   value="{{ cw_day }}"/>
@@ -13,65 +13,55 @@
                 <a href="{% url 'supply_materials' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
+    <div class="position-absolute translate-middle-x  start-50  mb-3 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 
 
-<div class="container container-fluid  row">
+<div class="container container-fluid mx-auto  row">
     <div class="container mt-5 col-auto " >
         <div class="row">
-{#        {% for a in today_applications_list %}#}
+        {% for a in materials_list %}
         <div class="col-auto mb-3">
 
         <div class="card shadow-lg
-            {% if  app_today.status.status  == 'Сохранена' %}
+            {% if  a.0.status.status  == 'Сохранена' %}
                 border border-3 border-warning
-            {% elif app_today.status.status == 'Одобрена' %}
+            {% elif a.0.status.status == 'Одобрена' %}
                 border border-3 border-success
-            {% elif app_today.status.status == 'Подана' %}
+            {% elif a.0.status.status == 'Подана' %}
                 border border-3 border-primary
             {% endif %}
 
             "
-             style="width: 25rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
+             style="width: 18rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
 
           <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2
-                {% if  app_today.status.status  == 'Сохранена' %}
+                {% if  a.0.status.status  == 'Сохранена' %}
                     text-warning border-warning
-                {% elif app_today.status.status == 'Одобрена' %}
+                {% elif a.0.status.status == 'Одобрена' %}
                     text-success border-success
-                {% elif app_today.status.status == 'Подана' %}
+                {% elif a.0.status.status == 'Подана' %}
                     text-primary border-primary
                 {% else %}
                     text-dark border-dark
                 {% endif %}
-                fw-bold text-lowercase ps-2 pe-2">Заявка {{ app_today.status.status }}</label>
+                fw-bold text-lowercase ps-2 pe-2">Заявка {{ a.0.status.status }}</label>
 
 
           <div class="card-body mt-1" >
-            <h6 class="card-title  fw-bold text-center">{{app_today.construction_site.address}}</h6>
-            <h6 class="card-title" >{{app_today.date}}</h6>
-          {% if apps_tech %}
-          <hr style="border-width: medium; border-color: green">
-              <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
-              {% for v in apps_tech %}
-                  <div class="row">
-                <div class="card-text fs-6 col-auto {% if v.id in conflicts_vehicles_list_id %}text-danger{% endif %}">{{ v.technic_driver.technic.name }}</div>
-                <div class="card-text fs-6 col-auto"> ({{ v.technic_driver.driver.driver }})
-                {% for count in count_app_list %}{% if v.technic_driver.id == count.0 %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
-                </div>
-                    </div>
+            <h6 class="card-title  fw-bold text-center">{{a.0.construction_site.address}} ({{ a.0.construction_site.foreman.last_name }})</h6>
+            <h6 class="card-title" >{{a.0.date}}</h6>
 
-                  {% if v.description %}
-                <textarea class="form-control app_description" readonly>{{ v.description }}</textarea>
-                {%endif%}
-                  <hr>
-
-              {% endfor %}
+            {% if a.1  %}
+              <div class="card-text"><label><b>Список материалов:</b></label> </div>
+              <textarea class="form-control app_description" readonly>{{ a.1 }}</textarea>
+              <hr>
           {% endif %}
+
             <div class="btn-group ">
-{#                <a href="{% url 'show_info_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>#}
-{#                <a href="{% url 'add_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>#}
+{#                <a href="{% url 'show_info_application' a.0.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>#}
+                <a href="{% url 'edit_list_materials' a.0.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
 {#                <a href="{% url 'clear_application' app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>#}
 {#                {% if  app_today.status.status  == 'Сохранена' or post  == 'admin' and app_today.status.status  == 'Подана' %}#}
 {#                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
@@ -92,58 +82,31 @@
           </div>
         </div>
         </div>
-{#        {% endfor %}#}
+        {% endfor %}
     </div>
     </div>
 {% csrf_token %}
-<div class="foreman_panel container col-auto position-fixed end-0 top-0"style="margin-top: 5rem; height: 100vh;" {% if var_supply_panel.value == user.id|slugify and var_supply_panel.flag %} hidden="" {% endif %}>
-        <div class="card-body  overflow-auto "style="height: 75%" >
 
-            {% for app in today_applications_list %}
-                <div class="col-auto mb-3">
-
-        <div class="card " style="width: 18rem;">
-
-          <div class="card-body " >
-            <h6 class="card-title  fw-bold text-center">{{app.0.construction_site.address}} ({{app.0.construction_site.foreman.last_name}})</h6>
-
-
-          <hr style="border-width: medium;">
-{#              <h6 class="card-text"><label><b>Список техники:</b></label> </h6>#}
-                    {% for t in app.1 %}
-                  <div class="row {% if t.var_check %}bg-warning{% endif %}">
-                <div class="card-text fs-6 col-auto">{{ t.technic_driver.technic.name }} ({{ t.technic_driver.driver.driver }})</div>
-                  </div>
-
-                  {% if t.description %}
-                <textarea class="form-control app_description" readonly>{{ t.description }}</textarea>
-                  {%endif%}
-                    {% endfor %}
-                  <hr>
-            <div class="btn-group ">
-                <a href="{% url 'move_supply_app' cw_day app.0.id %}" class="btn btn-outline-success  btn-sm" aria-current="page"><i class="fa-solid fa-backward"></i> </a>
-            </div>
-          </div>
-        </div>
-        </div>
-
-            {% endfor %}
-
-        </div>
-    </div>
 
 {% endblock %}
 
+{% block tab %}
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
+    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm  btn-outline-secondary" aria-current="page">Техника</a>
+    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  btn-outline-success active " aria-current="page">Материалы</a>
+</div>
+{% endblock %}
+
 {% block script %}{% load static %}
-    <script src="{% static "admin/js/scripts/supply_app.js" %}"></script>
+    <script src="{% static "admin/js/scripts/supply_app_materials.js" %}"></script>
 {% endblock %}
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Настройка приоритета</a>
+{#<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Настройка приоритета</a>#}
+{##}
+{#<a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>#}
 
-<a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
-
-<button role="button" class="btn_panel btn btn-outline-light  col-auto position-absolute end-0 m-2"><i class="fa-solid fa-list"></i> </button>
+{#<button role="button" class="btn_panel btn btn-outline-light  col-auto position-absolute end-0 m-2"><i class="fa-solid fa-list"></i> </button>#}
 </div>
 {% endblock %}
