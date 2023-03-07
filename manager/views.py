@@ -1210,16 +1210,30 @@ def show_today_applications(request, day, id_foreman=None):
         _app = ApplicationTechnic.objects.filter(
             app_for_day__construction_site__foreman=id_foreman,
             app_for_day__date=current_day)
-
+        out['filter'] = User.objects.get(id=id_foreman).last_name
         if id_foreman != _filter:
             set_var('filter_today_app', value=id_foreman, user=request.user)
     else:
-        if _filter:
+
+
+        if _filter == 'supply':
+            id_supply_list = Post.objects.filter(
+                post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
+            _app = ApplicationTechnic.objects.filter(
+                app_for_day__date=current_day,
+                technic_driver__technic__supervisor_id__in=id_supply_list
+            )
+            out['filter'] = 'Снабжение'
+
+        elif _filter:
             _app = ApplicationTechnic.objects.filter(
                 app_for_day__construction_site__foreman_id=_filter,
                 app_for_day__date=current_day)
+            out['filter'] = User.objects.get(id=_filter).last_name
+
         else:
             _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+            out['filter'] = 'Все'
 
     app_tech_day = _app.filter(
         Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
