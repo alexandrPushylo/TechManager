@@ -1012,6 +1012,9 @@ def show_applications_view(request, day, id_user=None):
         set_var('filter_main_apps', value=_filter, user=request.user)
     out['var_filter_apps'] = get_var('filter_main_apps', user=request.user)
 
+    _var_reload_main_page = get_var('reload_main_page')
+    out["var_reload_main_page"] = _var_reload_main_page
+
 
     if is_admin(current_user):
         app_for_day = ApplicationToday.objects.filter(
