@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 
-{% if var_cache %}
-{% block meta %}
-    <meta http-equiv='cache-control' content='no-cache'>
-    <meta http-equiv='expires' content='0'>
-    <meta http-equiv='pragma' content='no-cache'>
+{% if var_reload_main_page.value %}{% block meta %}
+    <meta http-equiv="refresh" content="{{ var_reload_main_page.value }}; URL={% url 'application_list' nw_day %}">
 {% endblock %}{% endif %}
+
+{#{% if var_cache %}#}
+{#{% block meta %}#}
+{#    <meta http-equiv='cache-control' content='no-cache'>#}
+{#    <meta http-equiv='expires' content='0'>#}
+{#    <meta http-equiv='pragma' content='no-cache'>#}
+{#{% endblock %}{% endif %}#}
 
 {% block indicator %}
 {% if post == 'admin' %}
