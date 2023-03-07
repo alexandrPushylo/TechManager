@@ -1134,6 +1134,21 @@ def show_application_for_driver(request, day, id_user):
     else:
         current_user = User.objects.get(username=request.user)
 
+    id_supply_list = Post.objects.filter(
+        post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
+
+    supply_driver_id_list = Post.objects.filter(supervisor_id__in=id_supply_list).values_list('user_post_id', flat=True)
+
+    if current_user.id in supply_driver_id_list:
+        app_material_list = ApplicationMeterial.objects.filter(
+            app_for_day__date=current_day,
+            status_checked=True
+        )
+        out['material_list'] = app_material_list
+    else:
+        print('no')
+
+
     out["current_user"] = current_user
     out["date_of_target"] = current_day.strftime('%d %B')
     applications = ApplicationTechnic.objects.filter(
