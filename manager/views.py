@@ -1169,12 +1169,14 @@ def show_today_applications(request, day, id_foreman=None):
         if id_foreman == 0:
             _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day, status_checked=True)
             set_var('filter_material_app', value=None, user=request.user)
+            out['filter'] = 'Все'
 
         elif id_foreman:
             _app = ApplicationMeterial.objects.filter(
                 app_for_day__construction_site__foreman=id_foreman,
                 app_for_day__date=current_day,
                 status_checked=True)
+            out['filter'] = User.objects.get(id=id_foreman).last_name
 
             if id_foreman != _filter:
                 set_var('filter_material_app', value=id_foreman, user=request.user)
@@ -1184,8 +1186,10 @@ def show_today_applications(request, day, id_foreman=None):
                     app_for_day__construction_site__foreman_id=_filter,
                     status_checked=True,
                     app_for_day__date=current_day)
+                out['filter'] = User.objects.get(id=_filter).last_name
             else:
                 _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day, status_checked=True)
+                out['filter'] = 'Все'
 
         out['materials_list'] = _app
         return render(request, "extend/material_today_app.html", out)
