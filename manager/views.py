@@ -81,7 +81,7 @@ def edit_list_materials(request, id_application):
     out = {}
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = current_application.date
-    get_prepare_data(out, request)
+    get_prepare_data(out, request, current_day)
     cur_app_mater = ApplicationMeterial.objects.get(app_for_day=current_application)
 
     out['date_of_target'] = current_day
