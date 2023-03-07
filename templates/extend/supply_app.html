@@ -137,10 +137,10 @@
 {% endblock %}
 
 {% block tab %}
-{#<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">#}
-{#    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm btn-outline-success active " aria-current="page">Техника</a>#}
-{#    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm   btn-outline-secondary" aria-current="page">Материалы</a>#}
-{#</div>#}
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
+    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm btn-outline-success active " aria-current="page">Техника</a>
+    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm   btn-outline-secondary" aria-current="page">Материалы</a>
+</div>
 {% endblock %}
 
 {% block script %}{% load static %}
