@@ -1082,15 +1082,19 @@ def show_applications_view(request, day, id_user=None):
             out['inf_btn_status'] = True
             out['inf_btn_content'] = 'Имеются не поданные заявки'
             out['saved_ap_list'] = saved_ap_list
+        materials_list = ApplicationMeterial.objects.filter(status_checked=True)
 
     elif is_foreman(current_user):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=current_user, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+        materials_list = ApplicationMeterial.objects.filter(app_for_day__in=app_for_day)
+
 
     elif is_master(current_user):
         _foreman = Post.objects.get(user_post=current_user).supervisor
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+        materials_list = ApplicationMeterial.objects.filter(app_for_day__in=app_for_day)
 
     elif is_employee_supply(current_user):  #TODO:del
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
@@ -1105,8 +1109,8 @@ def show_applications_view(request, day, id_user=None):
 
     for appToday in app_for_day.order_by('construction_site__address'):
         appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
-        appMater = ApplicationMeterial.objects.filter(
-            app_for_day=appToday, status_checked=True).values_list('description', flat=True).first()
+        appMater = materials_list.filter(
+            app_for_day=appToday).values_list('description', flat=True).first()
         out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
