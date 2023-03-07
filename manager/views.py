@@ -50,7 +50,6 @@ from manager.utilities import BOT
 def notice_submitt(request, current_day):
     out = []
     _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-
     id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
     id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
@@ -1096,11 +1095,11 @@ def show_applications_view(request, day, id_user=None):
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
         materials_list = ApplicationMeterial.objects.filter(app_for_day__in=app_for_day)
 
-    elif is_employee_supply(current_user):  #TODO:del
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
-                                                      date=current_day,
-                                                      construction_site__address='Снабжение')
-        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+    # elif is_employee_supply(current_user):  #TODO:del
+    #     app_for_day = ApplicationToday.objects.filter(construction_site__foreman=None,
+    #                                                   date=current_day,
+    #                                                   construction_site__address='Снабжение')
+    #     out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
     else:
         return HttpResponseRedirect('/')
 
