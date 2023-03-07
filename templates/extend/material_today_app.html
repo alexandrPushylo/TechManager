@@ -20,7 +20,9 @@
 <div class="container-lg  mx-auto mt-4">
 
 <div class="btn-group dropend">
-    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i> Фильтр</button>
+    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-filter"></i> {{ filter }}
+    </button>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day 0 %}">Все</a></li>
             <hr>
