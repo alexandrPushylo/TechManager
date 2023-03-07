@@ -1220,6 +1220,17 @@ def show_today_applications(request, day, id_foreman=None):
     if id_foreman == 0:
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
         set_var('filter_today_app', value=None, user=request.user)
+        out['filter'] = 'Все'
+
+    elif id_foreman == 1:
+        id_supply_list = Post.objects.filter(
+            post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
+        _app = ApplicationTechnic.objects.filter(
+            app_for_day__date=current_day,
+            technic_driver__technic__supervisor_id__in=id_supply_list
+        )
+        set_var('filter_today_app', value='supply', user=request.user)
+        out['filter'] = 'Снабжение'
 
     elif id_foreman:
         _app = ApplicationTechnic.objects.filter(
