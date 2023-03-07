@@ -22,13 +22,16 @@
 
 
     <div class="btn-group dropend">
-    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i> Фильтр</button>
+    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-filter"></i> {{ filter }}
+    </button>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 0 %}">Все</a></li>
             <hr>
             {% for forem in foreman_list %}
             <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day forem.user_post.id %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a></li>
             {% endfor %}
+            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 1 %}">Снабжение</a></li>
         </ul>
     </div>
 

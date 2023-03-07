@@ -22,7 +22,7 @@
     {% endblock %}
 
 <div class="container-lg  mx-auto  mt-4"  >
-    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+    <div class="card shadow-lg mb-5" style="background-color: rgba(247,247,248,0.71)">
       <div class="card-body">
 
         <p class="card-text">
@@ -43,6 +43,29 @@
 
       </div>
     </div>
+
+
+    {% for a in material_list %}
+    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body">
+
+        <p class="card-text">
+
+            <h6 class="card-title  fw-bold">{{a.app_for_day.construction_site.address}} ({{ a.app_for_day.construction_site.foreman.last_name }})</h6>
+            <hr>
+        </p>
+
+        <ul class="container-fluid" >
+
+                <div class=" mb-3" id="vehicle_list">
+                    <textarea class="app_description form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ a.description }}</textarea>
+                </div>
+
+        </ul>
+
+      </div>
+    </div>
+    {% endfor %}
 </div>
 
 {% endblock %}
