@@ -1207,9 +1207,6 @@ def show_today_applications(request, day, id_foreman=None):
         out['materials_list'] = _app
         return render(request, "extend/material_today_app.html", out)
 
-
-
-
     if is_admin(request.user):
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
 
@@ -1238,7 +1235,6 @@ def show_today_applications(request, day, id_foreman=None):
         if id_foreman != _filter:
             set_var('filter_today_app', value=id_foreman, user=request.user)
     else:
-
 
         if _filter == 'supply':
             id_supply_list = Post.objects.filter(
@@ -1885,7 +1881,14 @@ def show_start_page(request):
         elif is_employee_supply(request.user):
             return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
         else:
-            return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
+            id_supply_list = Post.objects.filter(
+                post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
+            supply_driver_id_list = Post.objects.filter(supervisor_id__in=id_supply_list).values_list('user_post_id',
+                                                                                                      flat=True)
+            if request.user.id in supply_driver_id_list:
+                return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}/materials")
+            else:
+                return HttpResponseRedirect(f"/today_app/{get_current_day('last_day')}")
 
 
 def get_prepare_data(out: dict, request, current_day=TOMORROW):
