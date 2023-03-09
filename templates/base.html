@@ -44,8 +44,11 @@
 <div class="alert alert-success w-25 mx-auto text-center position-fixed start-50 top-50 translate-middle" hidden=""  id="notice_stat" status="{{ message_status }}"  role="alert">
     {{ message }}</div>
         {% endif %}
+        
         <script src="{% static "admin/js/scripts/bootstrap.bundle.min.js" %}"></script>
         <script src="{% static "admin/js/scripts/jquery-3.6.3.min.js" %}"></script>
+        <script src="{% static "admin/js/scripts/masonry.pkgd.min.js" %}"></script>
+
         <script>const notice = $('#notice_stat');
 
             if (notice.attr('status')){
