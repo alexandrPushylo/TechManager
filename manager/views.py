@@ -1258,12 +1258,17 @@ def show_today_applications(request, day, id_foreman=None):
         else:
             _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
             out['filter'] = 'Все'
-
-    app_tech_day = _app.filter(
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
-    ).exclude(var_check=True)
+    if is_admin(request.user):
+        app_tech_day = _app.filter(
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+        ).exclude(var_check=True)
+    else:
+        app_tech_day = _app.filter(
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+        ).exclude(var_check=True)
 
     driver_technic = app_tech_day.values_list(
         'technic_driver__driver__driver__last_name',
