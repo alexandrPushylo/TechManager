@@ -40,7 +40,7 @@
     </div>
     {% endblock %}
 
-    <div class="container-fluid">
+    <div class="container-fluid row">
 
     {% if inf_btn_status %}
     <button type="button" class="btn btn-warning col-auto ms-3 position-absolute" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -48,8 +48,8 @@
     </button>
     {% endif %}
 
-    <div id="container" class="container mt-5" >
-        <div class="container">
+    <div id="container" class="container ms-3 mt-5" >
+{#        <div class="container">#}
         {% for a in today_applications_list %}
         <div class="item m-3">
 
@@ -143,11 +143,11 @@
         </div>
         </div>
         {% endfor %}
-    </div>
+{#    </div>#}
     </div>
 
     {% if post == 'admin' %}
-    <div class="driver_panel container col-auto   position-fixed end-0 "style="margin-top: -65px; height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
+    <div class="driver_panel container col-auto   position-fixed end-0 translate-middle-y top-50 mt-4" style="height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
         <div class="card-body  overflow-auto "style="height: 90%" >
 
             {% for drv, count, attach_drv, tech_drv in DRV_LIST %}
