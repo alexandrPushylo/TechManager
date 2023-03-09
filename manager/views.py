@@ -835,8 +835,7 @@ def tabel_driver_view(request, day):
                 st.status = False
                 st.save()
 
-        out['message_status'] = True
-        out['message'] = 'Сохранено'
+        return HttpResponseRedirect('/')
 
     return render(request, 'tabel_driver.html', out)
 
@@ -948,8 +947,9 @@ def Technic_Driver_view(request, day):
                 _td.status = False
                 _td.save()
 
-        out['message_status'] = True
-        out['message'] = 'Сохранено'
+        return HttpResponseRedirect('/')
+
+
 
     if 'tech_list' in request.path:
         return render(request, 'tech_list.html', out)
