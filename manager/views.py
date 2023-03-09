@@ -1394,8 +1394,6 @@ def create_new_application(request, id_application):
     except ApplicationMeterial.DoesNotExist:
         pass
 
-
-
     if request.method == "POST":
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
