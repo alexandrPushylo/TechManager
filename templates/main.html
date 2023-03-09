@@ -40,7 +40,7 @@
     </div>
     {% endblock %}
 
-    <div class="container container-fluid mx-auto row">
+    <div class="container-fluid">
 
     {% if inf_btn_status %}
     <button type="button" class="btn btn-warning col-auto ms-3 position-absolute" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -48,10 +48,10 @@
     </button>
     {% endif %}
 
-    <div class="container mt-5 col-auto " >
-        <div class="row ms-2">
+    <div id="container" class="container mt-5" >
+        <div class="container">
         {% for a in today_applications_list %}
-        <div class="col-auto mb-3">
+        <div class="item m-3">
 
         <div class="card shadow-lg
             {% if  a.app_today.status.status  == 'Сохранена' %}
@@ -63,7 +63,7 @@
             {% endif %}
 
             "
-             style="width: 18rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
+             style="width: 18rem;  background-color: rgba(248,248,247,0.75); ">
 
           <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2
                 {% if  a.app_today.status.status  == 'Сохранена' %}
