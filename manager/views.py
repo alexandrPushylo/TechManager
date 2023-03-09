@@ -970,7 +970,7 @@ def clear_application_view(request, id_application):
             _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
             _a_tmp.var_check = False
             _a_tmp.save()
-        except:
+        except ApplicationTechnic.DoesNotExist:
             pass
         _app.delete()
     try:
@@ -1447,15 +1447,19 @@ def create_new_application(request, id_application):
         if len(id_app_tech) < len(vehicle_list):
             n = len(vehicle_list) - _len__id_app_list
             for i in range(0, n):
-                tech_drv = TechnicDriver.objects.get(
-                    driver__driver__last_name=driver_list[_len__id_app_list + i],
-                    technic__name__name=vehicle_list[_len__id_app_list + i],
-                    date=current_date, status=True)
-                description = description_app_list[_len__id_app_list + i]
-                ApplicationTechnic.objects.create(
-                    app_for_day=current_application,
-                    technic_driver=tech_drv,
-                    description=description).save()
+                try:
+                    tech_drv = TechnicDriver.objects.get(
+                        driver__driver__last_name=driver_list[_len__id_app_list + i],
+                        technic__name__name=vehicle_list[_len__id_app_list + i],
+                        date=current_date, status=True)
+                    description = description_app_list[_len__id_app_list + i]
+                    ApplicationTechnic.objects.create(
+                        app_for_day=current_application,
+                        technic_driver=tech_drv,
+                        description=description).save()
+                except Exception as e:
+                    send_debug_messages(
+                        f'{e}\n{driver_list[_len__id_app_list + i], vehicle_list[_len__id_app_list + i]}')
 
         _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
         if materials:
@@ -2189,3 +2193,13 @@ def check_table(day):
         prepare_technic_driver_table(day)
 
     prepare_application_today(day)
+
+
+def send_debug_messages(messages='Test'):
+    admin_id_list = User.objects.filter(is_superuser=True)
+
+
+    mess = f"{TODAY}\n{messages}"
+
+    for _id in admin_id_list:
+        send_message(_id, mess)
