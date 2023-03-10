@@ -20,7 +20,7 @@
 
 <div class="container mx-auto  ">
     <div class="container mt-5" >
-        <div class="border {% if status_checked %} border-4 border-success {% else %} border-dark {% endif %} ">
+        <div class=" {% if status_checked and materials_list %}border border-4 border-success  {% endif %} ">
         <form method="post" id="material_form" enctype="multipart/form-data">{% csrf_token %}
         {% for a in materials_list %}
         <div class="col-auto mb-3">
