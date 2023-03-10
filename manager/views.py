@@ -76,7 +76,7 @@ def notice_submitt(request, current_day):
 
 
 
-def edit_list_materials(request, id_application):
+def edit_list_materials(request, id_application):   #TODO: del
     out = {}
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = current_application.date
@@ -122,7 +122,7 @@ def supply_materials_view(request, day):
         _status0 = False
     out['status_checked'] = _status0
 
-    if request.POST.get('status_checked'): # TODO: edit
+    if request.POST.get('status_checked'):
         _status = request.POST.get('status_checked')
         if _status0 == False:
             app_material.update(status_checked=True)
