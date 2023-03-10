@@ -18,8 +18,8 @@
     {% endblock %}
 
 
-<div class="container container-fluid mx-auto  row">
-    <div class="container mt-5  " >
+<div class="container mx-auto  ">
+    <div class="container mt-5" >
         <div class="border {% if status_checked %} border-4 border-success {% else %} border-dark {% endif %} ">
         <form method="post" id="material_form" enctype="multipart/form-data">{% csrf_token %}
         {% for a in materials_list %}
@@ -42,15 +42,16 @@
         </form>
     </div>
     </div>
+</div>
 {% csrf_token %}
 
 
 {% endblock %}
 
 {% block tab %}
-<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
-    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm  btn-outline-secondary" aria-current="page">Техника</a>
-    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  btn-outline-success active " aria-current="page">Материалы</a>
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -20px; width: 3.2rem">
+    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-rl; " class=" btn btn-sm  btn-outline-secondary" aria-current="page">Техника</a>
+    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-rl;" class=" btn btn-sm  btn-outline-success active " aria-current="page">Материалы</a>
 </div>
 {% endblock %}
 
@@ -63,6 +64,7 @@
     <a  class="btn btn_print btn-primary m-1" aria-current="page"><i class="fa-solid fa-print"></i> Печать</a>
     <a class="btn  btn_status_check {% if status_checked %} btn-outline-secondary {% else %} btn-warning {% endif %}  m-1" aria-current="page"><i class="fa-solid fa-check"></i> Одобрить</a>
     <input form="material_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить изменения">
+
 {#<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Настройка приоритета</a>#}
 {##}
 {#<a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>#}
