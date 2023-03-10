@@ -76,7 +76,7 @@ def notice_submitt(request, current_day):
 
 
 
-def edit_list_materials(request, id_application):
+def edit_list_materials(request, id_application):   #TODO: del
     out = {}
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = current_application.date
@@ -115,26 +115,45 @@ def supply_materials_view(request, day):
     )
 
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
+    if all(app_material.values_list('status_checked', flat=True)):
+        _status0 = True
 
-    if request.POST.get('id_app_material'):
-        _id_m = request.POST.get('id_app_material')
-        _am = ApplicationMeterial.objects.get(id=_id_m)
-        if _am.status_checked:
-            _am.status_checked = False
-        else:
-            _am.status_checked = True
-        _am.save()
+    else:
+        _status0 = False
+    out['status_checked'] = _status0
+
+    if request.POST.get('status_checked'):
+        _status = request.POST.get('status_checked')
+        if _status0 == False:
+            app_material.update(status_checked=True)
 
 
-    out['materials_list'] = []
-    for _app_t in current_application:
+
+    out['materials_list'] = app_material.values(
+        'id',
+        'app_for_day__construction_site__address',
+        'app_for_day__construction_site__foreman__last_name',
+        'description'
+    )
+
+    if request.method == 'POST':
         try:
-            _app_m = app_material.get(app_for_day=_app_t)
-            out['materials_list'].append((_app_t, _app_m))
+            _id_list = request.POST.getlist('materials_id')
+            _desc_list = request.POST.getlist('materials_description')
+            for _id, _desc in zip(_id_list, _desc_list):
+                _app = ApplicationMeterial.objects.get(id=_id)
+                if _desc:
+                    _app.description = str(_desc).strip()
+                    _app.status_checked = False
+                    _app.save()
+                else:
+                    _app.delete()
         except ApplicationMeterial.DoesNotExist:
             pass
 
-
+        return HttpResponseRedirect(request.path)
+    if 'print' in request.path:
+        return render(request, 'print_page.html', out)
     return render(request, 'extend/supply_app_materials.html', out)
 
 

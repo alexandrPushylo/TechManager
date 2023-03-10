@@ -18,83 +18,40 @@
     {% endblock %}
 
 
-<div class="container container-fluid mx-auto  row">
-    <div class="container mt-5 col-auto " >
-        <div class="row">
+<div class="container mx-auto  ">
+    <div class="container mt-5" >
+        <div class="border {% if status_checked %} border-4 border-success {% else %} border-dark {% endif %} ">
+        <form method="post" id="material_form" enctype="multipart/form-data">{% csrf_token %}
         {% for a in materials_list %}
         <div class="col-auto mb-3">
 
-        <div class="card shadow-lg
-            {% if  a.1.status_checked %}
-              border border-3 border-success
-{#            {% elif a.0.status.status == 'Одобрена' %}#}
-{#                border border-3 border-success#}
-{#            {% elif a.0.status.status == 'Подана' %}#}
-{#                border border-3 border-primary#}
-            {% endif %}
-
-            "
-             style="width: 18rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
-
-{#          <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2#}
-{#                {% if  a.0.status.status  == 'Сохранена' %}#}
-{#                    text-warning border-warning#}
-{#                {% elif a.0.status.status == 'Одобрена' %}#}
-{#                    text-success border-success#}
-{#                {% elif a.0.status.status == 'Подана' %}#}
-{#                    text-primary border-primary#}
-{#                {% else %}#}
-{#                    text-dark border-dark#}
-{#                {% endif %}#}
-{#                fw-bold text-lowercase ps-2 pe-2">Заявка {{ a.0.status.status }}</label>#}
 
 
-          <div class="card-body mt-1" >
-            <h6 class="card-title  fw-bold text-center">{{a.0.construction_site.address}} ({{ a.0.construction_site.foreman.last_name }})</h6>
-            <h6 class="card-title" >{{a.0.date}}</h6>
+          <div class="container mt-1" >
+            <h6 class=" fw-bold text-center">{{a.app_for_day__construction_site__address}} ({{ a.app_for_day__construction_site__foreman__last_name }})</h6>
 
-            {% if a.1  %}
-              <div class="card-text"><label><b>Список материалов:</b></label> </div>
-                <input type="hidden" id="io_id_app_m" value="{{ a.1.id }}">
-              <textarea class="form-control app_description" readonly>{{ a.1.description }}</textarea>
-              <hr>
+            {% if a.description  %}
+                <input type="hidden" name="materials_id" value="{{ a.id }}">
+              <textarea class="form-control app_description" name="materials_description">{{ a.description }}</textarea>
+
           {% endif %}
 
-            <div class="btn-group ">
-{#                <a href="{% url 'show_info_application' a.0.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>#}
-                <a href="{% url 'edit_list_materials' a.0.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i> Редакт.</a>
-                <a id="{{ a.1.id }}" class="btn btn-outline-success btn_status_check {% if not a.1.status_checked %} active {% endif %}  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
-{#                {% if  app_today.status.status  == 'Сохранена' or post  == 'admin' and app_today.status.status  == 'Подана' %}#}
-{#                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
-{#                {% elif post  == 'admin' and app_today.status.status  == 'Одобрена' %}#}
-{#                <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>#}
-{#                {% endif %}#}
-
-{#                <div class="dropdown">#}
-{#                    <a class="btn m-1 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">...</a>#}
-{#                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">#}
-{#                        <li><a class="dropdown-item" href="{% url 'copy_app' app_today.id %}">Копировать на следующий день</a></li>#}
-{#                        <li><a class="dropdown-item" href="#">Другое действие</a></li>#}
-{#                        <li><a class="dropdown-item" href="#">Что-то еще здесь</a></li>#}
-{#                      </ul>#}
-{#                </div>#}
-
-            </div>
           </div>
         </div>
-        </div>
         {% endfor %}
+        </form>
     </div>
     </div>
+</div>
 {% csrf_token %}
 
 
 {% endblock %}
 
 {% block tab %}
-<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
-    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm  btn-outline-secondary" aria-current="page">Техника</a>
-    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  btn-outline-success active " aria-current="page">Материалы</a>
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -20px; width: 3.2rem">
+    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-rl; " class=" btn btn-sm  btn-outline-secondary" aria-current="page">Техника</a>
+    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-rl;" class=" btn btn-sm  btn-outline-success active " aria-current="page">Материалы</a>
 </div>
 {% endblock %}
 
@@ -104,6 +61,10 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
+    <a  class="btn btn_print btn-primary m-1" aria-current="page"><i class="fa-solid fa-print"></i> Печать</a>
+    <a class="btn  btn_status_check {% if status_checked %} btn-outline-secondary {% else %} btn-warning {% endif %}  m-1" aria-current="page"><i class="fa-solid fa-check"></i> Одобрить</a>
+    <input form="material_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить изменения">
+
 {#<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Настройка приоритета</a>#}
 {##}
 {#<a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>#}
