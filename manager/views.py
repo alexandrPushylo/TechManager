@@ -152,6 +152,8 @@ def supply_materials_view(request, day):
             pass
 
         return HttpResponseRedirect(request.path)
+    if 'print' in request.path:
+        return render(request, 'print_page.html', out)
     return render(request, 'extend/supply_app_materials.html', out)
 
 

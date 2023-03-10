@@ -60,6 +60,7 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
+    <a  class="btn btn_print btn-primary m-1" aria-current="page"><i class="fa-solid fa-print"></i> Печать</a>
     <a class="btn  btn_status_check {% if status_checked %} btn-outline-secondary {% else %} btn-warning {% endif %}  m-1" aria-current="page"><i class="fa-solid fa-check"></i> Одобрить</a>
     <input form="material_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить изменения">
 {#<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Настройка приоритета</a>#}

@@ -37,3 +37,8 @@ function sent() {
         })
 }
 
+$('.btn_print').click(function () {
+    window.open(pathname.replace('materials','print'))
+
+})
+

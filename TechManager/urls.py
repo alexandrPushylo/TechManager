@@ -108,6 +108,9 @@ urlpatterns = [
     path('today_app/<str:day>/materials', show_today_applications, name="show_today_materials"),
     path('today_app/<str:day>/materials/<int:id_foreman>', show_today_applications, name="show_today_materials"),
     path('materials/<str:day>', supply_materials_view, name='supply_materials'),
+
+    path('print/<str:day>', supply_materials_view, name='print_materials'),
+
     path('edit_list_materials/<int:id_application>', edit_list_materials, name='edit_list_materials'),
 
     path('info_app/<int:id_application>', show_info_application, name="show_info_application"),
