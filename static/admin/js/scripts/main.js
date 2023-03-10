@@ -1,5 +1,5 @@
 $('.app_description').each(function () {
-    this.style.height = ""+(this.scrollHeight)+"px";
+    this.style.height = ""+(this.scrollHeight+5)+"px";
 });
 
 const cw_date = $('.io_current_day');

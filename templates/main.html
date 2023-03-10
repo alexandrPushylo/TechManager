@@ -4,13 +4,6 @@
     <meta http-equiv="refresh" content="{{ var_reload_main_page.value }}; URL={% url 'application_list' nw_day %}">
 {% endblock %}{% endif %}
 
-{#{% if var_cache %}#}
-{#{% block meta %}#}
-{#    <meta http-equiv='cache-control' content='no-cache'>#}
-{#    <meta http-equiv='expires' content='0'>#}
-{#    <meta http-equiv='pragma' content='no-cache'>#}
-{#{% endblock %}{% endif %}#}
-
 {% block indicator %}
 {% if post == 'admin' %}
     {% if conflicts_vehicles_list %}<a href="{% url 'conflict_resolution' cw_day %}" class="btn btn-sm btn-danger ">Недостаток техники</a>
@@ -119,7 +112,7 @@
           {% endif %}
 
 
-            <div class="btn-group ">
+            <div class="btn-group " {% if cw_day != lw_day and cw_day != nw_day %}hidden{% endif %}>
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
                 <a href="{% url 'clear_application' a.app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
