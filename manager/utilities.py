@@ -1,3 +1,4 @@
+import time
 from datetime import date, timedelta, datetime
 from random import choice
 import telebot
@@ -65,3 +66,13 @@ def get_id_chat(key, result):
         if upd.get('message'):
             if upd.get('message').get('text') == key:
                 return (upd['message']['chat']['id'])
+
+
+def check_time(stop_time=16):
+    if not stop_time:
+        stop_time = 16
+    else:
+        stop_time = int(stop_time)
+    now = datetime.now().time()
+    if now.hour in range(8, stop_time):
+        return stop_time
