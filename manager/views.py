@@ -103,6 +103,8 @@ def notice_submitt(request, current_day):
 
 
 def supply_materials_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
@@ -158,6 +160,8 @@ def supply_materials_view(request, day):
 
 
 def supply_today_app_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
