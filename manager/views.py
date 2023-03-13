@@ -34,6 +34,7 @@ from manager.utilities import timedelta
 from manager.utilities import choice as rand_choice
 from manager.utilities import convert_str_to_date
 
+from manager.utilities import check_time as NOW_IN_TIME
 from manager.utilities import get_json
 from manager.utilities import get_id_chat
 from manager.utilities import BOT
@@ -1121,6 +1122,7 @@ def show_applications_view(request, day, id_user=None):
             out['saved_ap_list'] = saved_ap_list
         materials_list = ApplicationMeterial.objects.filter(status_checked=True)
 
+
     elif is_foreman(current_user):
         app_for_day = ApplicationToday.objects.filter(construction_site__foreman=current_user, date=current_day)
         out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
@@ -1388,6 +1390,9 @@ def create_new_application(request, id_application):
 
     check_table(str(current_date))
     get_prepare_data(out, request, current_day=current_date)
+
+    var_submit_mat_app = get_var('time_limit_for_submission')
+    out['check_time'] = NOW_IN_TIME(var_submit_mat_app.value)
 
     out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site

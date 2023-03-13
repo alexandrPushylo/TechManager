@@ -108,8 +108,11 @@
          <p class="card-text fs-5 fw-bold col-auto">Список материалов</p>
          <hr>
          <div >
-
-            <textarea class="form-control app_description mx-auto" name="desc_meterials" placeholder="Описание материалов">{{ material_list_raw }}</textarea>
+            {% if check_time %}
+            <textarea class="form-control app_description mx-auto" name="desc_meterials" placeholder="Время подачи заявок на материалы ограниченно до {{ check_time }}:00">{{ material_list_raw }}</textarea>
+             {% else %}
+                <textarea readonly class="form-control app_description mx-auto" name="desc_meterials" placeholder="Время подачи заявок на материалы закончилось">{{ material_list_raw }}</textarea>
+             {% endif %}
 
         </div>
       </div>
