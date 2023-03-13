@@ -26,7 +26,7 @@
             <h6 class=" fw-bold text-center">{{a.app_for_day__construction_site__address}} ({{ a.app_for_day__construction_site__foreman__last_name }})</h6>
             {% if a.description  %}
                 <input type="hidden" name="materials_id" value="{{ a.id }}">
-              <textarea class="form-control app_description overflow-hidden" name="materials_description">{{ a.description }}</textarea>
+              <textarea class="form-control app_description overflow-hidden" style="height: content-box" name="materials_description">{{ a.description }}</textarea>
           {% endif %}
           </div>
         </div>
