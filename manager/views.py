@@ -1766,16 +1766,17 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
     else:
         for f in Technic.objects.all():
             out[f.name.name] = TechnicDriver.objects.filter(
-                status=True, date=current_day,
+                status=True,
+                date=current_day,
                 technic__name__name=f.name.name,
-                driver__status=True).count()
+                # driver__status=True
+            ).count()
 
     app_list_today = ApplicationTechnic.objects.filter(
         app_for_day__date=current_day).exclude(
         Q(technic_driver__status=False) |
-        Q(var_check=True) |
-        Q(technic_driver=None) |
-        Q(technic_driver__technic__name__name=None))
+        # Q(technic_driver__driver__status=False) |
+        Q(var_check=True))
 
     if includeSave:
         app_list_submit_approv = app_list_today.filter(
@@ -1788,10 +1789,7 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])))
 
     app_list_priority = app_list_submit_approv.filter(priority=1)
-    app_tech = app_list_priority.values_list('technic_driver', 'technic_driver__technic__name__name').exclude(
-        Q(technic_driver=None) |
-        Q(technic_driver__technic__name__name=None)
-    )
+    app_tech = app_list_priority.values_list('technic_driver', 'technic_driver__technic__name__name')
 
     work_app_tech_list = [_[1] for _ in app_tech]
     for i in set(work_app_tech_list):
