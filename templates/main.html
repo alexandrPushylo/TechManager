@@ -83,6 +83,9 @@
                 <div class="card-text fs-6 col-auto
                         {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
+                        {% if not v.technic_driver.status %}
+                        text-decoration-line-through
+                        {% endif %}
                             ">{{ v.technic_driver.technic.name }}</div>
                 <div id="{{ v.technic_driver.driver.driver.id }}" class="card-text fs-6 col-auto driver_name_link
                             {% if v.id in priority_list %}
@@ -165,7 +168,9 @@
                                 {% endif %}
                             {% endfor %}
                         {% else %}
-                            {% for tech in attach_drv %}<div class="lh-sm text-danger text-truncate">{{ tech.0 }}</div>{% endfor %}
+                            {% for tech in attach_drv %}
+                                <div class="lh-sm text-danger text-truncate">{{ tech.0 }}</div>
+                            {% endfor %}
                         {% endif %}
 
 
