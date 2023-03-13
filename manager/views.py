@@ -830,17 +830,18 @@ def tabel_driver_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
-    prepare_driver_table(day)
+
+    if not DriverTabel.objects.filter(date=current_day).exists():
+        prepare_driver_table(day)
+
+    if not TechnicDriver.objects.filter(date=current_day).exists():
+        prepare_technic_driver_table(day)
+    else:
+        technic_driver_list = TechnicDriver.objects.filter(date=current_day)
+
 
     driver_today_tabel = DriverTabel.objects.filter(date=current_day)
     out['driver_list'] = driver_today_tabel.order_by('driver__last_name')
-
-    if request.POST.get('id_drv'):
-        _id = request.POST.get('id_drv')
-        _status = request.POST.get('status')
-        _user = DriverTabel.objects.get(id=_id)
-        _user.status = str(_status).capitalize()
-        _user.save()
 
     if request.POST.getlist('staff_id'):
         id_driver_list = request.POST.getlist('staff_id')
@@ -848,13 +849,17 @@ def tabel_driver_view(request, day):
             if request.POST.get(f'staff_status_{n}'):
                 st = DriverTabel.objects.get(id=staff_id)
                 st.status = True
+                _td = technic_driver_list.filter(driver=None, technic__attached_driver=st.driver)
+                _td.update(driver=st)
                 st.save()
             else:
                 st = DriverTabel.objects.get(id=staff_id)
                 st.status = False
+                _td = technic_driver_list.filter(driver=staff_id)
+                _td.update(driver=None)
                 st.save()
 
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(request.path)
 
     return render(request, 'tabel_driver.html', out)
 
