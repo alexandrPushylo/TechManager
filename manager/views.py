@@ -1039,7 +1039,8 @@ def show_applications_view(request, day, id_user=None):
         # technics, all, materials
         _filter = request.POST.get('filter')
         set_var('filter_main_apps', value=_filter, user=request.user)
-    out['var_filter_apps'] = get_var('filter_main_apps', user=request.user)
+    var_filter_apps = get_var('filter_main_apps', user=request.user)
+    out['var_filter_apps'] = var_filter_apps
 
     _var_reload_main_page = get_var('reload_main_page')
     out["var_reload_main_page"] = _var_reload_main_page
@@ -1074,7 +1075,6 @@ def show_applications_view(request, day, id_user=None):
             dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
         else:
             dr_tab_l_ord = driver_table_list.order_by('driver__last_name')
-
 
         l_out = []
         try:
@@ -1139,11 +1139,24 @@ def show_applications_view(request, day, id_user=None):
     out['style_font_color'] = get_var('style_font_color', user=request.user)
     out['today_applications_list'] = []
 
-    for appToday in app_for_day.order_by('construction_site__address'):
-        appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
-        appMater = materials_list.filter(
-            app_for_day=appToday).values_list('description', flat=True).first()
-        out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
+    if 'technics' in var_filter_apps.value:
+        for appToday in app_for_day.order_by('construction_site__address'):
+            appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
+            out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech})
+
+    elif 'materials' in var_filter_apps.value:
+        for appToday in app_for_day.order_by('construction_site__address'):
+            appMater = materials_list.filter(
+                app_for_day=appToday).values_list('description', flat=True).first()
+            out['today_applications_list'].append({'app_today': appToday, 'app_mater': appMater})
+    else:
+        for appToday in app_for_day.order_by('construction_site__address'):
+            appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
+            appMater = materials_list.filter(
+                app_for_day=appToday).values_list('description', flat=True).first()
+            out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
+
+
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
 
