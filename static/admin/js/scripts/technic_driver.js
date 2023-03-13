@@ -6,9 +6,9 @@ for (let i=1;i<=count_row;i++) {
     const select_drv = '#select_drv_'+i;
     const io_drv_val = $(io_drv).val();
 
-    if ($('#inp_'+i).is(':checked')){
-        $(select_drv+' > option[value="'+io_drv_val+'"]').prop('selected', true);
-    }
+
+    $(select_drv+' > option[value="'+io_drv_val+'"]').prop('selected', true);
+
 
     $('.row_'+i).click(function () {
         if ($('#inp_'+i).is(':checked')){
