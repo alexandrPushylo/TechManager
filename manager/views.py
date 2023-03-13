@@ -1139,12 +1139,16 @@ def show_applications_view(request, day, id_user=None):
     out['style_font_color'] = get_var('style_font_color', user=request.user)
     out['today_applications_list'] = []
 
-    if 'technics' in var_filter_apps.value:
+    if var_filter_apps:
+        filtr = var_filter_apps.value
+    else:
+        filtr = 'all'
+    if 'technics' in filtr:
         for appToday in app_for_day.order_by('construction_site__address'):
             appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech})
 
-    elif 'materials' in var_filter_apps.value:
+    elif 'materials' in filtr:
         for appToday in app_for_day.order_by('construction_site__address'):
             appMater = materials_list.filter(
                 app_for_day=appToday).values_list('description', flat=True).first()
