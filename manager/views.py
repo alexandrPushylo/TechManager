@@ -1517,9 +1517,11 @@ def create_new_application(request, id_application):
         _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
         if materials:
             _material.description = materials
+            _material.status_checked = False
             _material.save()
         else:
             _material.delete()
+
         if ApplicationTechnic.objects.filter(app_for_day=current_application).count() == 0 and \
                 ApplicationMeterial.objects.filter(app_for_day=current_application).count() == 0:
             _status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
