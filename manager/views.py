@@ -1392,7 +1392,10 @@ def create_new_application(request, id_application):
     get_prepare_data(out, request, current_day=current_date)
 
     var_submit_mat_app = get_var('time_limit_for_submission')
-    out['check_time'] = NOW_IN_TIME(var_submit_mat_app.value)
+    if var_submit_mat_app:
+        out['check_time'] = NOW_IN_TIME(var_submit_mat_app.value)
+    else:
+        out['check_time'] = NOW_IN_TIME()
 
     out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site
