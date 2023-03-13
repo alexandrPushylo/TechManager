@@ -1049,15 +1049,16 @@ def show_applications_view(request, day, id_user=None):
         if ApplicationToday.objects.filter(
                 date=current_day,
                 status=ApplicationStatus.objects.get(
-                status=STATUS_AP['submitted'])).count() != 0:
+                status=STATUS_AP['submitted'])).exists():
             out['submitted_app_list'] = True
 
         if ApplicationToday.objects.filter(
                 date=current_day,
-                status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])).count() != 0:
+                status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])).exists():
             out['send_app_list'] = True
 
         driver_table_list = DriverTabel.objects.filter(date=current_day)
+        technic_driver_table = TechnicDriver.objects.filter(date=current_day)
         var_sort_driver_panel = get_var('var_sort_driver_panel', user=request.user)
 
         if var_sort_driver_panel and var_sort_driver_panel.value:
@@ -1065,11 +1066,14 @@ def show_applications_view(request, day, id_user=None):
         else:
             dr_tab_l_ord = driver_table_list.order_by('driver__last_name')
 
+
         l_out = []
         try:
             for _drv in dr_tab_l_ord:
                 app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
-                tech_drv = TechnicDriver.objects.filter(driver=_drv)
+                tech_drv = technic_driver_table.filter(driver=_drv)
+                if not tech_drv:
+                    tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver)
                 attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
                 count = app.count()
 
@@ -1078,7 +1082,9 @@ def show_applications_view(request, day, id_user=None):
         except:
             for _drv in driver_table_list.order_by('driver__last_name'):
                 app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
-                tech_drv = TechnicDriver.objects.filter(driver=_drv)
+                tech_drv = technic_driver_table.filter(driver=_drv)
+                if not tech_drv:
+                    tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
                 attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
                 count = app.count()
 
