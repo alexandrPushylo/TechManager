@@ -966,7 +966,7 @@ def Technic_Driver_view(request, day):
                 _td.status = False
                 _td.save()
 
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(request.path)
 
 
 
