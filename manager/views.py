@@ -1335,8 +1335,9 @@ def show_today_applications(request, day, id_foreman=None):
             app_list.append((_drv, _tech, desc, _id_list))
 
     out["today_technic_applications"] = app_list
-    out["priority_list"] = get_priority_list(current_day)
-    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+    if is_admin(request.user):
+        out["priority_list"] = get_priority_list(current_day)
+        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
     if request.method == 'POST':
         prior_id_list = request.POST.getlist('prior_id')

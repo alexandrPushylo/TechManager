@@ -20,7 +20,7 @@
 {% block content %}{% csrf_token %}
     {% block choosedate %}
     <div class="container-fluid  ">
-        <div class="btn-group position-relative start-50 top-0 translate-middle">
+        <div class="btn-group position-relative start-50 top-0 translate-middle-x">
             {% if cw_day == nw_day %}
                 <a href="{% url 'application_list' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
@@ -29,11 +29,11 @@
                 <a href="{% url 'application_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
-    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
+    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 
-    <div class="container-fluid row">
+    <div class="container row">
 
     {% if inf_btn_status %}
     <button type="button" class="btn btn-warning col-auto ms-5 position-absolute" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -41,7 +41,7 @@
     </button>
     {% endif %}
 
-    <div id="container" class="container ms-3 mt-5" >
+    <div id="container" class="container  mt-5" >
 {#        <div class="container">#}
         {% for a in today_applications_list %}
         <div class="item m-3">
@@ -145,8 +145,38 @@
 {#    </div>#}
     </div>
 
+
+
+</div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{ inf_btn_content }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {% for app in saved_ap_list %}
+                <div class="small">
+                    {% if app.construction_site.foreman.last_name %}{{ app.construction_site.foreman.last_name }} -- {% endif %}{{ app.construction_site.address }}
+                </div>
+            {% endfor %}
+          </div>
+          <div class="modal-footer">
+              <a href="{% url 'notice_submitt' cw_day %}"  class=" btn btn-sm btn-outline-info me-5"> Напомнить </a>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+{% block rigth_tab %}
     {% if post == 'admin' %}
-    <div class="driver_panel container col-auto   position-fixed end-0 translate-middle-y top-50 mt-4" style="height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
+    <div class="driver_panel  col-auto   position-fixed end-0 translate-middle-y top-50 mt-4" style="height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
         <div class="card-body overflow-auto " style="height: 90%;" >
 
             {% for drv, count, attach_drv, tech_drv in DRV_LIST %}
@@ -187,32 +217,6 @@
         </div>
     </div>
     {% endif %}
-
-</div>
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{ inf_btn_content }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            {% for app in saved_ap_list %}
-                <div class="small">
-                    {% if app.construction_site.foreman.last_name %}{{ app.construction_site.foreman.last_name }} -- {% endif %}{{ app.construction_site.address }}
-                </div>
-            {% endfor %}
-          </div>
-          <div class="modal-footer">
-              <a href="{% url 'notice_submitt' cw_day %}"  class=" btn btn-sm btn-outline-info me-5"> Напомнить </a>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-
-          </div>
-        </div>
-      </div>
-    </div>
-
 {% endblock %}
 
 {% block script %}{% load static %}
@@ -220,7 +224,7 @@
 {% endblock %}
 
 {% block tab %}
-<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -5px;">
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >
     <a  id="btn_show_tech"  style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>
     <a  id="btn_show_all"   style=" text-orientation: upright; writing-mode: vertical-lr;" class="  btn  btn-sm {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</a>
     <a  id="btn_show_mater"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</a>
@@ -229,11 +233,12 @@
 
 {% block bottom_panel %}
 
-<div class="input-group d-flex justify-content-center align-items-center">
+<div class=" d-flex justify-content-center align-items-center">
     <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
-</div>
+
     {% if post == 'admin' %}
-    <button role="button" class="btn_driver_panel btn btn-outline-light  col-auto position-absolute end-0 m-2"><i class="fa-solid fa-list"></i> </button>
+    <button role="button" class="btn_driver_panel btn btn-outline-light position-absolute me-3 end-0"><i class="fa-solid fa-list"></i> </button>
     {% endif %}
+</div>
 {% endblock %}
 

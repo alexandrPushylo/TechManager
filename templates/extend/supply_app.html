@@ -97,7 +97,12 @@
 {#        {% endfor %}#}
     </div>
     </div>
+</div>
+{% endblock %}
 {% csrf_token %}
+
+
+    {% block rigth_tab %}
 <div class="foreman_panel container col-auto position-fixed end-0 top-0"style="margin-top: 5rem; height: 100vh;" {% if var_supply_panel.value == user.id|slugify and var_supply_panel.flag %} hidden="" {% endif %}>
         <div class="card-body  overflow-auto "style="height: 75%" >
 
@@ -133,13 +138,14 @@
 
         </div>
     </div>
+        {% endblock %}
 
-{% endblock %}
+
 
 {% block tab %}
-<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" style="margin-left: -15px; width: 3.5rem">
-    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm btn-outline-success active " aria-current="page">Техника</a>
-    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm   btn-outline-secondary" aria-current="page">Материалы</a>
+<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical-sm" style="margin-left: -10px; width: 3.2rem">
+    <a  id="btn_show_tech" href="{% url 'supply_app' cw_day %}" style=" text-orientation: upright; writing-mode: vertical-rl; " class=" btn btn-sm btn-outline-success active " aria-current="page">Техника</a>
+    <a  id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"   style="text-orientation: upright; writing-mode: vertical-rl;" class=" btn btn-sm   btn-outline-secondary" aria-current="page">Материалы</a>
 </div>
 {% endblock %}
 
@@ -149,10 +155,10 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Настройка приоритета</a>
+<a href="{% url 'supply_today_app' cw_day %}" class="btn btn-outline-primary active " aria-current="page">Настройка приоритета</a>
 
 <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 
-<button role="button" class="btn_panel btn btn-outline-light  col-auto position-absolute  end-0"><i class="fa-solid fa-list"></i> </button>
+<button role="button" class="btn_panel btn btn-outline-light position-absolute end-0 "><i class="fa-solid fa-list"></i> </button>
 </div>
 {% endblock %}
