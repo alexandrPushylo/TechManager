@@ -8,7 +8,7 @@
 
     {% block choosedate %}
     <div class="container-fluid  ">
-        <div class="btn-group position-relative start-50 translate-middle">
+        <div class="btn-group position-relative start-50 translate-middle-x">
             {% if cw_day == nw_day %}
                 <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
@@ -17,7 +17,7 @@
                 <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
-    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
+    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 
