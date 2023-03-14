@@ -24,13 +24,13 @@
     {% endblock %}
     </div>
 
-{#        <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 15px;">#}
-{#            {% block indicator %}#}
-{#                {% if user.is_authenticated %}#}
-{#                <a href="{% url 'start_page' %}"  class="btn btn-sm btn-primary  " aria-current="page">На главную страницу</a>#}
-{#                {% endif %}#}
-{#            {% endblock %}#}
-{#        </div>#}
+        <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 15px;">
+            {% block indicator %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'start_page' %}"  class="btn btn-sm btn-primary  " aria-current="page">На главную страницу</a>
+                {% endif %}
+            {% endblock %}
+        </div>
 
 <div class="container d-flex" style="width: 100vw; height: max-content; margin-top: 10vh;">
 
@@ -38,7 +38,7 @@
     {% block tab %}{% endblock %}
     </div>
 
-    <div class="position-relative mx-auto border border-danger" style="width: 100%; height: max-content" >
+    <div class="position-relative mx-auto" style="width: 100%; height: max-content" >
     {% block content %}{% endblock %}
     </div>
 
