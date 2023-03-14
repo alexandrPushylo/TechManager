@@ -33,14 +33,14 @@
         </ul>
     </div>
       {% for m in materials_list %}
-    <div class="card shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
+    <div class="container shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
       <div class="card-body">
         <ul class="container-fluid" >
                 <div class="  " id="vehicle_list">
                     <label class="ms-1 fw-bold">{{ m.app_for_day.construction_site.address}} ({{ m.app_for_day.construction_site.foreman.last_name }})  </label>
                         <div class=" conteiner-fluid form-floating row mt-1 ">
                             <div class="input-group form-floating p-0">
-                               <textarea  readonly class="form-control app_description" aria-label="With textarea" id="floatingInputValue" name="descr">{{ m.description }}</textarea>
+                               <textarea  readonly class="form-control app_description mb-1 overflow-hidden" aria-label="With textarea" id="floatingInputValue" name="descr">{{ m.description }}</textarea>
                             </div>
                         </div>
                 </div>
