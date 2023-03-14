@@ -15,27 +15,46 @@
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&display=swap" rel="stylesheet">
     </head>
         {% load static %}
-    <body style="margin-bottom: 100px; margin-top: 100px;">
+    <body style="margin-bottom: 50px; ">
 
+    <div class="container-fluid position-fixed top-0" style="width: 100vw; height: max-content; z-index: 100">
+
+    {% block top %}
         {% include 'components/top_panel.html' %}
-        <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 15px;">
-            {% block indicator %}
-                {% if user.is_authenticated %}
-                <a href="{% url 'start_page' %}"  class="btn btn-sm btn-primary  " aria-current="page">На главную страницу</a>
-                {% endif %}
-            {% endblock %}
-        </div>
+    {% endblock %}
+    </div>
 
-        {% block content %}{% endblock %}
+{#        <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 15px;">#}
+{#            {% block indicator %}#}
+{#                {% if user.is_authenticated %}#}
+{#                <a href="{% url 'start_page' %}"  class="btn btn-sm btn-primary  " aria-current="page">На главную страницу</a>#}
+{#                {% endif %}#}
+{#            {% endblock %}#}
+{#        </div>#}
 
-        {% block tab %}{% endblock %}
-        <nav class="navbar fixed-bottom " style="min-height: 40px; background-color: rgba(52,58,64,0.89);">
-            <div class="container-fluid position-relative">
+<div class="container d-flex" style="width: 100vw; height: max-content; margin-top: 10vh;">
 
+    <div class="position-fixed start-0" style="width: max-content; height: inherit; min-width: max-content">
+    {% block tab %}{% endblock %}
+    </div>
+
+    <div class="position-relative mx-auto border border-danger" style="width: 100%; height: max-content" >
+    {% block content %}{% endblock %}
+    </div>
+
+    <div class="position-fixed end-0 " style="width: max-content; height: inherit; min-width: max-content">
+    {% block rigth_tab %}{% endblock %}
+    </div>
+</div>
+
+<div class="container-fluid position-fixed  bottom-0" style="width: 100vw; height: max-content;background-color: rgba(52,58,64,0.89);">
+
+{#    <nav class="navbar fixed-bottom " style="min-height: 40px; background-color: rgba(52,58,64,0.89);">#}
+{#        <div class="container-fluid position-relative">#}
             {% block bottom_panel %}{% endblock %}
-
-            </div>
-        </nav>
+{#        </div>#}
+{#    </nav>#}
+</div>
     {% if message_status %}
 <div class="alert alert-success w-25 mx-auto text-center position-fixed start-50 top-50 translate-middle" hidden=""  id="notice_stat" status="{{ message_status }}"  role="alert">
     {{ message }}</div>
