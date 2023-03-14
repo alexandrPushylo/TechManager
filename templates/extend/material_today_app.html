@@ -4,7 +4,7 @@
 
     {% block choosedate %}
     <div class="container">
-        <div class="btn-group position-relative start-50 top-0 translate-middle ">
+        <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
             {% if cw_day == nw_day %}
                 <a href="{% url 'show_today_materials' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
@@ -13,10 +13,11 @@
                 <a href="{% url 'show_today_materials' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
-    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
+    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 <div></div>
+
 <div class="container-lg  mx-auto mt-4">
 
 <div class="btn-group dropend">
