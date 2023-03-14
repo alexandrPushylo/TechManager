@@ -1783,8 +1783,7 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])))
 
     app_list_day = tech_app_status.filter(app_for_day__date=current_day)
-    tech_app_today = [app_list_day.values_list('technic_driver', flat=True)]
-
+    tech_app_today = list(app_list_day.values_list('technic_driver', flat=True))
     for _i in set(tech_app_today):
         if tech_app_today.count(_i) > c_in:
             out.append(_i)
