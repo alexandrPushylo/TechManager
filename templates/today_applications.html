@@ -4,7 +4,7 @@
 
     {% block choosedate %}
     <div class="container">
-        <div class="btn-group position-relative start-50 top-0 translate-middle ">
+        <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
             {% if cw_day == nw_day %}
                 <a href="{% url 'show_today_applications' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
                 <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
@@ -13,7 +13,7 @@
                 <a href="{% url 'show_today_applications' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
-    <div class="position-absolute translate-middle  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
+    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
 <div></div>
@@ -39,7 +39,7 @@
 
     <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
       {% for v in today_technic_applications %}
-    <div class="container shadow-lg m-2 pb-1" style="background-color: rgba(247,247,248,0.71)">
+    <div class="container shadow-lg m-2 " style="background-color: rgba(247,247,248,0.71)">
       <div class="card-body">
         <ul class="container-fluid" >
 
@@ -58,7 +58,7 @@
                         {% for d in v.2 %}
                         <div class=" conteiner-fluid form-floating row mt-1 ">
                         <input type="hidden" name="prior_id" value="{{ d.id }}"/>
-                            <div class="input-group form-floating p-0">
+                            <div class="input-group form-floating p-0 mb-1">
                                 {% if post == 'admin' %}
 
                                 <span class="input-group-text {% if d.id in priority_list %} border border-2 border-primary{% endif %}">
