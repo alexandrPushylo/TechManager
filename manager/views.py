@@ -1727,7 +1727,7 @@ def send_all_applications(request, day):
         send_status_app_for_foreman(day)
         send_message_for_admin(day)
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{day}')
 
 
 def approv_all_applications(request, day):
@@ -1743,7 +1743,7 @@ def approv_all_applications(request, day):
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
             app.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{day}')
 
 
 def submitted_all_applications(request, day):
@@ -1785,7 +1785,7 @@ def submitted_all_applications(request, day):
         except Variable.DoesNotExist:
             pass
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{day}')
 
 
 def get_priority_list(current_day):
@@ -2041,7 +2041,7 @@ def success_application(request, id_application):
 
     current_application.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{current_day}')
 
 
 def get_current_day(selected_day: str):
