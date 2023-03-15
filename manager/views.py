@@ -101,7 +101,25 @@ def notice_submitt(request, current_day):
 #
 #     return render(request, 'edit_application_materials.html', out)
 
+def print_material_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    current_application = ApplicationToday.objects.filter(
+        Q(date=current_day),
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+    )
+    app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
 
+    out['materials_list'] = app_material.values(
+        'id',
+        'app_for_day__construction_site__address',
+        'app_for_day__construction_site__foreman__last_name',
+        'description'
+    )
+
+    return render(request, 'print_page.html', out)
 
 def supply_materials_view(request, day):
     if request.user.is_anonymous:
@@ -155,8 +173,6 @@ def supply_materials_view(request, day):
             pass
 
         return HttpResponseRedirect(request.path)
-    if 'print' in request.path:
-        return render(request, 'print_page.html', out)
     return render(request, 'extend/supply_app_materials.html', out)
 
 
@@ -417,7 +433,7 @@ def copy_app_view(request, id_application):
                 _drv_tab = DriverTabel.objects.get(
                     date=get_current_day('next_day'),
                     status=True,
-                    driver__user=_apptech.technic_driver.driver.driver.user)
+                    driver=_apptech.technic_driver.driver.driver)
 
                 if TechnicDriver.objects.filter(
                         status=True,
@@ -1046,6 +1062,22 @@ def show_applications_view(request, day, id_user=None):
     _var_reload_main_page = get_var('reload_main_page')
     out["var_reload_main_page"] = _var_reload_main_page
 
+    if request.POST.get('td_from') and request.POST.get('td_to'):
+        td_from = request.POST.get('td_from')
+        td_to = request.POST.get('td_to')
+
+        _app = ApplicationTechnic.objects.filter(
+            app_for_day__date=current_day,
+            technic_driver_id=td_from
+
+        )
+        _app_td = ApplicationToday.objects.filter(applicationtechnic__technic_driver_id=td_from)
+        _app_td.update(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))
+        _app.update(technic_driver=td_to)
+
+    else:
+        print('NONE')
+
 
     if is_admin(current_user):
         app_for_day = ApplicationToday.objects.filter(
@@ -1121,6 +1153,15 @@ def show_applications_view(request, day, id_user=None):
             out['inf_btn_content'] = 'Имеются не поданные заявки'
             out['saved_ap_list'] = saved_ap_list
         materials_list = ApplicationMeterial.objects.filter(status_checked=True)
+
+        out['technic_driver_table_TT'] = technic_driver_table.filter(
+            status=True, driver__status=True).order_by('driver__driver__last_name')  #########
+
+        out['app_technic_today'] = ApplicationTechnic.objects.filter(app_for_day__date=current_day).values(
+            'technic_driver_id',
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name'
+        ).distinct().order_by('technic_driver__driver__driver__last_name')
 
 
     elif is_foreman(current_user):
@@ -1686,7 +1727,7 @@ def send_all_applications(request, day):
         send_status_app_for_foreman(day)
         send_message_for_admin(day)
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{day}')
 
 
 def approv_all_applications(request, day):
@@ -1702,7 +1743,7 @@ def approv_all_applications(request, day):
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
             app.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{day}')
 
 
 def submitted_all_applications(request, day):
@@ -1744,7 +1785,7 @@ def submitted_all_applications(request, day):
         except Variable.DoesNotExist:
             pass
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{day}')
 
 
 def get_priority_list(current_day):
@@ -2000,7 +2041,7 @@ def success_application(request, id_application):
 
     current_application.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{current_day}')
 
 
 def get_current_day(selected_day: str):
