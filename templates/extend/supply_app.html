@@ -99,10 +99,10 @@
     </div>
 </div>
 {% endblock %}
-{% csrf_token %}
 
 
-    {% block rigth_tab %}
+
+    {% block rigth_tab %}{% csrf_token %}
 <div class="foreman_panel container col-auto position-fixed end-0 top-0"style="margin-top: 5rem; height: 100vh;" {% if var_supply_panel.value == user.id|slugify and var_supply_panel.flag %} hidden="" {% endif %}>
         <div class="card-body  overflow-auto "style="height: 75%" >
 
