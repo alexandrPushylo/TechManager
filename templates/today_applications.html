@@ -17,7 +17,7 @@
     {% endblock %}
 
 
-    <div class="btn-group dropend mt-3 ms-3">
+    <div class="btn-group dropend mt-4 ms-3">
     <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-filter"></i> {{ filter }}
     </button>
@@ -31,11 +31,7 @@
         </ul>
     </div>
 
-<div class="container position-absolute start-50 translate-middle-x mx-auto mt-4">
-
-
-
-
+<div class="container position-absolute start-50 translate-middle-x mx-auto mt-1">
 
     <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
       {% for v in today_technic_applications %}
