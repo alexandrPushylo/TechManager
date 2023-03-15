@@ -101,7 +101,25 @@ def notice_submitt(request, current_day):
 #
 #     return render(request, 'edit_application_materials.html', out)
 
+def print_material_view(request, day):
+    out = {}
+    current_day = convert_str_to_date(day)
+    current_application = ApplicationToday.objects.filter(
+        Q(date=current_day),
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
+        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+    )
+    app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
 
+    out['materials_list'] = app_material.values(
+        'id',
+        'app_for_day__construction_site__address',
+        'app_for_day__construction_site__foreman__last_name',
+        'description'
+    )
+
+    return render(request, 'print_page.html', out)
 
 def supply_materials_view(request, day):
     if request.user.is_anonymous:
@@ -155,8 +173,6 @@ def supply_materials_view(request, day):
             pass
 
         return HttpResponseRedirect(request.path)
-    if 'print' in request.path:
-        return render(request, 'print_page.html', out)
     return render(request, 'extend/supply_app_materials.html', out)
 
 
