@@ -32,6 +32,7 @@ from manager.views import conflict_correction_view
 
 from manager.views import supply_app_view
 from manager.views import move_supply_app
+from manager.views import cancel_supply_app
 from manager.views import supply_today_app_view
 from manager.views import supply_materials_view
 from manager.views import print_material_view
@@ -125,6 +126,7 @@ urlpatterns = [
     path('foreman_app_list/<str:day>', foreman_app_list_view, name='foreman_app_list'),
     path('supply_app/<str:day>', supply_app_view, name='supply_app'),
     path('move_supply_app/<str:day>/<int:id_app>', move_supply_app, name='move_supply_app'),
+    path('cancel_supply_app/<int:id_app>', cancel_supply_app, name='cancel_supply_app'),
     path('supply_today_app/<str:day>', supply_today_app_view, name='supply_today_app'),
 
     path('success_app/<int:id_application>', success_application, name='success_application'),

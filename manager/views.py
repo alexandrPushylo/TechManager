@@ -232,8 +232,23 @@ def supply_today_app_view(request, day):
     return render(request, 'supply_today_app.html', out)
 
 
+def cancel_supply_app(request, id_app):
+    temp_str = 'ОТВЕРГНУТА\n'
+    _app_tech = ApplicationTechnic.objects.get(id=id_app)
+    if not _app_tech.var_check:
+        _tmp_desc = _app_tech.description
+        _app_tech.description = temp_str + _tmp_desc
+        _app_tech.var_check = True
+        _app_tech.save()
+    elif temp_str in _app_tech.description:
+        _tmp_desc = _app_tech.description
+        _app_tech.description = _tmp_desc.replace('ОТВЕРГНУТА\n', '')
+        _app_tech.var_check = False
+        _app_tech.save()
+
+    return HttpResponseRedirect('/')
+
 def move_supply_app(request, day, id_app):
-    cur_app_today = ApplicationToday.objects.get(id=id_app)
     current_day = convert_str_to_date(day)
     _save_status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
 
@@ -245,23 +260,17 @@ def move_supply_app(request, day, id_app):
     supply_list = Post.objects.filter(
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
 
-    cur_app_tech = ApplicationTechnic.objects.filter(
-        app_for_day=cur_app_today,
-        technic_driver__technic__supervisor__in=supply_list)
-
-    for _app_tech in cur_app_tech:
-        if _app_tech.var_check:
-            continue
-
-        _id = _app_tech.id
-        _app_tech.var_check = True
-        _app_tech.save()
-        _app_tech.pk = None
-        _app_tech.var_check = False
-        _app_tech.description = f'{_app_tech.app_for_day.construction_site.address} ({_app_tech.app_for_day.construction_site.foreman.last_name})\n{_app_tech.description}'
-        _app_tech.app_for_day = app_for_day
-        _app_tech.var_ID_orig = _id
-        _app_tech.save()
+    cur_app_tech = ApplicationTechnic.objects.get(id=id_app)
+    if not cur_app_tech.var_check:
+        _id = cur_app_tech.id
+        cur_app_tech.var_check = True
+        cur_app_tech.save()
+        cur_app_tech.pk = None
+        cur_app_tech.var_check = False
+        cur_app_tech.description = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\n{cur_app_tech.description}'
+        cur_app_tech.app_for_day = app_for_day
+        cur_app_tech.var_ID_orig = _id
+        cur_app_tech.save()
         app_for_day.status = _save_status
         app_for_day.save()
 
