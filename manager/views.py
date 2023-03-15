@@ -417,7 +417,7 @@ def copy_app_view(request, id_application):
                 _drv_tab = DriverTabel.objects.get(
                     date=get_current_day('next_day'),
                     status=True,
-                    driver__user=_apptech.technic_driver.driver.driver.user)
+                    driver=_apptech.technic_driver.driver.driver)
 
                 if TechnicDriver.objects.filter(
                         status=True,
