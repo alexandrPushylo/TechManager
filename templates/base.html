@@ -17,7 +17,7 @@
         {% load static %}
     <body style="margin-bottom: 50px; ">
 
-    <div class="container-fluid position-fixed top-0" style="width: 100vw; height: max-content; z-index: 100">
+    <div id="block_top" class="container-fluid position-fixed top-0" style="width: 100vw; height: max-content; z-index: 100">
 
     {% block top %}
         {% include 'components/top_panel.html' %}
@@ -32,22 +32,23 @@
             {% endblock %}
         </div>
 
-<div class=" d-flex " style="width: 100%; height: max-content; margin-top: 10vh;">
-
-    <div class="position-fixed start-0" style="width: max-content; height: inherit; min-width: max-content">
+<div class="d-flex justify-content-center  " style="width: 100%; height: max-content; margin-top: 10vh;">
+{% block body %}
+    <div id="block_tab" class="position-fixed start-0" style="width: max-content; height: inherit; min-width: max-content">
     {% block tab %}{% endblock %}
     </div>
 
-    <div class="position-relative mx-auto ms-5 me-5" style="width: inherit; height: max-content" >
+    <div id="block_content" class="position-relative mx-auto " style="width: inherit; height: max-content" >
     {% block content %}{% endblock %}
     </div>
 
-    <div class="position-fixed end-0 " style="width: max-content; height: inherit; min-width: max-content">
+    <div id="block_rigth_tab" class="position-fixed end-0 " style="width: max-content; height: inherit; min-width: max-content">
     {% block rigth_tab %}{% endblock %}
     </div>
+{% endblock %}
 </div>
 
-<div class="container-fluid position-fixed  bottom-0" style="width: 100vw; height: max-content;background-color: rgba(52,58,64,0.89); z-index: 100;">
+<div id="block_bottom_panel" class="container-fluid position-fixed  bottom-0" style="width: 100vw; height: max-content;background-color: rgba(52,58,64,0.89); z-index: 100;">
 
 {#    <nav class="navbar fixed-bottom " style="min-height: 40px; background-color: rgba(52,58,64,0.89);">#}
 {#        <div class="container-fluid position-relative">#}

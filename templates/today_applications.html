@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
     {% block choosedate %}
@@ -16,11 +15,9 @@
     <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
     </div>
     {% endblock %}
-<div></div>
 
-<div class="container-fluid w-100  mx-auto mt-4 ">
 
-    <div class="btn-group dropend mt-2">
+    <div class="btn-group dropend mt-2 ms-3">
     <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-filter"></i> {{ filter }}
     </button>
@@ -34,11 +31,15 @@
         </ul>
     </div>
 
+<div class="container position-absolute start-50 translate-middle-x mx-auto mt-4">
+
+
+
 
 
     <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
       {% for v in today_technic_applications %}
-    <div class="container shadow-lg m-2 " style="background-color: rgba(247,247,248,0.71)">
+    <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">
       <div class="card-body">
         <ul class="container-fluid" >
 
