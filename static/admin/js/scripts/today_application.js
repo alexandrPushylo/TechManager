@@ -1,4 +1,4 @@
-//auto resize <textarea>
+// $('#block_tab').remove();
 $('.app_description').each(function () {
     this.style.height = ""+(this.scrollHeight)+"px";
 });
