@@ -69,6 +69,26 @@ function sent(i) {
         })
 }
 
+
+$('#btn_sub_change_drv').click(function () {
+    const s_from = $('#select_from_drv').val();
+    const s_to = $('#select_to_drv').val();
+    // console.log(s_from,'>>',s_to);
+    $.ajax({
+        type: 'POST',
+        mode: 'same-origin',
+        url: pathname,
+        data:{
+            csrfmiddlewaretoken: csrf,
+                td_from: s_from,
+                td_to:s_to
+            },
+        success: function() {
+            window.location.reload();
+            }
+        })
+})
+
 $('#container').masonry({
 // указываем элемент-контейнер в котором расположены блоки для динамической верстки
 	  itemSelector: '.item',

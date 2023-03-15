@@ -1062,6 +1062,22 @@ def show_applications_view(request, day, id_user=None):
     _var_reload_main_page = get_var('reload_main_page')
     out["var_reload_main_page"] = _var_reload_main_page
 
+    if request.POST.get('td_from') and request.POST.get('td_to'):
+        td_from = request.POST.get('td_from')
+        td_to = request.POST.get('td_to')
+
+        _app = ApplicationTechnic.objects.filter(
+            app_for_day__date=current_day,
+            technic_driver_id=td_from
+
+        )
+        _app_td = ApplicationToday.objects.filter(applicationtechnic__technic_driver_id=td_from)
+        _app_td.update(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))
+        _app.update(technic_driver=td_to)
+
+    else:
+        print('NONE')
+
 
     if is_admin(current_user):
         app_for_day = ApplicationToday.objects.filter(
@@ -1137,6 +1153,15 @@ def show_applications_view(request, day, id_user=None):
             out['inf_btn_content'] = 'Имеются не поданные заявки'
             out['saved_ap_list'] = saved_ap_list
         materials_list = ApplicationMeterial.objects.filter(status_checked=True)
+
+        out['technic_driver_table_TT'] = technic_driver_table.filter(
+            status=True, driver__status=True).order_by('driver__driver__last_name')  #########
+
+        out['app_technic_today'] = ApplicationTechnic.objects.filter(app_for_day__date=current_day).values(
+            'technic_driver_id',
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name'
+        ).distinct().order_by('technic_driver__driver__driver__last_name')
 
 
     elif is_foreman(current_user):
