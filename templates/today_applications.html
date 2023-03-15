@@ -17,12 +17,11 @@
     </div>
     {% endblock %}
 <div></div>
-<div class="container-lg  mx-auto mt-4">
 
+<div class="container-fluid w-100  mx-auto mt-4 ">
 
-
-    <div class="btn-group dropend">
-    <button type="button" class="btn btn-outline-secondary ms-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+    <div class="btn-group dropend mt-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-filter"></i> {{ filter }}
     </button>
         <ul class="dropdown-menu">
@@ -93,7 +92,7 @@
 <div class="input-group d-flex justify-content-center align-items-center">
     {% if post == 'admin' %}
     <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
-    <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить изменения">
+    <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить">
         {% else %}
         <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
     {% endif %}
