@@ -118,18 +118,25 @@
           <hr style="border-width: medium;">
 {#              <h6 class="card-text"><label><b>Список техники:</b></label> </h6>#}
                     {% for t in app.1 %}
+                        <hr>
                   <div class="row {% if t.var_check %}bg-warning{% endif %}">
                 <div class="card-text fs-6 col-auto">{{ t.technic_driver.technic.name }} ({{ t.technic_driver.driver.driver }})</div>
+
                   </div>
 
                   {% if t.description %}
-                <textarea class="form-control app_description" readonly>{{ t.description }}</textarea>
+                <textarea class="form-control app_description mt-1" readonly>{{ t.description }}</textarea>
                   {%endif%}
+                        <div class="btn-group mt-1">
+                <a href="{% url 'move_supply_app' cw_day t.id %}" class="btn btn-outline-success  btn-sm me-2" aria-current="page"><i class="fa-solid fa-backward"></i> </a>
+                <a href="{% url 'cancel_supply_app' t.id %}" class="btn btn-outline-danger  btn-sm ms-2" aria-current="page"><i class="fa-solid fa-xmark"></i> Отвергнуть </a>
+                </div>
                     {% endfor %}
-                  <hr>
-            <div class="btn-group ">
-                <a href="{% url 'move_supply_app' cw_day app.0.id %}" class="btn btn-outline-success  btn-sm" aria-current="page"><i class="fa-solid fa-backward"></i> </a>
-            </div>
+{#                  <hr>#}
+{#            <div class="btn-group ">#}
+{#                <a href="{% url 'move_supply_app' cw_day app.0.id %}" class="btn btn-outline-success  btn-sm me-2" aria-current="page"><i class="fa-solid fa-backward"></i> </a>#}
+{#                <a href="{% url 'cancel_supply_app' cw_day app.0.id %}" class="btn btn-outline-danger  btn-sm ms-2" aria-current="page"><i class="fa-solid fa-xmark"></i> Отвергнуть </a>#}
+{#            </div>#}
           </div>
         </div>
         </div>
