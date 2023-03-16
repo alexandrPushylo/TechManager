@@ -143,18 +143,12 @@ def supply_materials_view(request, day):
         _status0 = False
     out['status_checked'] = _status0
 
-    if request.POST.get('status_checked'):
-        _status = request.POST.get('status_checked')
-        if _status0 == False:
-            app_material.update(status_checked=True)
-
-
-
     out['materials_list'] = app_material.values(
         'id',
         'app_for_day__construction_site__address',
         'app_for_day__construction_site__foreman__last_name',
-        'description'
+        'description',
+        'status_checked'
     )
 
     if request.method == 'POST':
@@ -163,11 +157,14 @@ def supply_materials_view(request, day):
             _desc_list = request.POST.getlist('materials_description')
             for _id, _desc in zip(_id_list, _desc_list):
                 _app = ApplicationMeterial.objects.get(id=_id)
-                if _desc:
+                if _app.description != _desc:
                     _app.description = str(_desc).strip()
-                    _app.status_checked = False
+                    _app.status_checked = True
                     _app.save()
-                else:
+                elif _app.description == _desc:
+                    _app.status_checked = True
+                    _app.save()
+                elif not _desc:
                     _app.delete()
         except ApplicationMeterial.DoesNotExist:
             pass
