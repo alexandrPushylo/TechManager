@@ -284,7 +284,20 @@
     <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 
     {% if post == 'admin' %}
-    <button role="button" class="btn btn-outline-info position-absolute ms-3 start-0" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange"><i class="fa-solid fa-ellipsis"></i> </button>
+
+
+    <div class="btn-group dropup position-absolute ms-3 start-0">
+      <button type="button" class="btn btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+{#        <i class="fa-solid fa-ellipsis"></i>#}
+          Опции
+      </button>
+      <ul class="dropdown-menu">
+        <a  class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange">Замена водителя </a>
+      </ul>
+    </div>
+
+
+
     <button role="button" class="btn_driver_panel btn btn-outline-light position-absolute me-3 end-0"><i class="fa-solid fa-list"></i> </button>
     {% endif %}
 </div>
