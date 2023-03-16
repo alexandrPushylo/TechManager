@@ -1265,7 +1265,7 @@ def show_application_for_driver(request, day, id_user):
     return render(request, 'applications_for_driver.html', out)
 
 
-def show_today_applications(request, day, id_foreman=None):
+def show_today_applications(request, day, filter=None):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
@@ -1277,29 +1277,33 @@ def show_today_applications(request, day, id_foreman=None):
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
+
+
     if 'materials' in request.path:
         _filter = get_var('filter_material_app', value=True, user=request.user)
-        if id_foreman == 0:
+        if filter == 'all':
             _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day, status_checked=True)
             set_var('filter_material_app', value=None, user=request.user)
             out['filter'] = 'Все'
 
-        elif id_foreman:
+        elif str(filter).isnumeric():
+            id_foreman = int(filter)
             _app = ApplicationMeterial.objects.filter(
                 app_for_day__construction_site__foreman=id_foreman,
                 app_for_day__date=current_day,
                 status_checked=True)
             out['filter'] = User.objects.get(id=id_foreman).last_name
 
-            if id_foreman != _filter:
+            if filter != _filter:
                 set_var('filter_material_app', value=id_foreman, user=request.user)
         else:
-            if _filter:
+            if str(_filter).isnumeric():
+                id_foreman = int(_filter)
                 _app = ApplicationMeterial.objects.filter(
-                    app_for_day__construction_site__foreman_id=_filter,
+                    app_for_day__construction_site__foreman_id=id_foreman,
                     status_checked=True,
                     app_for_day__date=current_day)
-                out['filter'] = User.objects.get(id=_filter).last_name
+                out['filter'] = User.objects.get(id=id_foreman).last_name
             else:
                 _app = ApplicationMeterial.objects.filter(app_for_day__date=current_day, status_checked=True)
                 out['filter'] = 'Все'
@@ -1307,17 +1311,19 @@ def show_today_applications(request, day, id_foreman=None):
         out['materials_list'] = _app
         return render(request, "extend/material_today_app.html", out)
 
+
+
     if is_admin(request.user):
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
 
     _filter = get_var('filter_today_app', value=True, user=request.user)
 
-    if id_foreman == 0:
+    if filter == 'all':
         _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
         set_var('filter_today_app', value=None, user=request.user)
         out['filter'] = 'Все'
 
-    elif id_foreman == 1:
+    elif filter == 'supply':
         id_supply_list = Post.objects.filter(
             post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
         _app = ApplicationTechnic.objects.filter(
@@ -1327,13 +1333,14 @@ def show_today_applications(request, day, id_foreman=None):
         set_var('filter_today_app', value='supply', user=request.user)
         out['filter'] = 'Снабжение'
 
-    elif id_foreman:
+    elif str(filter).isnumeric():
+        id_foreman = int(filter)
         _app = ApplicationTechnic.objects.filter(
             app_for_day__construction_site__foreman=id_foreman,
             app_for_day__date=current_day)
         out['filter'] = User.objects.get(id=id_foreman).last_name
-        if id_foreman != _filter:
-            set_var('filter_today_app', value=id_foreman, user=request.user)
+        if filter != _filter:
+            set_var('filter_today_app', value=filter, user=request.user)
     else:
 
         if _filter == 'supply':
@@ -1345,15 +1352,19 @@ def show_today_applications(request, day, id_foreman=None):
             )
             out['filter'] = 'Снабжение'
 
-        elif _filter:
+        elif str(_filter).isnumeric():
+            id_foreman = int(_filter)
             _app = ApplicationTechnic.objects.filter(
-                app_for_day__construction_site__foreman_id=_filter,
+                app_for_day__construction_site__foreman_id=id_foreman,
                 app_for_day__date=current_day)
-            out['filter'] = User.objects.get(id=_filter).last_name
+            out['filter'] = User.objects.get(id=id_foreman).last_name
 
         else:
             _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
             out['filter'] = 'Все'
+
+
+
     if is_admin(request.user):
         app_tech_day = _app.filter(
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
