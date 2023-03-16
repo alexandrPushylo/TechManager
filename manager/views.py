@@ -1311,8 +1311,6 @@ def show_today_applications(request, day, filter=None):
         out['materials_list'] = _app
         return render(request, "extend/material_today_app.html", out)
 
-
-
     if is_admin(request.user):
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
 
@@ -1363,8 +1361,6 @@ def show_today_applications(request, day, filter=None):
             _app = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
             out['filter'] = 'Все'
 
-
-
     if is_admin(request.user):
         app_tech_day = _app.filter(
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
@@ -1377,10 +1373,19 @@ def show_today_applications(request, day, filter=None):
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
         ).exclude(var_check=True)
 
+    # TODO: SORT
+
     driver_technic = app_tech_day.values_list(
         'technic_driver__driver__driver__last_name',
         'technic_driver__technic__name__name').order_by(
         'technic_driver__driver__driver__last_name').distinct()
+
+    # driver_technic = app_tech_day.values_list(
+    #     'technic_driver__driver__driver__last_name',
+    #     'technic_driver__technic__name__name').order_by(
+    #     'technic_driver__technic__name__name').distinct()
+
+    # ----------------------------------------------------------
 
     app_list = []
     for _drv, _tech in driver_technic:
