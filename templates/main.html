@@ -46,7 +46,8 @@
     <div id="container" class="container mt-5 ms-5">
 {#        <div class="container">#}
         {% for a in today_applications_list %}
-        <div class="item m-3">
+            <div id="per_{{ a.app_today.id }}" class="item">
+        <div id="{{ a.app_today.id }}" class="m-3">
 
         <div class="card shadow-lg
             {% if  a.app_today.status.status  == 'Сохранена' %}
@@ -121,11 +122,14 @@
           {% endif %}
 
             <div class="btn-group " {% if cw_day != lw_day and cw_day != nw_day %}hidden{% endif %}>
+
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
                 <a href="{% url 'clear_application' a.app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
                 {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
+{#                <a id="success_application_{{ a.app_today.id }}" class="btn_T btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
+
                 {% elif post  == 'admin' and a.app_today.status.status  == 'Одобрена' %}
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>
                 {% endif %}
@@ -143,6 +147,7 @@
           </div>
         </div>
         </div>
+            </div>
         {% endfor %}
 {#    </div>#}
     </div>
