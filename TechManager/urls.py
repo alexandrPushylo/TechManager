@@ -105,9 +105,10 @@ urlpatterns = [
     path('logout', logout_view, name="logout"),
 
     path('today_app/<str:day>', show_today_applications, name="show_today_applications"),
-    path('today_app/<str:day>/<int:id_foreman>', show_today_applications, name="show_today_applications"),
+    path('today_app/<str:day>/<str:filter>', show_today_applications, name="show_today_applications"),
     path('today_app/<str:day>/materials', show_today_applications, name="show_today_materials"),
-    path('today_app/<str:day>/materials/<int:id_foreman>', show_today_applications, name="show_today_materials"),
+    path('today_app/<str:day>/materials/<str:filter>', show_today_applications, name="show_today_materials"),
+
     path('materials/<str:day>', supply_materials_view, name='supply_materials'),
 
     path('print/<str:day>', print_material_view, name='print_materials'),

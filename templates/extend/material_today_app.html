@@ -25,7 +25,7 @@
         <i class="fa-solid fa-filter"></i> {{ filter }}
     </button>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day 0 %}">Все</a></li>
+            <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day 'all' %}">Все</a></li>
             <hr>
             {% for forem in foreman_list %}
             <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day forem.user_post.id %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a></li>

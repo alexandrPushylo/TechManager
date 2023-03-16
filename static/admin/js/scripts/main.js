@@ -105,4 +105,22 @@ $('#container').masonry({
 	      duration: 500
 	  }
 // опции анимации - очередь и продолжительность анимации
-	});
+});
+
+// $('.btn_T').click(function () {
+//     const btn_id = this.id.replace('success_application_', '');
+//     const path = '/success_app/'+btn_id;
+//     $.ajax({
+//         type: 'POST',
+//         mode: 'same-origin',
+//         url: path,
+//         data:{
+//             csrfmiddlewaretoken: csrf,
+//                 app_id: btn_id,
+//
+//             },
+//         success: function () {
+//             $('#per_'+btn_id).load(path+' #'+btn_id);
+//         }
+//         })
+// })
