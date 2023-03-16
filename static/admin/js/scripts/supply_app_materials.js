@@ -16,26 +16,12 @@ $('.app_description').on('input', function(){
 const csrf = $('input[name="csrfmiddlewaretoken"]').val();
 const pathname = window.location.pathname;
 
-// const io_id_app_m = $('#io_id_app_m');
-const btn_status_check = $('.btn_status_check');
-btn_status_check.click(function () {
-    sent()
+$('.app_description').on('input', function () {
+    const desc_id = this.id;
+    $('#div'+desc_id).removeClass('border','border-success', 'border-2');
+    $('#btn_save').val('Сохранить изменения');
+    $('#btn_save').removeClass('btn-danger').addClass('btn-warning');
 })
-
-function sent() {
-        $.ajax({
-        type: 'POST',
-        mode: 'same-origin',
-        url: pathname,
-        data:{
-            csrfmiddlewaretoken: csrf,
-                status_checked: true
-            },
-        success: function() {
-            window.location.reload();
-            }
-        })
-}
 
 $('.btn_print').click(function () {
     window.open(pathname.replace('materials','print'))
