@@ -1587,9 +1587,10 @@ def create_new_application(request, id_application):
 
         _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
         if materials:
-            _material.description = materials
-            _material.status_checked = False
-            _material.save()
+            if materials != _material.description:
+                _material.description = materials
+                _material.status_checked = False
+                _material.save()
         else:
             _material.delete()
 
@@ -1742,7 +1743,7 @@ def send_all_applications(request, day):
             app.status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
             app.save()
 
-        set_var('status_sended_app', value=current_day, flag=True)
+        set_var('status_sended_app', date=current_day, flag=True)
 
         send_task_for_drv(day)
         send_status_app_for_foreman(day)
@@ -1799,7 +1800,7 @@ def submitted_all_applications(request, day):
     count_apps = current_applications.count()
     if count_apps > 0:
         try:
-            _var = Variable.objects.get(name='status_sended_app', value=current_day)
+            _var = Variable.objects.get(name='status_sended_app', date=current_day)
             if _var.flag:
                 mess = f'Подана {count_apps} заявки(а) требующих рассмотрение!'
                 send_message_for_admin(current_day, mess)
@@ -2051,7 +2052,7 @@ def success_application(request, id_application):
     else:
         current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
         try:
-            _var = Variable.objects.get(name='status_sended_app', value=current_day)
+            _var = Variable.objects.get(name='status_sended_app', date=current_day)
             if _var.flag:
                 mess = f'Подана заявка требующая рассмотрение!'
                 send_message_for_admin(current_day, mess)
@@ -2177,10 +2178,12 @@ def get_var(var, value=False, flag=False, user=None):
         return None
 
 
-def set_var(name, value=None, flag=False, user=None):
+def set_var(name, value=None, time=None, date=None, flag=False, user=None):
     _var, _ = Variable.objects.get_or_create(name=name, user=user)
     _var.value = value
     _var.flag = flag
+    _var.time = time
+    _var.date = date
     _var.save()
 
     return _var
