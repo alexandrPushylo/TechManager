@@ -121,7 +121,7 @@
               <hr>
           {% endif %}
 
-            <div class="btn-group " {% if cw_day != lw_day and cw_day != nw_day %}hidden{% endif %}>
+            <div class="btn-group ">
 
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
