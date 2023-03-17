@@ -76,31 +76,6 @@ def notice_submitt(request, current_day):
     return HttpResponseRedirect('/')
 
 
-
-# def edit_list_materials(request, id_application):   #TODO: del
-#     out = {}
-#     current_application = ApplicationToday.objects.get(id=id_application)
-#     current_day = current_application.date
-#     get_prepare_data(out, request, current_day)
-#     cur_app_mater = ApplicationMeterial.objects.get(app_for_day=current_application)
-#
-#     out['date_of_target'] = current_day
-#     out['application_materials'] = cur_app_mater
-#
-#     if request.method == 'POST':
-#         if request.POST.get('id_app_materials'):
-#             _id_app_mat = request.POST.get('id_app_materials')
-#             _a = ApplicationMeterial.objects.get(id=_id_app_mat)
-#             if request.POST.get('desc_materials'):
-#                 _a.description = request.POST.get('desc_materials')
-#                 _a.save()
-#             else:
-#                 _a.delete()
-#
-#         return HttpResponseRedirect(f'/materials/{current_day}')
-#
-#     return render(request, 'edit_application_materials.html', out)
-
 def print_material_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
