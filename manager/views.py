@@ -2295,7 +2295,10 @@ def setting_view(request):
     out = {}
     get_prepare_data(out, request)
     current_user = request.user
-    setting_list = Variable.objects.filter(user=current_user)
+    if is_admin(request.user):
+        setting_list = Variable.objects.filter(Q(user=current_user) | Q(user=None))
+    else:
+        setting_list = Variable.objects.filter(user=current_user)
     out['setting_list'] = setting_list
 
     if request.method == 'POST':
@@ -2305,6 +2308,12 @@ def setting_view(request):
             for n, _id in enumerate(setting_id_list, 1):
                 var = Variable.objects.get(id=_id, user=current_user)
                 value = request.POST.get(f"setting_value_{n}")
+                _time = request.POST.get(f"setting_time_{n}")
+                if not _time:
+                    _time = None
+                _date = request.POST.get(f"setting_date_{n}")
+                if not _date:
+                    _date = None
 
                 if request.POST.get(f"setting_flag_{n}"):
                     flag = True
@@ -2312,6 +2321,8 @@ def setting_view(request):
                     flag = False
 
                 var.value = value
+                var.time = _time
+                var.date = _date
                 var.flag = flag
                 var.save()
 
