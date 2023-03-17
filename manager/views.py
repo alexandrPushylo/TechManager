@@ -1587,9 +1587,10 @@ def create_new_application(request, id_application):
 
         _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
         if materials:
-            _material.description = materials
-            _material.status_checked = False
-            _material.save()
+            if materials != _material.description:
+                _material.description = materials
+                _material.status_checked = False
+                _material.save()
         else:
             _material.delete()
 
