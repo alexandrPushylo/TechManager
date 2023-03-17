@@ -76,31 +76,6 @@ def notice_submitt(request, current_day):
     return HttpResponseRedirect('/')
 
 
-
-# def edit_list_materials(request, id_application):   #TODO: del
-#     out = {}
-#     current_application = ApplicationToday.objects.get(id=id_application)
-#     current_day = current_application.date
-#     get_prepare_data(out, request, current_day)
-#     cur_app_mater = ApplicationMeterial.objects.get(app_for_day=current_application)
-#
-#     out['date_of_target'] = current_day
-#     out['application_materials'] = cur_app_mater
-#
-#     if request.method == 'POST':
-#         if request.POST.get('id_app_materials'):
-#             _id_app_mat = request.POST.get('id_app_materials')
-#             _a = ApplicationMeterial.objects.get(id=_id_app_mat)
-#             if request.POST.get('desc_materials'):
-#                 _a.description = request.POST.get('desc_materials')
-#                 _a.save()
-#             else:
-#                 _a.delete()
-#
-#         return HttpResponseRedirect(f'/materials/{current_day}')
-#
-#     return render(request, 'edit_application_materials.html', out)
-
 def print_material_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
@@ -111,6 +86,12 @@ def print_material_view(request, day):
         Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
     )
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
+
+    _font_size = get_var('font_size', user=request.user)
+    if _font_size and _font_size.value.isnumeric():
+        out['font_size'] = _font_size.value
+    else:
+        out['font_size'] = 10
 
     out['materials_list'] = app_material.values(
         'id',
