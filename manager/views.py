@@ -918,7 +918,7 @@ def tabel_workday_view(request, ch_week):
     out['week'] = []
 
     for _day in range(7):
-        out['week'].append((WorkDayTabel.objects.get(date=current_week[_day]), WEEKDAY[_day]))
+        out['week'].append((WorkDayTabel.objects.get(date=current_week[_day]), WEEKDAY[_day]))# TODO: fix creating
 
     if request.POST.get('id_day'):
         _id = request.POST.get('id_day')
@@ -977,7 +977,6 @@ def Technic_Driver_view(request, day):
 
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     out['work_driver_list'] = work_driver_list.order_by('driver__last_name')
-
     technic_driver_list = TechnicDriver.objects.filter(date=current_day)
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
 
@@ -1891,10 +1890,8 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
         app_list_submit_approv = app_list_today.filter(
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
             Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])))
-
     app_list_priority = app_list_submit_approv.filter(priority=1)
     app_tech = app_list_priority.values_list('technic_driver', 'technic_driver__technic__name__name')
-
     work_app_tech_list = [_[1] for _ in app_tech]
     for i in set(work_app_tech_list):
         if work_app_tech_list.count(i)+c_in > out[i]:
@@ -2092,12 +2089,12 @@ def get_CH_day(day):
 
 
 def prepare_driver_table(day):
-    current_day = day
+    current_day = convert_str_to_date(day)
     ch_day = get_CH_day(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
 
     if DriverTabel.objects.filter(date=current_day).count() == 0:
-        if ch_day == 'next_day':
+        if current_day > TODAY:
             try:
                 for _drv in DriverTabel.objects.filter(date=TODAY):
                     DriverTabel.objects.create(
@@ -2117,7 +2114,7 @@ def prepare_technic_driver_table(day):
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY)
 
-    if get_CH_day(day) == 'next_day':
+    if current_day > TODAY:
         for _tech in Technic.objects.all():
             _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__last_name', 'status')
             driver = _drv[0][0]
