@@ -68,11 +68,10 @@ def get_id_chat(key, result):
                 return (upd['message']['chat']['id'])
 
 
-def check_time(stop_time=16):
+def check_time(stop_time):
     if not stop_time:
-        stop_time = 16
-    else:
-        stop_time = int(stop_time)
+        stop_time = datetime.now().time().replace(hour=16, minute=00)
+
     now = datetime.now().time()
-    if now.hour in range(8, stop_time):
+    if now < stop_time:
         return stop_time
