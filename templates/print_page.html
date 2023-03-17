@@ -17,16 +17,16 @@
         {% load static %}
     <body>
 
-            <div class="container container-fluid mx-auto  row" id="PRINT">
-    <div class="container mt-5  " >
-        <div class="border border-dark">
+            <div class="container container-fluid mx-auto" id="PRINT">
+    <div class=" " >
+        <div class="">
         {% for a in materials_list %}
         <div class="col-auto mb-3">
-          <div class="container mt-1" >
-            <h6 class=" fw-bold text-center">{{a.app_for_day__construction_site__address}} ({{ a.app_for_day__construction_site__foreman__last_name }})</h6>
+          <div class="mt-1" >
+            <div class="fw-bold text-center" style="font-size: {{ font_size }}pt;">{{a.app_for_day__construction_site__address}} ({{ a.app_for_day__construction_site__foreman__last_name }})</div>
             {% if a.description  %}
                 <input type="hidden" name="materials_id" value="{{ a.id }}">
-              <textarea class="form-control app_description overflow-hidden" style="height: content-box" name="materials_description">{{ a.description }}</textarea>
+              <textarea class="form-control app_description overflow-hidden" style="font-size: {{ font_size }}pt;height: content-box" name="materials_description">{{ a.description }}</textarea>
           {% endif %}
           </div>
         </div>
