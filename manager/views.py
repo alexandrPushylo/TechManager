@@ -87,6 +87,12 @@ def print_material_view(request, day):
     )
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
 
+    _font_size = get_var('font_size', user=request.user)
+    if _font_size and _font_size.value.isnumeric():
+        out['font_size'] = _font_size.value
+    else:
+        out['font_size'] = 10
+
     out['materials_list'] = app_material.values(
         'id',
         'app_for_day__construction_site__address',
