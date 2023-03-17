@@ -2109,7 +2109,7 @@ def prepare_driver_table(day):
                     DriverTabel.objects.create(driver=drv, date=current_day)
         else:
             for drv in driver_list:
-                DriverTabel.objects.create(driver=drv, date=current_day)
+                DriverTabel.objects.create(driver=drv.user_post, date=current_day)
 
 
 def prepare_technic_driver_table(day):
