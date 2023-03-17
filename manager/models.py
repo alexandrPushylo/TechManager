@@ -159,8 +159,10 @@ class Variable(models.Model):
     value = models.CharField(max_length=512, null=True, blank=True, verbose_name='Значение переменной')
     flag = models.BooleanField(default=False, verbose_name='Флаг переменной')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
+    time = models.TimeField(null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    def __str__(self): return f'{self.name} - {self.value} - [{self.flag}] -- [{self.user}]'
+    def __str__(self): return f'{self.name} - {self.value} - [{self.flag}] -- [{self.user}] == ({self.time}:{self.date})'
     class Meta:
         verbose_name = "Переменная"
         verbose_name_plural = "Переменные"
