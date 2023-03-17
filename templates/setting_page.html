@@ -11,6 +11,8 @@
       <th scope="col">#</th>
       <th scope="col">Название</th>
       <th scope="col">Значение</th>
+      <th scope="col">Время</th>
+      <th scope="col">Дата</th>
       <th scope="col">Флаг</th>
       <th scope="col">Описание</th>
       <th scope="col" hidden>id</th>
@@ -19,12 +21,13 @@
   </thead>
   <tbody>{% for setting in setting_list %}
 
-    <tr id="row_{{ forloop.counter }}" class="setting_row" >
+    <tr id="row_{{ forloop.counter }}" class="setting_row {% if not setting.user %} border border-success{% endif %}" >
       <th scope="row">{{ forloop.counter }}</th>
       <td>{{ setting.name }}</td>
       <td><input class="form-control" type="text" name="setting_value_{{ forloop.counter }}" value="{{ setting.value }}" /></td>
-        <td><input {% if setting.flag %} checked {% endif %}
-              id="inp_{{ forloop.counter }}" type="checkbox" name="setting_flag_{{ forloop.counter }}"/></td>
+      <td><input class="form-control" type="time" name="setting_time_{{ forloop.counter }}" value="{{ setting.time }}"></td>
+      <td><input class="form-control" type="date" name="setting_date_{{ forloop.counter }}" value="{{ setting.date.isoformat }}"></td>
+      <td><input {% if setting.flag %} checked {% endif %} id="inp_{{ forloop.counter }}" type="checkbox" name="setting_flag_{{ forloop.counter }}"/></td>
       <td>{{ setting.description }}</td>
       <td hidden><input name="setting_id" type="hidden" value="{{ setting.id }}"></td>
 
