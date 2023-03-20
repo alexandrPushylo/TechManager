@@ -888,13 +888,7 @@ def tabel_workday_view(request, ch_week):
     get_prepare_data(out, request)
     last_week = list(get_week(_day, 'l'))
     current_week = list(get_week(_day))
-
-    if WorkDayTabel.objects.filter(date=current_week[0]).count() == 0:
-        for n, day in enumerate(current_week, 1):
-            if n in (6, 7):
-                WorkDayTabel.objects.create(date=day, status=False)
-            else:
-                WorkDayTabel.objects.create(date=day)
+    prepare_work_day_table(_day)
 
     out['week'] = []
 
@@ -923,7 +917,7 @@ def tabel_workday_view(request, ch_week):
         out['message_status'] = True
         out['message'] = 'Сохранено'
 
-        # return HttpResponseRedirect(f'/tabel_workday/{ch_week}')
+        return HttpResponseRedirect(request.path)
     return render(request, 'tabel_workday.html', out)
 
 
@@ -1036,7 +1030,7 @@ def show_applications_view(request, day, id_user=None):
         current_user = request.user
 
     get_prepare_data(out, request, current_day)
-    check_table(day)
+    check_table(current_day)
 
     if request.POST.get('filter'):
         # technics, all, materials
@@ -2070,6 +2064,16 @@ def get_CH_day(day):
         return str(day)
 
 
+def prepare_work_day_table(day):
+    current_week = list(get_week(day))
+    if WorkDayTabel.objects.filter(date__in=current_week).count() < 7:
+        for n, _day in enumerate(current_week, 1):
+            if n in (6, 7):
+                WorkDayTabel.objects.get_or_create(date=_day, status=False)
+            else:
+                WorkDayTabel.objects.get_or_create(date=_day)
+
+
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
     ch_day = get_CH_day(day)
@@ -2312,6 +2316,9 @@ def setting_view(request):
 
 def check_table(day):
     date = convert_str_to_date(day)
+
+    if not WorkDayTabel.objects.filter(date=date).exists():
+        prepare_work_day_table(day)
 
     if DriverTabel.objects.filter(date=date).count() == 0:
         prepare_driver_table(day)
