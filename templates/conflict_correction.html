@@ -72,7 +72,7 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>
+  <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>
     <a href="{% url 'conflict_resolution' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page"> Отмена</a>
   <input form="conf_corr_form" class="btn btn-success  col-auto m-1" type="submit" value="Сохранить">
 </div>
