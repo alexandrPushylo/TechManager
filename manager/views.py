@@ -2003,6 +2003,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["DAY"] = f'{current_day.day} {MONTH[current_day.month-1]}'
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user)
+    out['tense'] = current_day >= TODAY
 
     return out
 

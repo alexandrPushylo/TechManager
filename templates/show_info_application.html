@@ -50,8 +50,10 @@
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
     <a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">На главную страницу</a>
+    {% if tense %}
     <a href="{% url 'clear_application' application_id %}" class="btn btn btn-outline-danger   col-auto m-1" aria-current="page">Отчистить</a>
     <a href="{% url 'add_application' application_id %}" class="btn btn-primary  col-auto m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i> Редактировать</a>
+    {% endif %}
 </div>
 
 {% endblock %}
