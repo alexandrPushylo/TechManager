@@ -2079,20 +2079,19 @@ def prepare_driver_table(day):
     ch_day = get_CH_day(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
 
-    if DriverTabel.objects.filter(date=current_day).count() == 0:
-        if current_day > TODAY:
-            try:
-                for _drv in DriverTabel.objects.filter(date=TODAY):
-                    DriverTabel.objects.create(
-                        driver=_drv.driver,
-                        date=current_day,
-                        status=_drv.status)
-            except DriverTabel.DoesNotExist:
-                for drv in driver_list:
-                    DriverTabel.objects.create(driver=drv, date=current_day)
-        else:
+    if current_day > TODAY:
+        try:
+            _driver_table = DriverTabel.objects.filter(date=TODAY)
+            for _dt in _driver_table:
+                _dt.pk = None
+                _dt.date = current_day
+            DriverTabel.objects.bulk_create(_driver_table)
+        except DriverTabel.DoesNotExist:
             for drv in driver_list:
-                DriverTabel.objects.create(driver=drv.user_post, date=current_day)
+                DriverTabel.objects.create(driver=drv, date=current_day)
+    else:
+        for drv in driver_list:
+            DriverTabel.objects.create(driver=drv.user_post, date=current_day)
 
 
 def prepare_technic_driver_table(day):
@@ -2320,7 +2319,7 @@ def check_table(day):
     if not WorkDayTabel.objects.filter(date=date).exists():
         prepare_work_day_table(day)
 
-    if DriverTabel.objects.filter(date=date).count() == 0:
+    if not DriverTabel.objects.filter(date=date).exists():
         prepare_driver_table(day)
 
     if TechnicDriver.objects.filter(date=date).count() == 0:
