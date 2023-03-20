@@ -121,9 +121,9 @@
               <hr>
           {% endif %}
 
-            <div class="btn-group ">
-
+            <div class="btn-group">
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
+                {% if tense %}
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
                 <a href="{% url 'clear_application' a.app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
                 {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
@@ -133,7 +133,7 @@
                 {% elif post  == 'admin' and a.app_today.status.status  == 'Одобрена' %}
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>
                 {% endif %}
-
+                {% endif %}
                 <div class="dropdown">
                     <a class="btn m-1 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">...</a>
                       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
@@ -142,8 +142,9 @@
 {#                        <li><a class="dropdown-item" href="#">Что-то еще здесь</a></li>#}
                       </ul>
                 </div>
-
             </div>
+
+
           </div>
         </div>
         </div>
@@ -292,7 +293,9 @@
           Опции
       </button>
       <ul class="dropdown-menu">
+          {% if tense %}
         <a  class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange">Замена водителя </a>
+          {% endif %}
       </ul>
     </div>
 

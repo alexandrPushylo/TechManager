@@ -272,10 +272,10 @@ def supply_app_view(request, day):
 
     out['app_today'] = app_for_day
 
-    if request.POST.get('panel'):
-        _flag = request.POST.get('panel')
-        _flag = str(_flag).capitalize()
-        set_var('supply_panel', value=request.user.id, flag=_flag, user=request.user)
+    # if request.POST.get('panel'):
+    #     _flag = request.POST.get('panel')
+    #     _flag = str(_flag).capitalize()
+    #     set_var('supply_panel', value=request.user.id, flag=_flag, user=request.user)
 
     out['var_supply_panel'] = get_var('supply_panel', user=request.user)
 
@@ -888,13 +888,7 @@ def tabel_workday_view(request, ch_week):
     get_prepare_data(out, request)
     last_week = list(get_week(_day, 'l'))
     current_week = list(get_week(_day))
-
-    if WorkDayTabel.objects.filter(date=current_week[0]).count() == 0:
-        for n, day in enumerate(current_week, 1):
-            if n in (6, 7):
-                WorkDayTabel.objects.create(date=day, status=False)
-            else:
-                WorkDayTabel.objects.create(date=day)
+    prepare_work_day_table(_day)
 
     out['week'] = []
 
@@ -923,7 +917,7 @@ def tabel_workday_view(request, ch_week):
         out['message_status'] = True
         out['message'] = 'Сохранено'
 
-        # return HttpResponseRedirect(f'/tabel_workday/{ch_week}')
+        return HttpResponseRedirect(request.path)
     return render(request, 'tabel_workday.html', out)
 
 
@@ -1036,7 +1030,7 @@ def show_applications_view(request, day, id_user=None):
         current_user = request.user
 
     get_prepare_data(out, request, current_day)
-    check_table(day)
+    check_table(current_day)
 
     if request.POST.get('filter'):
         # technics, all, materials
@@ -2009,6 +2003,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["DAY"] = f'{current_day.day} {MONTH[current_day.month-1]}'
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user)
+    out['tense'] = current_day >= TODAY
 
     return out
 
@@ -2070,25 +2065,34 @@ def get_CH_day(day):
         return str(day)
 
 
+def prepare_work_day_table(day):
+    current_week = list(get_week(day))
+    if WorkDayTabel.objects.filter(date__in=current_week).count() < 7:
+        for n, _day in enumerate(current_week, 1):
+            if n in (6, 7):
+                WorkDayTabel.objects.get_or_create(date=_day, status=False)
+            else:
+                WorkDayTabel.objects.get_or_create(date=_day)
+
+
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
     ch_day = get_CH_day(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
 
-    if DriverTabel.objects.filter(date=current_day).count() == 0:
-        if current_day > TODAY:
-            try:
-                for _drv in DriverTabel.objects.filter(date=TODAY):
-                    DriverTabel.objects.create(
-                        driver=_drv.driver,
-                        date=current_day,
-                        status=_drv.status)
-            except DriverTabel.DoesNotExist:
-                for drv in driver_list:
-                    DriverTabel.objects.create(driver=drv, date=current_day)
-        else:
+    if current_day > TODAY:
+        try:
+            _driver_table = DriverTabel.objects.filter(date=TODAY)
+            for _dt in _driver_table:
+                _dt.pk = None
+                _dt.date = current_day
+            DriverTabel.objects.bulk_create(_driver_table)
+        except DriverTabel.DoesNotExist:
             for drv in driver_list:
-                DriverTabel.objects.create(driver=drv.user_post, date=current_day)
+                DriverTabel.objects.create(driver=drv, date=current_day)
+    else:
+        for drv in driver_list:
+            DriverTabel.objects.create(driver=drv.user_post, date=current_day)
 
 
 def prepare_technic_driver_table(day):
@@ -2104,7 +2108,7 @@ def prepare_technic_driver_table(day):
 
             c_drv = work_driver_list.filter(driver__last_name=driver)
 
-            if c_drv.count() != 0:
+            if c_drv.exists():
                 TechnicDriver.objects.create(
                     technic=_tech,
                     driver=DriverTabel.objects.get(date=current_day, driver__last_name=driver),
@@ -2134,11 +2138,12 @@ def prepare_application_today(day):
             if _:
                 _app.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
                 _app.save()
+        print('AP created')
     else:
         if construction_site_list.count() < applications_today_list_all.count():
             applications_today_list_all.exclude(construction_site__in=construction_site_list).delete()
         else:
-            print("OK")
+            print("AP OK")
 
 
 # ---------------------------------------------------------------
@@ -2313,13 +2318,21 @@ def setting_view(request):
 def check_table(day):
     date = convert_str_to_date(day)
 
-    if DriverTabel.objects.filter(date=date).count() == 0:
-        prepare_driver_table(day)
+    if not WorkDayTabel.objects.filter(date=date).exists():
+        prepare_work_day_table(day)
 
-    if TechnicDriver.objects.filter(date=date).count() == 0:
-        prepare_technic_driver_table(day)
+    _today = WorkDayTabel.objects.get(date=date)
+    if _today.date >= TODAY and _today.status:
+        if not DriverTabel.objects.filter(date=date).exists():
+            prepare_driver_table(day)
 
-    prepare_application_today(day)
+        if not TechnicDriver.objects.filter(date=date).exists():
+            prepare_technic_driver_table(day)
+
+        prepare_application_today(day)
+        print('workday')
+    else:
+        print('weekend')
 
 
 def send_debug_messages(messages='Test'):

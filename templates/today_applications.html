@@ -89,7 +89,9 @@
 <div class="input-group d-flex justify-content-center align-items-center">
     {% if post == 'admin' %}
     <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
+    {% if tense %}
     <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить">
+    {% endif %}
         {% else %}
         <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
     {% endif %}

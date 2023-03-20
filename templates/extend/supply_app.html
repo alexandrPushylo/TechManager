@@ -166,6 +166,6 @@
 
 <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 
-<button role="button" class="btn_panel btn btn-outline-light position-absolute end-0 "><i class="fa-solid fa-list"></i> </button>
+<button role="button" class="btn_panel btn {% if today_applications_list %} btn-warning {% else %} btn-outline-light {% endif %} position-absolute end-0 "><i class="fa-solid fa-list"></i> </button>
 </div>
 {% endblock %}
