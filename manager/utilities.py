@@ -47,8 +47,11 @@ def get_week(c_date, week=None):
 def convert_str_to_date(str_date: str) -> date:
     """конвертация str в datetime.date"""
     try:
-        _day = datetime.strptime(str_date, '%Y-%m-%d').date()
-        return _day
+        if isinstance(str_date, str):
+            _day = datetime.strptime(str_date, '%Y-%m-%d').date()
+            return _day
+        elif isinstance(str_date, date):
+            return str_date
     except:
         print('Error date')
 
