@@ -16,14 +16,14 @@ $('.btn_panel').click(function () {
         }else {
             $('.foreman_panel').prop('hidden',true)
         }
-    $.ajax({
-        type: 'POST',
-        mode: 'same-origin',
-        url: pathname,
-        data: {
-            csrfmiddlewaretoken: csrf,
-                panel: $('.foreman_panel').is(':hidden')
-        }
-    })
+    // $.ajax({
+    //     type: 'POST',
+    //     mode: 'same-origin',
+    //     url: pathname,
+    //     data: {
+    //         csrfmiddlewaretoken: csrf,
+    //             panel: $('.foreman_panel').is(':hidden')
+    //     }
+    // })
     return false
 })
