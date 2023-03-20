@@ -2319,13 +2319,18 @@ def check_table(day):
     if not WorkDayTabel.objects.filter(date=date).exists():
         prepare_work_day_table(day)
 
-    if not DriverTabel.objects.filter(date=date).exists():
-        prepare_driver_table(day)
+    _today = WorkDayTabel.objects.get(date=date)
+    if _today.date >= TODAY and _today.status:
+        if not DriverTabel.objects.filter(date=date).exists():
+            prepare_driver_table(day)
 
-    if TechnicDriver.objects.filter(date=date).count() == 0:
-        prepare_technic_driver_table(day)
+        if not TechnicDriver.objects.filter(date=date).exists():
+            prepare_technic_driver_table(day)
 
-    prepare_application_today(day)
+        prepare_application_today(day)
+        print('workday')
+    else:
+        print('weekend')
 
 
 def send_debug_messages(messages='Test'):
