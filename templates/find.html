@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% block choosedate %}
+    <div class="container">
+        <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
+            {% if cw_day == nw_day %}
+                <a href="{% url 'find' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
+                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+            {% else %}
+                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <a href="{% url 'find' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+            {% endif %}
+        </div>
+    <div class="position-relative text-center translate-middle-x  start-50   text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b><br>
+        <form method="post" id="find_form" enctype="multipart/form-data">{% csrf_token %}
+            <div class="input-group">
+                <input id="find_input" class="form-control mt-2" type="text" name="find_input" value="{{ str_find }}">
+                <button type="submit" class="btn btn-outline-secondary mt-2 " aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+        </form>
+    </div>
+    </div>
+    {% endblock %}
+
+
+<div id="container" class="container position-relative  mx-auto mt-3">
+
+{#    <div class="shadow-lg " style="margin-top: 100px;">#}
+{#        {{ application_today }}<hr>#}
+{#        {{ application_technic }}#}
+{#    </div>#}
+
+    {% for p in post %}
+    <div class="item card shadow-lg m-2" style="width: 10rem;  background-color: rgba(248,248,247,0.75); ">
+          <div class="card-body" >
+            <h6 class="card-title  fw-bold text-center " > {{ p.user_post.last_name }} {{ p.user_post.first_name }} </h6>
+            {% if p.post_name.name_post != None %}<h6 class="card-text" >{{p.post_name.name_post}}</h6>{% endif %}
+              {% if p.telephone and p.telephone != 'None' %}<h6 class="card-text" >{{p.telephone}}</h6>{% endif %}
+          </div>
+        </div>
+    {% endfor %}
+
+
+    {% for t in tech_inf %}
+        <div class="item card shadow-lg m-2" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
+          <div class="card-body" >
+            <h6 class="card-title  fw-bold text-center " > {{ t.0 }} </h6>
+            <h6 class="card-text" ><label class="small">Общее кол.во:</label> {{ t.1 }}</h6>
+            <h6 class="card-text text-success" ><label class="small">Кол.во в робочим сост.:</label> {{ t.2 }}</h6>
+            <h6 class="card-text text-danger" ><label class="small">Кол.во в не робочим сост.:</label> {{ t.3 }}</h6>
+          </div>
+        </div>
+    {% endfor %}
+
+
+
+    {% if application_today %}
+    <div class="item card shadow-lg m-2" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
+          <div class="card-body" >
+          <h6 class="card-title  fw-bold text-center ">Объекты: </h6>
+          {% for at in application_today %}
+              <div class="container shadow-lg"
+              {% if at.status.status == 'Отправлена' %} style="background: #42af56"
+              {% elif at.status.status == 'Одобрена'%} style="background: #46bdcc"
+              {% elif at.status.status == 'Подана'%} style="background: #222bec"
+              {% elif at.status.status == 'Сохранена'%} style="background: #eacb02"
+              {% endif %}
+            >
+            <h6 class="card-title "> {{ at.construction_site.address }} </h6>
+            <h6 class="card-title small">Статус заявки: {{ at.status }} </h6>
+              </div>
+          {% endfor %}
+          </div>
+        </div>
+    {% endif %}
+
+    {% for drv in drivers %}
+    <div class="item card shadow-lg m-2" style="width: 10rem;  background-color: rgba(248,248,247,0.75); ">
+          <div class="card-body" {% if drv.status %}style="background: #42af56" {% else %}style="background: #f52e44" {% endif %}>
+            <h6 class="card-title  fw-bold text-center " > {{ drv.driver.last_name }} {{ drv.driver.first_name }} </h6>
+            {% if drv.status %}
+                <h6 class="card-text small">Работает</h6>
+            {% else %}
+                <h6 class="card-text small">Не работает</h6>
+            {% endif %}
+
+              {% if p.telephone %}<h6 class="card-text" >{{p.telephone}}</h6>{% endif %}
+          </div>
+        </div>
+    {% endfor %}
+
+
+    {% if technic_driver %}
+    {% for td in technic_driver %}
+    <div class="item m-2 card shadow-lg border border-2 {% if td.status %} border-success {% else %} border-danger{% endif %}" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
+          <div class="card-body" >
+          <h6 class="card-title  fw-bold text-center ">{{ td.technic.name }} [{{ td.technic.id_information }}]</h6>
+              <hr>
+              <h6 class="card-title">Текущий вадитель: {{ td.driver.driver.last_name }}</h6>
+              <h6 class="card-title "><label class="small">Закрепленный вадитель:</label> {{ td.technic.attached_driver.last_name }}</h6>
+              {% if td.status %}
+                  <h6 class="card-text"><label class="small">Статус техники:</label> работает</h6>
+            {% else %}
+                <h6 class="card-text"><label class="small">Статус техники:</label> не работает</h6>
+            {% endif %}
+
+          </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+
+    {% if application_technic %}
+        <div class="item card shadow-lg m-2" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
+              <div class="card-body" >
+              <h6 class="card-title  fw-bold text-center ">Техника заказанная на объекты: </h6>
+              {% for at in application_technic %}
+                  <div class="container shadow-lg mb-2">
+                <h6 class="card-title fw-bold"> {{ at.0.0 }} ({{ at.0.1 }})</h6>
+                      {% for at_a in at.1 %}
+                      <h6 class="card-text small">{{ at_a.technic_driver.technic.name.name }} ({{ at_a.technic_driver.driver.driver.last_name }})</h6>
+                      {% endfor %}
+                  </div>
+              {% endfor %}
+              </div>
+            </div>
+        {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{#    #}
+{#      {% for v in application_technic %}#}
+{#    <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">#}
+{#      <div class="card-body">#}
+{#        <ul class="container-fluid" >#}
+{##}
+{#                <div class=" " id="vehicle_list"> <label class="ms-1 fw-bold" >   {{ v.technic_driver.technic.name.name }} ({{ v.technic_driver.driver.driver.last_name }})</label>#}
+{##}
+{##}
+{#                        <div class=" conteiner-fluid form-floating row mt-1 ">#}
+{#                            <div class="input-group form-floating p-0 mb-1">#}
+{##}
+{##}
+{#                                <textarea class="form-control app_description overflow-hidden" aria-label="With textarea" id="floatingInputValue" name="descr">{{ v.description }}</textarea>#}
+{##}
+{#                                <label for="floatingInputValue" class="fw-bold text-nowrap" style="color: black; margin-left: 60px; margin-top: -10px">{{ v.app_for_day.construction_site.foreman.last_name }} ({{ v.app_for_day.construction_site.address }})</label>#}
+{##}
+{#                            </div>#}
+{#                        </div>#}
+{#                </div>#}
+{#        </ul>#}
+{#      </div>#}
+{#    </div>#}
+{#      {% endfor %}#}
+
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/find.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+    <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
+</div>
+{% endblock %}

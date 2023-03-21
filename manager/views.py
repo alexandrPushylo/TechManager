@@ -2343,3 +2343,75 @@ def send_debug_messages(messages='Test'):
 
     for _id in admin_id_list:
         send_message(_id, mess)
+
+
+def find_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    application_today = ApplicationToday.objects.filter(date=current_day)
+    application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
+    technic_driver = TechnicDriver.objects.filter(date=current_day)
+    driver = DriverTabel.objects.filter(date=current_day)
+    construction_site = ConstructionSite.objects.filter(
+        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+    )
+
+    if request.method == 'POST':
+        str_find = request.POST.get('find_input')
+        # str_find = str(str_find).strip()
+        out['str_find'] = str_find
+        post = Post.objects.filter(user_post__last_name__icontains=str_find)
+        post_list = [u.supervisor.id if u.supervisor else u.user_post.id for u in post]
+        out['post'] = post.exclude(
+            Q(post_name__name_post=POST_USER['driver']) |
+            Q(post_name__name_post=POST_USER['admin'])
+        )
+
+        out['application_today'] = application_today.filter(
+            construction_site__foreman__in=post_list).order_by('construction_site__address')
+
+        technic = technic_driver.filter(
+            Q(technic__tech_type__name__icontains=str_find) |
+            Q(technic__tech_type__short_name__icontains=str_find) |
+            Q(driver__driver__last_name__icontains=str_find) |
+            Q(technic__name__name__icontains=str_find))
+        out['technic_driver'] = technic
+
+        out['drivers'] = driver.filter(driver__last_name__icontains=str_find)
+
+
+        app_tech = application_technic.filter(
+            Q(technic_driver__technic__name__name__icontains=str_find) |
+            Q(technic_driver__driver__driver__last_name__icontains=str_find) |
+            Q(app_for_day__construction_site__foreman__in=post_list)
+        ).order_by('app_for_day__construction_site__address')
+
+        out['application_technic'] = []
+        for a_t in app_tech.values_list(
+                'app_for_day__construction_site__address',
+                'app_for_day__construction_site__foreman__last_name').distinct():
+            _app = app_tech.filter(app_for_day__construction_site__address=a_t[0])
+            out['application_technic'].append((a_t, _app))
+
+
+
+        tech_name_list = list(technic.values_list('technic__name__name', flat=True).distinct())
+        out['tech_inf'] = []
+
+        for tn in tech_name_list:
+            all_t = technic_driver.filter(technic__name__name=tn)
+            work_t = all_t.filter(status=True)
+            all_c = all_t.count()
+            work_c = work_t.count()
+            out['tech_inf'].append((tn, all_c, work_c, all_c - work_c))
+
+
+
+
+    return render(request, 'find.html', out)
+
