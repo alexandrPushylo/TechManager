@@ -70,6 +70,8 @@ from manager.views import connect_bot_view
 from manager.views import test_bot
 from manager.views import notice_submitt
 
+from manager.views import find_view
+
 
 urlpatterns = [
     path('', show_start_page, name='start_page'),
@@ -103,6 +105,8 @@ urlpatterns = [
     path('signin/', signin_view, name="sign_in"),
     path('signup/', signup_view, name="sign_up"),
     path('logout', logout_view, name="logout"),
+
+    path('find/<str:day>', find_view, name='find'),
 
     path('today_app/<str:day>', show_today_applications, name="show_today_applications"),
     path('today_app/<str:day>/<str:filter>', show_today_applications, name="show_today_applications"),
