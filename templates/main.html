@@ -272,6 +272,7 @@
 {% endblock %}
 
 {% block tab %}
+    <a href="{% url 'find' cw_day %}" id="btn_find" class="btn btn-outline-info ms-1" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
 <div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >
     <a  id="btn_show_tech"  style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>
     <a  id="btn_show_all"   style=" text-orientation: upright; writing-mode: vertical-lr;" class="  btn  btn-sm {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</a>
