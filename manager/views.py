@@ -1159,6 +1159,8 @@ def show_applications_view(request, day, id_user=None):
     else:
         return HttpResponseRedirect('/')
 
+
+
     out['style_font_color'] = get_var('style_font_color', user=request.user)
     out['today_applications_list'] = []
 
@@ -1182,7 +1184,6 @@ def show_applications_view(request, day, id_user=None):
             appMater = materials_list.filter(
                 app_for_day=appToday).values_list('description', flat=True).first()
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
-
 
 
     out['count_app_list'] = get_count_app_for_driver(current_day)

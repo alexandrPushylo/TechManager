@@ -43,7 +43,7 @@
 
 
 
-    <div id="container" class="container mt-5 ms-5">
+    <div id="container" class="container mt-5 ms-5 app_container">
 {#        <div class="container">#}
         {% for a in today_applications_list %}
             <div id="per_{{ a.app_today.id }}" class="item">
@@ -57,9 +57,7 @@
             {% elif a.app_today.status.status == 'Подана' %}
                 border border-3 border-primary
             {% endif %}
-
-            "
-             style="width: 18rem;  background-color: rgba(248,248,247,0.75); ">
+    "style="width: 18rem;  background-color: rgba(248,248,247,0.75); ">
 
           <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2
                 {% if  a.app_today.status.status  == 'Сохранена' %}
@@ -214,8 +212,6 @@
         </div>
       </div>
     </div>
-
-
 
 
 
