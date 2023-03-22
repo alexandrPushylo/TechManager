@@ -25,13 +25,7 @@
 
 
 <div id="container" class="container position-relative  mx-auto mt-3">
-
-{#    <div class="shadow-lg " style="margin-top: 100px;">#}
-{#        {{ application_today }}<hr>#}
-{#        {{ application_technic }}#}
-{#    </div>#}
-
-    {% for p in post %}
+    {% for p in post_list %}
     <div class="item card shadow-lg m-2" style="width: 10rem;  background-color: rgba(248,248,247,0.75); ">
           <div class="card-body" >
             <h6 class="card-title  fw-bold text-center " > {{ p.user_post.last_name }} {{ p.user_post.first_name }} </h6>
@@ -44,7 +38,7 @@
 
     {% for t in tech_inf %}
         <div class="item card shadow-lg m-2" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
-          <div class="card-body" >
+          <div class="card-body">
             <h6 class="card-title  fw-bold text-center " > {{ t.0 }} </h6>
             <h6 class="card-text" ><label class="small">Общее кол.во:</label> {{ t.1 }}</h6>
             <h6 class="card-text text-success" ><label class="small">Кол.во в робочим сост.:</label> {{ t.2 }}</h6>
