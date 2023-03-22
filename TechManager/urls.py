@@ -109,9 +109,9 @@ urlpatterns = [
     path('find/<str:day>', find_view, name='find'),
 
     path('today_app/<str:day>', show_today_applications, name="show_today_applications"),
-    path('today_app/<str:day>/<str:filter>', show_today_applications, name="show_today_applications"),
+    path('today_app/<str:day>/<str:filter_foreman>/<str:filter_csite>', show_today_applications, name="show_today_applications"),
     path('today_app/<str:day>/materials', show_today_applications, name="show_today_materials"),
-    path('today_app/<str:day>/materials/<str:filter>', show_today_applications, name="show_today_materials"),
+    path('today_app/<str:day>/materials/<str:filter_foreman>/<str:filter_csite>', show_today_applications, name="show_today_materials"),
 
     path('materials/<str:day>', supply_materials_view, name='supply_materials'),
 
