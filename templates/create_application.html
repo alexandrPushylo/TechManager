@@ -99,7 +99,7 @@
 
             <button role="button" class="btn btn-success   btn-sm  col-auto ms-2 fs-5" id = "add_vehicle_btn">+</button>
         </div>
-            <textarea class="form-control mt-3 app_description mx-auto" id="description_app_add" placeholder="Описание для техники"></textarea>
+            <textarea class="form-control mt-3 app_description mx-auto" rows="3" id="description_app_add" placeholder="Описание для техники"></textarea>
       </div>
     </div>
 
@@ -109,7 +109,7 @@
          <hr>
          <div >
             {% if check_time %}
-            <textarea class="form-control app_description mx-auto" name="desc_meterials" placeholder="Время подачи заявок на материалы ограниченно до {{ check_time }}:00">{{ material_list_raw }}</textarea>
+            <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials" placeholder="Время подачи заявок на материалы ограниченно до {{ check_time }}:00">{{ material_list_raw }}</textarea>
              {% else %}
                 <textarea readonly class="form-control app_description mx-auto" name="desc_meterials" placeholder="Время подачи заявок на материалы закончилось">{{ material_list_raw }}</textarea>
              {% endif %}
