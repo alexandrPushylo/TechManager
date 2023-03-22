@@ -268,7 +268,7 @@
 {% endblock %}
 
 {% block tab %}
-    <a href="{% url 'find' cw_day %}" id="btn_find" class="btn btn-outline-info ms-1" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
+
 <div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >
     <a  id="btn_show_tech"  style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>
     <a  id="btn_show_all"   style=" text-orientation: upright; writing-mode: vertical-lr;" class="  btn  btn-sm {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</a>
@@ -279,11 +279,10 @@
 {% block bottom_panel %}
 
 <div class=" d-flex justify-content-center align-items-center">
+    <a href="{% url 'find' cw_day %}" id="btn_find" class="btn btn-outline-info position-relative me-2" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
     <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
 
     {% if post == 'admin' %}
-
-
     <div class="btn-group dropup position-absolute ms-3 start-0">
       <button type="button" class="btn btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 {#        <i class="fa-solid fa-ellipsis"></i>#}
@@ -295,11 +294,14 @@
           {% endif %}
       </ul>
     </div>
+    {% endif %}
 
 
 
+    {% if post == 'admin' %}
     <button role="button" class="btn_driver_panel btn btn-outline-light position-absolute me-3 end-0"><i class="fa-solid fa-list"></i> </button>
     {% endif %}
+
 </div>
 {% endblock %}
 
