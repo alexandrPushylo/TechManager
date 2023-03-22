@@ -43,7 +43,7 @@
                         <div class="form-floating">
 
 
-                            <textarea class="form-control app_description mb-2" id="floatingInputValue" readonly rows="1">{{ d.description }}</textarea>
+                            <textarea class="form-control app_description mb-2 overflow-hidden" id="floatingInputValue" readonly rows="1">{{ d.description }}</textarea>
                         <label  class="fw-bold ms-5"{% if d.technic_driver__driver__driver__last_name %} >{{ d.technic_driver__driver__driver__last_name }} {% if d.technic_driver_id in work_TD_list %}<i class="fa-sharp fa-solid fa-circle-exclamation"></i> {% endif %}
                             {% else %}  style="color: red"> Водитель не назначен
 
