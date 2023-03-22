@@ -2332,7 +2332,7 @@ def find_view(request, day):
         out['str_find'] = str_find
         post = Post.objects.filter(user_post__last_name__icontains=str_find)
         post_list = [u.supervisor.id if u.supervisor else u.user_post.id for u in post]
-        out['post'] = post.exclude(
+        out['post_list'] = post.exclude(
             Q(post_name__name_post=POST_USER['driver']) |
             Q(post_name__name_post=POST_USER['admin'])
         )
