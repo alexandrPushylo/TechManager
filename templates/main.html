@@ -269,24 +269,12 @@
 
 {% block tab %}
 
-<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >
-    <a  id="btn_show_tech"  style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>
-    <a  id="btn_show_all"   style=" text-orientation: upright; writing-mode: vertical-lr;" class="  btn  btn-sm {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</a>
-    <a  id="btn_show_mater"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</a>
-</div>
-{% endblock %}
-
-{% block bottom_panel %}
-
-<div class=" d-flex justify-content-center align-items-center">
-    <a href="{% url 'find' cw_day %}" id="btn_find" class="btn btn-outline-info position-relative me-2" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
-    <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
+<a href="{% url 'find' cw_day %}" id="btn_find" style="margin-top: 6rem;" class="btn btn-outline-info position-fixed" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
 
     {% if post == 'admin' %}
-    <div class="btn-group dropup position-absolute ms-3 start-0">
-      <button type="button" class="btn btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-{#        <i class="fa-solid fa-ellipsis"></i>#}
-          Опции
+    <div class="btn-group dropend position-fixed " style="margin-top: 8.5rem;">
+      <button type="button" class="btn btn-sm btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-ellipsis"></i>
       </button>
       <ul class="dropdown-menu">
           {% if tense %}
@@ -294,6 +282,68 @@
           {% endif %}
       </ul>
     </div>
+    {% endif %}
+
+
+
+
+    <div class="position-fixed translate-middle-x start-0 top-50 ms-3 mt-5 btn-group dropend">
+
+        {% if var_filter_apps.value == 'technics' %}
+      <button type="button" class="btn btn-warning  dropdown-toggle position-relative " data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
+          Техника
+      </button>
+      <ul class="dropdown-menu" >
+           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item" aria-current="page">Всё</a>
+           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item" aria-current="page">Материалы</a>
+      </ul>
+
+        {% elif var_filter_apps.value == 'materials' %}
+      <button type="button" class="btn btn-warning  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
+          Материалы
+      </button>
+      <ul class="dropdown-menu">
+           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item" aria-current="page">Техника</a>
+           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item" aria-current="page">Всё</a>
+      </ul>
+
+        {% else %}
+      <button type="button" class="btn btn-warning  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
+          Всё
+      </button>
+      <ul class="dropdown-menu">
+           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item" aria-current="page">Техника</a>
+           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item" aria-current="page">Материалы</a>
+      </ul>
+
+        {% endif %}
+    </div>
+{#</div>#}
+
+{#<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >#}
+{#    <a  id="btn_show_tech"  style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>#}
+{#    <a  id="btn_show_all"   style=" text-orientation: upright; writing-mode: vertical-lr;" class="  btn  btn-sm {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</a>#}
+{#    <a  id="btn_show_mater"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</a>#}
+{#</div>#}
+
+{% endblock %}
+
+{% block bottom_panel %}
+
+<div class=" d-flex justify-content-center align-items-center">
+    <a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
+
+    {% if post == 'admin' %}
+{#    <div class="btn-group dropup position-absolute ms-3 start-0">#}
+{#      <button type="button" class="btn btn-sm btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">#}
+{#        <i class="fa-solid fa-ellipsis"></i>#}
+{#      </button>#}
+{#      <ul class="dropdown-menu">#}
+{#          {% if tense %}#}
+{#        <a  class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange">Замена водителя </a>#}
+{#          {% endif %}#}
+{#      </ul>#}
+{#    </div>#}
     {% endif %}
 
 
