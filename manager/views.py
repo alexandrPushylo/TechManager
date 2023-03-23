@@ -1035,6 +1035,14 @@ def show_applications_view(request, day, id_user=None):
     _Application_today = ApplicationToday.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
     _Application_material = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+
+    STATUS_absent = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+    STATUS_saved = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+    STATUS_submitted = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+    STATUS_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
+    STATUS_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+    # ---------------------------------------
+
     if request.POST.get('filter'):
         # technics, all, materials
         _filter = request.POST.get('filter')
@@ -1051,7 +1059,7 @@ def show_applications_view(request, day, id_user=None):
 
         _app = _Application_technic.filter(technic_driver_id=td_from)
         _app_td = _Application_today.filter(applicationtechnic__technic_driver_id=td_from)
-        _app_td.update(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))
+        _app_td.update(status=STATUS_submitted)
         _app.update(technic_driver=td_to)
 
     else:
@@ -1060,20 +1068,18 @@ def show_applications_view(request, day, id_user=None):
 
     if is_admin(current_user):
         app_for_day = _Application_today.filter(
-            Q(Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-                Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-                Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))))
+            Q(Q(status=STATUS_submitted) |
+                Q(status=STATUS_approved) |
+                Q(status=STATUS_send)
+              ))
 
         out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
-        if _Application_today.filter(
-                status=ApplicationStatus.objects.get(
-                status=STATUS_AP['submitted'])).exists():
+        if _Application_today.filter(status=STATUS_submitted).exists():
             out['submitted_app_list'] = True
 
-        if _Application_today.filter(
-                status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])).exists():
+        if _Application_today.filter(status=STATUS_approved).exists():
             out['send_app_list'] = True
 
         driver_table_list = DriverTabel.objects.filter(date=current_day)
@@ -1119,9 +1125,7 @@ def show_applications_view(request, day, id_user=None):
 
         out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
-        saved_ap_list = _Application_today.filter(
-            status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-        ).order_by('construction_site__foreman__last_name')
+        saved_ap_list = _Application_today.filter(status=STATUS_saved).order_by('construction_site__foreman__last_name')
 
         if saved_ap_list.count() != 0:
             out['inf_btn_status'] = True
@@ -1141,13 +1145,13 @@ def show_applications_view(request, day, id_user=None):
 
     elif is_foreman(current_user):
         app_for_day = _Application_today.filter(construction_site__foreman=current_user)
-        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+        out['saved_app_list'] = app_for_day.filter(status=STATUS_saved)
         materials_list = _Application_material.filter(app_for_day__in=app_for_day)
 
     elif is_master(current_user):
         _foreman = Post.objects.get(user_post=current_user).supervisor
         app_for_day = _Application_today.filter(construction_site__foreman=_foreman)
-        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
+        out['saved_app_list'] = app_for_day.filter(status=STATUS_saved)
         materials_list = _Application_material.filter(app_for_day__in=app_for_day)
 
     else:
