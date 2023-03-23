@@ -1008,7 +1008,7 @@ def clear_application_view(request, id_application):
 
     return HttpResponseRedirect('/')
 
-
+# ===============================================================================================
 def show_applications_view(request, day, id_user=None):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
@@ -1022,7 +1022,6 @@ def show_applications_view(request, day, id_user=None):
     _var_cache = get_var('no_cache')
     out["var_cache"] = _var_cache.flag
 
-
     if id_user:
         current_user = User.objects.get(id=id_user)
         out['current_user'] = current_user
@@ -1031,6 +1030,18 @@ def show_applications_view(request, day, id_user=None):
 
     get_prepare_data(out, request, current_day)
     check_table(current_day)
+
+    # ---------------------------------------
+    _Application_today = ApplicationToday.objects.filter(date=current_day)
+    _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+    _Application_material = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
+
+    STATUS_absent = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+    STATUS_saved = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+    STATUS_submitted = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+    STATUS_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
+    STATUS_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+    # ---------------------------------------
 
     if request.POST.get('filter'):
         # technics, all, materials
@@ -1046,13 +1057,9 @@ def show_applications_view(request, day, id_user=None):
         td_from = request.POST.get('td_from')
         td_to = request.POST.get('td_to')
 
-        _app = ApplicationTechnic.objects.filter(
-            app_for_day__date=current_day,
-            technic_driver_id=td_from
-
-        )
-        _app_td = ApplicationToday.objects.filter(applicationtechnic__technic_driver_id=td_from)
-        _app_td.update(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))
+        _app = _Application_technic.filter(technic_driver_id=td_from)
+        _app_td = _Application_today.filter(applicationtechnic__technic_driver_id=td_from)
+        _app_td.update(status=STATUS_submitted)
         _app.update(technic_driver=td_to)
 
     else:
@@ -1060,24 +1067,19 @@ def show_applications_view(request, day, id_user=None):
 
 
     if is_admin(current_user):
-        app_for_day = ApplicationToday.objects.filter(
-            Q(date=current_day),
-            Q(Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-                Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-                Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))))
+        app_for_day = _Application_today.filter(
+            Q(Q(status=STATUS_submitted) |
+                Q(status=STATUS_approved) |
+                Q(status=STATUS_send)
+              ))
 
         out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
-        if ApplicationToday.objects.filter(
-                date=current_day,
-                status=ApplicationStatus.objects.get(
-                status=STATUS_AP['submitted'])).exists():
+        if _Application_today.filter(status=STATUS_submitted).exists():
             out['submitted_app_list'] = True
 
-        if ApplicationToday.objects.filter(
-                date=current_day,
-                status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])).exists():
+        if _Application_today.filter(status=STATUS_approved).exists():
             out['send_app_list'] = True
 
         driver_table_list = DriverTabel.objects.filter(date=current_day)
@@ -1092,7 +1094,7 @@ def show_applications_view(request, day, id_user=None):
         l_out = []
         try:
             for _drv in dr_tab_l_ord:
-                app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
+                app = _Application_technic.filter(technic_driver__driver=_drv)
                 tech_drv = technic_driver_table.filter(driver=_drv)
                 if not tech_drv:
                     tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver)
@@ -1103,7 +1105,7 @@ def show_applications_view(request, day, id_user=None):
                     l_out.append((_drv, count, attach_drv, tech_drv))
         except:
             for _drv in driver_table_list.order_by('driver__last_name'):
-                app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
+                app = _Application_technic.filter(technic_driver__driver=_drv)
                 tech_drv = technic_driver_table.filter(driver=_drv)
                 if not tech_drv:
                     tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
@@ -1123,38 +1125,34 @@ def show_applications_view(request, day, id_user=None):
 
         out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
-        saved_ap_list = ApplicationToday.objects.filter(
-            date=current_day,
-            status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-        ).order_by('construction_site__foreman__last_name')
+        saved_ap_list = _Application_today.filter(status=STATUS_saved).order_by('construction_site__foreman__last_name')
 
         if saved_ap_list.count() != 0:
             out['inf_btn_status'] = True
             out['inf_btn_content'] = 'Имеются не поданные заявки'
             out['saved_ap_list'] = saved_ap_list
-        materials_list = ApplicationMeterial.objects.filter(status_checked=True)
+
+        materials_list = _Application_material.filter(status_checked=True)
 
         out['technic_driver_table_TT'] = technic_driver_table.filter(
             status=True, driver__status=True).order_by('driver__driver__last_name')  #########
 
-        out['app_technic_today'] = ApplicationTechnic.objects.filter(app_for_day__date=current_day).values(
+        out['app_technic_today'] = _Application_technic.values(
             'technic_driver_id',
             'technic_driver__driver__driver__last_name',
             'technic_driver__technic__name__name'
         ).distinct().order_by('technic_driver__driver__driver__last_name')
 
-
     elif is_foreman(current_user):
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=current_user, date=current_day)
-        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
-        materials_list = ApplicationMeterial.objects.filter(app_for_day__in=app_for_day)
-
+        app_for_day = _Application_today.filter(construction_site__foreman=current_user)
+        out['saved_app_list'] = app_for_day.filter(status=STATUS_saved)
+        materials_list = _Application_material.filter(app_for_day__in=app_for_day)
 
     elif is_master(current_user):
         _foreman = Post.objects.get(user_post=current_user).supervisor
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
-        out['saved_app_list'] = app_for_day.filter(status=ApplicationStatus.objects.get(status=STATUS_AP['saved']))
-        materials_list = ApplicationMeterial.objects.filter(app_for_day__in=app_for_day)
+        app_for_day = _Application_today.filter(construction_site__foreman=_foreman)
+        out['saved_app_list'] = app_for_day.filter(status=STATUS_saved)
+        materials_list = _Application_material.filter(app_for_day__in=app_for_day)
 
     else:
         return HttpResponseRedirect('/')
@@ -1170,7 +1168,7 @@ def show_applications_view(request, day, id_user=None):
         filtr = 'all'
     if 'technics' in filtr:
         for appToday in app_for_day.order_by('construction_site__address'):
-            appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
+            appTech = _Application_technic.filter(app_for_day=appToday)
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech})
 
     elif 'materials' in filtr:
@@ -1180,7 +1178,7 @@ def show_applications_view(request, day, id_user=None):
             out['today_applications_list'].append({'app_today': appToday, 'app_mater': appMater})
     else:
         for appToday in app_for_day.order_by('construction_site__address'):
-            appTech = ApplicationTechnic.objects.filter(app_for_day=appToday)
+            appTech = _Application_technic.filter(app_for_day=appToday)
             appMater = materials_list.filter(
                 app_for_day=appToday).values_list('description', flat=True).first()
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
@@ -1193,7 +1191,7 @@ def show_applications_view(request, day, id_user=None):
     else:
         return render(request, "main.html", out)
 
-
+# ===============================================================================================
 def show_application_for_driver(request, day, id_user):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
