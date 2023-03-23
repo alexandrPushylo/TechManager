@@ -2295,6 +2295,11 @@ def check_table(day):
 
         prepare_application_today(day)
         print('workday')
+    elif _today.date < TODAY:
+        app = ApplicationToday.objects.filter(date__lt=date, status=STATUS_APP_absent)
+        if app.exists():
+            app.delete()
+
     else:
         print('weekend')
 
