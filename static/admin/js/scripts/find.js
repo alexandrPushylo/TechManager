@@ -1,15 +1,7 @@
-$('.app_description').each(function () {
-    this.style.height = ""+(this.scrollHeight+5)+"px";
-});
 
 const cw_date = $('.io_current_day');
 cw_date.change(function () {
-    location.href = '/applications/'+this.value;
-})
-
-$('.div_td').click(function () {
-    location.href = '/append_in_hos_tech/'+this.id;
-
+    location.href = '/find/'+this.value;
 })
 
 const csrf = $('input[name="csrfmiddlewaretoken"]').val();
@@ -32,26 +24,3 @@ $('#container').masonry({
 	  }
 // опции анимации - очередь и продолжительность анимации
 });
-
-
-
-// $('#btn_find').click( function () {
-//     let find_input = $('#find_input').val();
-//     console.log(find_input);
-// //     const btn_id = this.id.replace('success_application_', '');
-// //     const path = '/find/';
-//     $.ajax({
-//         type: 'POST',
-//         mode: 'same-origin',
-//         url: pathname,
-//         data:{
-//             csrfmiddlewaretoken: csrf,
-//                 str_find: find_input,
-//
-//             },
-//         success: function () {
-//             // window.location.reload();
-//             $('html').load(pathname+ ' body');
-//         }
-//         })
-// })
