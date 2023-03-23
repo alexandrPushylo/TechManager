@@ -2332,7 +2332,10 @@ def find_view(request, day):
         str_find = request.POST.get('find_input')
         # str_find = str(str_find).strip()
         out['str_find'] = str_find
-        post = Post.objects.filter(user_post__last_name__icontains=str_find)
+        post = Post.objects.filter(
+            Q(user_post__last_name__icontains=str_find) |
+            Q(user_post__last_name__icontains=str(str_find).capitalize())
+        )
         post_list = [u.supervisor.id if u.supervisor else u.user_post.id for u in post]
         out['post_list'] = post.exclude(
             Q(post_name__name_post=POST_USER['driver']) |
@@ -2344,12 +2347,20 @@ def find_view(request, day):
 
         technic = technic_driver.filter(
             Q(technic__tech_type__name__icontains=str_find) |
+            Q(technic__tech_type__name__icontains=str(str_find).capitalize()) |
             Q(technic__tech_type__short_name__icontains=str_find) |
+            Q(technic__tech_type__short_name__icontains=str(str_find).capitalize()) |
             Q(driver__driver__last_name__icontains=str_find) |
-            Q(technic__name__name__icontains=str_find))
+            Q(driver__driver__last_name__icontains=str(str_find).capitalize()) |
+            Q(technic__name__name__icontains=str_find) |
+            Q(technic__name__name__icontains=str(str_find).capitalize())
+        )
         out['technic_driver'] = technic
 
-        out['drivers'] = driver.filter(driver__last_name__icontains=str_find)
+        out['drivers'] = driver.filter(
+            Q(driver__last_name__icontains=str_find) |
+            Q(driver__last_name__icontains=str(str_find).capitalize())
+            )
 
 
         app_tech = application_technic.filter(
