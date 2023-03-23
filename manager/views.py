@@ -41,7 +41,6 @@ from manager.utilities import BOT
 # ----------------
 
 # ----------PREPARE--------------
-# set_locale()
 
 # STATUS application_today------------------------------------------------------------------
 STATUS_APP_absent = ApplicationStatus.objects.get_or_create(status=STATUS_AP['absent'])[0]
@@ -2302,8 +2301,6 @@ def check_table(day):
 
 def send_debug_messages(messages='Test'):
     admin_id_list = User.objects.filter(is_superuser=True)
-
-
     mess = f"{TODAY}\n{messages}"
 
     for _id in admin_id_list:
@@ -2363,8 +2360,6 @@ def find_view(request, day):
             _app = app_tech.filter(app_for_day__construction_site__address=a_t[0])
             out['application_technic'].append((a_t, _app))
 
-
-
         tech_name_list = list(technic.values_list('technic__name__name', flat=True).distinct())
         out['tech_inf'] = []
 
@@ -2374,9 +2369,6 @@ def find_view(request, day):
             all_c = all_t.count()
             work_c = work_t.count()
             out['tech_inf'].append((tn, all_c, work_c, all_c - work_c))
-
-
-
 
     return render(request, 'find.html', out)
 
