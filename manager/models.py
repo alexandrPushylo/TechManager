@@ -176,7 +176,7 @@ class TeleBot(models.Model):
 
 class ApplicationMeterial(models.Model):
     app_for_day = models.ForeignKey(ApplicationToday, on_delete=models.CASCADE, verbose_name="Заявка на объект")
-    description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
+    description = models.TextField(max_length=2048, null=True, blank=True, verbose_name="Описание")
     status_checked = models.BooleanField(default=False, verbose_name='Проверенна')
     def __str__(self): return f"{self.app_for_day} - {self.description}"
     class Meta:
