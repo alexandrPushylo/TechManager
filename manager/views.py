@@ -143,10 +143,14 @@ def supply_materials_view(request, day):
             _desc_list = request.POST.getlist('materials_description')
             for _id, _desc in zip(_id_list, _desc_list):
                 _app = ApplicationMeterial.objects.get(id=_id)
+                _desc = str(_desc).strip()
                 if _app.description != _desc:
-                    _app.description = str(_desc).strip()
-                    _app.status_checked = True
-                    _app.save()
+                    if _desc == '':
+                        _app.delete()
+                    else:
+                        _app.description = _desc
+                        _app.status_checked = True
+                        _app.save()
                 elif _app.description == _desc:
                     _app.status_checked = True
                     _app.save()
