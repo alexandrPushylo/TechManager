@@ -1719,21 +1719,21 @@ def submitted_all_applications(request, day):
         return HttpResponseRedirect('/')
 
     current_day = convert_str_to_date(day)
+    _Application_today = ApplicationToday.objects.filter(date=current_day)
 
     if is_admin(request.user):
         pass
 
     elif is_foreman(request.user):
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=request.user, date=current_day)
+        app_for_day = _Application_today.filter(construction_site__foreman=request.user)
 
     elif is_master(request.user):
         _foreman = Post.objects.get(user_post=request.user).supervisor
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
+        app_for_day = _Application_today.filter(construction_site__foreman=_foreman)
 
     elif is_employee_supply(request.user):
-        app_for_day = ApplicationToday.objects.filter(
+        app_for_day = _Application_today.filter(
             construction_site__foreman=None,
-            date=current_day,
             construction_site__address='Снабжение')
 
     current_applications = app_for_day.filter(
@@ -1760,9 +1760,9 @@ def get_priority_list(current_day):
     """
     return ApplicationTechnic_id
     """
+    _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
     l = []
-    app_tech = ApplicationTechnic.objects.filter(
-        app_for_day__date=current_day).values_list(
+    app_tech = _Application_technic.values_list(
         'priority',
         'technic_driver_id',
         'id').order_by('technic_driver_id').exclude(var_check=True)
@@ -1771,8 +1771,7 @@ def get_priority_list(current_day):
     for _app in set(ll):
         count = ll.count(_app)
         if count > 1:
-            _l = [q[0] for q in ApplicationTechnic.objects.filter(
-                app_for_day__date=current_day,
+            _l = [q[0] for q in _Application_technic.filter(
                 priority=_app[0],
                 technic_driver_id=_app[1]).exclude(var_check=True).distinct().values_list('id')]
             l.extend(_l)
