@@ -41,21 +41,26 @@ from manager.utilities import BOT
 # ----------------
 
 # ----------PREPARE--------------
-# set_locale()
 
-# -------------------------------
+# STATUS application_today------------------------------------------------------------------
+STATUS_APP_absent = ApplicationStatus.objects.get_or_create(status=STATUS_AP['absent'])[0]
+STATUS_APP_saved = ApplicationStatus.objects.get_or_create(status=STATUS_AP['saved'])[0]
+STATUS_APP_submitted = ApplicationStatus.objects.get_or_create(status=STATUS_AP['submitted'])[0]
+STATUS_APP_approved = ApplicationStatus.objects.get_or_create(status=STATUS_AP['approved'])[0]
+STATUS_APP_send = ApplicationStatus.objects.get_or_create(status=STATUS_AP['send'])[0]
+# ------------------------------------------------------------------------------------------
+
 
 # ------FUNCTION VIEW----------------------
 
 
 def notice_submitt(request, current_day):
     out = []
-    _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
     id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
     id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
 
-    _app = ApplicationToday.objects.filter(date=current_day, status=_status)
+    _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_saved)
 
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
@@ -81,9 +86,9 @@ def print_material_view(request, day):
     current_day = convert_str_to_date(day)
     current_application = ApplicationToday.objects.filter(
         Q(date=current_day),
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+        Q(status=STATUS_APP_submitted) |
+        Q(status=STATUS_APP_approved) |
+        Q(status=STATUS_APP_send)
     )
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
 
@@ -111,9 +116,9 @@ def supply_materials_view(request, day):
 
     current_application = ApplicationToday.objects.filter(
         Q(date=current_day),
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+        Q(status=STATUS_APP_submitted) |
+        Q(status=STATUS_APP_approved) |
+        Q(status=STATUS_APP_send)
     )
 
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
@@ -168,10 +173,11 @@ def supply_today_app_view(request, day):
     _app = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
 
     app_tech_day = _app.filter(
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])) |
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-        Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send'])))
+        Q(app_for_day__status=STATUS_APP_submitted) |
+        Q(app_for_day__status=STATUS_APP_saved) |
+        Q(app_for_day__status=STATUS_APP_approved) |
+        Q(app_for_day__status=STATUS_APP_send)
+    )
 
     driver_technic = app_tech_day.values_list(
         'technic_driver__driver__driver__last_name',
@@ -228,7 +234,6 @@ def cancel_supply_app(request, id_app):
 
 def move_supply_app(request, day, id_app):
     current_day = convert_str_to_date(day)
-    _save_status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
 
     app_for_day = ApplicationToday.objects.get(
         construction_site__foreman=None,
@@ -249,7 +254,7 @@ def move_supply_app(request, day, id_app):
         cur_app_tech.app_for_day = app_for_day
         cur_app_tech.var_ID_orig = _id
         cur_app_tech.save()
-        app_for_day.status = _save_status
+        app_for_day.status = STATUS_APP_saved
         app_for_day.save()
 
     return HttpResponseRedirect('/')
@@ -289,14 +294,16 @@ def supply_app_view(request, day):
 
     app_today_list = ApplicationToday.objects.filter(
         Q(date=current_day),
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-        Q(status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']))).exclude(id=app_for_day.id)
+        Q(status=STATUS_APP_approved) |
+        Q(status=STATUS_APP_submitted)
+    ).exclude(id=app_for_day.id)
 
     tech_drv = TechnicDriver.objects.filter(
         date=current_day,
         status=True,
         driver__status=True,
-        technic__supervisor__in=supply_list).values_list('id', flat=True)
+        technic__supervisor__in=supply_list
+    ).values_list('id', flat=True)
 
     app_technic = ApplicationTechnic.objects.filter(
         app_for_day__in=app_today_list,
@@ -401,9 +408,9 @@ def copy_app_view(request, id_application):
     _app_technic = ApplicationTechnic.objects.filter(app_for_day=_app_for_day)
 
     if is_admin(request.user):
-        _status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        _status = STATUS_APP_submitted
     else:
-        _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+        _status = STATUS_APP_saved
 
     if current_day != get_current_day('next_day'):
         next_app_for_day, _ = ApplicationToday.objects.get_or_create(
@@ -462,7 +469,7 @@ def append_in_hos_tech(request, id_drv):
     app_for_day, _ = ApplicationToday.objects.get_or_create(
         construction_site=constr_site,
         date=date)
-    app_for_day.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+    app_for_day.status = STATUS_APP_submitted
     app_for_day.save()
 
     technic_driver = TechnicDriver.objects.filter(
@@ -506,7 +513,7 @@ def driver_app_list_view(request, day):
     current_app_tech = ApplicationTechnic.objects.filter(
         technic_driver__status=True,
         app_for_day__date=current_day,
-        app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send'])).exclude(var_check=True)
+        app_for_day__status=STATUS_APP_send).exclude(var_check=True)
 
     current_driver_list = DriverTabel.objects.filter(
         status=True,
@@ -1003,7 +1010,7 @@ def clear_application_view(request, id_application):
         ApplicationMeterial.objects.get(app_for_day=current_application).delete()
     except ApplicationMeterial.DoesNotExist:
         pass
-    current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+    current_application.status = STATUS_APP_absent
     current_application.save()
 
     return HttpResponseRedirect('/')
@@ -1036,11 +1043,11 @@ def show_applications_view(request, day, id_user=None):
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
     _Application_material = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
 
-    STATUS_absent = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
-    STATUS_saved = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-    STATUS_submitted = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
-    STATUS_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
-    STATUS_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+    # STATUS_absent = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+    # STATUS_saved = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+    # STATUS_submitted = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+    # STATUS_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
+    # STATUS_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
     # ---------------------------------------
 
     if request.POST.get('filter'):
@@ -1059,7 +1066,7 @@ def show_applications_view(request, day, id_user=None):
 
         _app = _Application_technic.filter(technic_driver_id=td_from)
         _app_td = _Application_today.filter(applicationtechnic__technic_driver_id=td_from)
-        _app_td.update(status=STATUS_submitted)
+        _app_td.update(status=STATUS_APP_submitted)
         _app.update(technic_driver=td_to)
 
     else:
@@ -1068,18 +1075,18 @@ def show_applications_view(request, day, id_user=None):
 
     if is_admin(current_user):
         app_for_day = _Application_today.filter(
-            Q(Q(status=STATUS_submitted) |
-                Q(status=STATUS_approved) |
-                Q(status=STATUS_send)
+            Q(Q(status=STATUS_APP_submitted) |
+                Q(status=STATUS_APP_approved) |
+                Q(status=STATUS_APP_send)
               ))
 
         out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
-        if _Application_today.filter(status=STATUS_submitted).exists():
+        if _Application_today.filter(status=STATUS_APP_submitted).exists():
             out['submitted_app_list'] = True
 
-        if _Application_today.filter(status=STATUS_approved).exists():
+        if _Application_today.filter(status=STATUS_APP_approved).exists():
             out['send_app_list'] = True
 
         driver_table_list = DriverTabel.objects.filter(date=current_day)
@@ -1125,7 +1132,8 @@ def show_applications_view(request, day, id_user=None):
 
         out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
-        saved_ap_list = _Application_today.filter(status=STATUS_saved).order_by('construction_site__foreman__last_name')
+        saved_ap_list = _Application_today.filter(
+            status=STATUS_APP_saved).order_by('construction_site__foreman__last_name')
 
         if saved_ap_list.count() != 0:
             out['inf_btn_status'] = True
@@ -1145,13 +1153,13 @@ def show_applications_view(request, day, id_user=None):
 
     elif is_foreman(current_user):
         app_for_day = _Application_today.filter(construction_site__foreman=current_user)
-        out['saved_app_list'] = app_for_day.filter(status=STATUS_saved)
+        out['saved_app_list'] = app_for_day.filter(status=STATUS_APP_saved)
         materials_list = _Application_material.filter(app_for_day__in=app_for_day)
 
     elif is_master(current_user):
         _foreman = Post.objects.get(user_post=current_user).supervisor
         app_for_day = _Application_today.filter(construction_site__foreman=_foreman)
-        out['saved_app_list'] = app_for_day.filter(status=STATUS_saved)
+        out['saved_app_list'] = app_for_day.filter(status=STATUS_APP_saved)
         materials_list = _Application_material.filter(app_for_day__in=app_for_day)
 
     else:
@@ -1225,8 +1233,7 @@ def show_application_for_driver(request, day, id_user):
     applications = ApplicationTechnic.objects.filter(
         app_for_day__date=current_day,
         technic_driver__driver__driver=current_user,
-        app_for_day__status=ApplicationStatus.objects.get(
-            status=STATUS_AP['send'])).order_by('priority').exclude(var_check=True)
+        app_for_day__status=STATUS_APP_send).order_by('priority').exclude(var_check=True)
     out['applications'] = applications
 
     _var_reload_drv_page = get_var('reload_drv_page')
@@ -1277,7 +1284,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         out['filter'] = User.objects.get(id=_id_foreman).last_name
 
         constr_site = application_today.exclude(
-            status=ApplicationStatus.objects.get(status=STATUS_AP['absent'])).values(
+            status=STATUS_APP_absent).values(
             'construction_site_id',
             'construction_site__address'
         )
@@ -1306,14 +1313,14 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
 
     if is_admin(request.user):
         app_tech_day = _app.filter(
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+            Q(app_for_day__status=STATUS_APP_submitted) |
+            Q(app_for_day__status=STATUS_APP_approved) |
+            Q(app_for_day__status=STATUS_APP_send)
         ).exclude(var_check=True)
     else:
         app_tech_day = _app.filter(
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['send']))
+            Q(app_for_day__status=STATUS_APP_approved) |
+            Q(app_for_day__status=STATUS_APP_send)
         ).exclude(var_check=True)
 
     driver_technic = app_tech_day.values_list(
@@ -1534,11 +1541,11 @@ def create_new_application(request, id_application):
 
         if ApplicationTechnic.objects.filter(app_for_day=current_application).count() == 0 and \
                 ApplicationMeterial.objects.filter(app_for_day=current_application).count() == 0:
-            _status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+            _status = STATUS_APP_absent
         elif is_admin(request.user):
-            _status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+            _status = STATUS_APP_submitted
         else:
-            _status = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
+            _status = STATUS_APP_saved
 
         current_application.status = _status
         current_application.save()
@@ -1613,7 +1620,7 @@ def signup_view(request):
     if request.method == 'POST':
         username = request.POST['username']
 
-        if User.objects.filter(username=username).count() == 0:
+        if not User.objects.filter(username=username).exists():
             password = request.POST['password']
             first_name = request.POST['first_name']
             telephone = request.POST['telephone']
@@ -1674,11 +1681,11 @@ def send_all_applications(request, day):
     if is_admin(request.user):
         current_day = convert_str_to_date(day)
         current_applications = ApplicationToday.objects.filter(
-            status=ApplicationStatus.objects.get(status=STATUS_AP['approved']),
+            status=STATUS_APP_approved,
             date=current_day)
 
         for app in current_applications:
-            app.status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
+            app.status = STATUS_APP_send
             app.save()
 
         set_var('status_sended_app', date=current_day, flag=True)
@@ -1697,10 +1704,10 @@ def approv_all_applications(request, day):
     if is_admin(request.user):
         current_day = convert_str_to_date(day)
         current_applications = ApplicationToday.objects.filter(
-            status=ApplicationStatus.objects.get(status=STATUS_AP['submitted']), date=current_day)
+            status=STATUS_APP_submitted, date=current_day)
 
         for app in current_applications:
-            app.status = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
+            app.status = STATUS_APP_approved
             app.save()
 
     return HttpResponseRedirect(f'/applications/{day}')
@@ -1711,29 +1718,29 @@ def submitted_all_applications(request, day):
         return HttpResponseRedirect('/')
 
     current_day = convert_str_to_date(day)
+    _Application_today = ApplicationToday.objects.filter(date=current_day)
 
     if is_admin(request.user):
         pass
 
     elif is_foreman(request.user):
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=request.user, date=current_day)
+        app_for_day = _Application_today.filter(construction_site__foreman=request.user)
 
     elif is_master(request.user):
         _foreman = Post.objects.get(user_post=request.user).supervisor
-        app_for_day = ApplicationToday.objects.filter(construction_site__foreman=_foreman, date=current_day)
+        app_for_day = _Application_today.filter(construction_site__foreman=_foreman)
 
     elif is_employee_supply(request.user):
-        app_for_day = ApplicationToday.objects.filter(
+        app_for_day = _Application_today.filter(
             construction_site__foreman=None,
-            date=current_day,
             construction_site__address='Снабжение')
 
     current_applications = app_for_day.filter(
-        status=ApplicationStatus.objects.get(status=STATUS_AP['saved']),
+        status=STATUS_APP_saved,
         date=current_day)
 
     for app in current_applications:
-        app.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        app.status = STATUS_APP_submitted
         app.save()
     count_apps = current_applications.count()
     if count_apps > 0:
@@ -1752,9 +1759,9 @@ def get_priority_list(current_day):
     """
     return ApplicationTechnic_id
     """
+    _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
     l = []
-    app_tech = ApplicationTechnic.objects.filter(
-        app_for_day__date=current_day).values_list(
+    app_tech = _Application_technic.values_list(
         'priority',
         'technic_driver_id',
         'id').order_by('technic_driver_id').exclude(var_check=True)
@@ -1763,8 +1770,7 @@ def get_priority_list(current_day):
     for _app in set(ll):
         count = ll.count(_app)
         if count > 1:
-            _l = [q[0] for q in ApplicationTechnic.objects.filter(
-                app_for_day__date=current_day,
+            _l = [q[0] for q in _Application_technic.filter(
                 priority=_app[0],
                 technic_driver_id=_app[1]).exclude(var_check=True).distinct().values_list('id')]
             l.extend(_l)
@@ -1776,13 +1782,15 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
 
     if F_saved: #if ApplicationTechnic have status = 'saved'
         tech_app_status = ApplicationTechnic.objects.filter(
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])))
+            Q(app_for_day__status=STATUS_APP_submitted) |
+            Q(app_for_day__status=STATUS_APP_approved) |
+            Q(app_for_day__status=STATUS_APP_saved)
+        )
     else:
         tech_app_status = ApplicationTechnic.objects.filter(
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])))
+            Q(app_for_day__status=STATUS_APP_submitted) |
+            Q(app_for_day__status=STATUS_APP_approved)
+        )
 
     app_list_day = tech_app_status.filter(app_for_day__date=current_day)
     tech_app_today = list(app_list_day.values_list('technic_driver', flat=True))
@@ -1810,25 +1818,25 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
             out[f.name.name] = TechnicDriver.objects.filter(
                 status=True,
                 date=current_day,
-                technic__name__name=f.name.name,
-                # driver__status=True
+                technic__name__name=f.name.name
             ).count()
 
     app_list_today = ApplicationTechnic.objects.filter(
         app_for_day__date=current_day).exclude(
         Q(technic_driver__status=False) |
-        # Q(technic_driver__driver__status=False) |
         Q(var_check=True))
 
     if includeSave:
         app_list_submit_approv = app_list_today.filter(
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['saved'])))
+            Q(app_for_day__status=STATUS_APP_submitted) |
+            Q(app_for_day__status=STATUS_APP_approved) |
+            Q(app_for_day__status=STATUS_APP_saved)
+        )
     else:
         app_list_submit_approv = app_list_today.filter(
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['submitted'])) |
-            Q(app_for_day__status=ApplicationStatus.objects.get(status=STATUS_AP['approved'])))
+            Q(app_for_day__status=STATUS_APP_submitted) |
+            Q(app_for_day__status=STATUS_APP_approved)
+        )
     app_list_priority = app_list_submit_approv.filter(priority=1)
     app_tech = app_list_priority.values_list('technic_driver', 'technic_driver__technic__name__name')
     work_app_tech_list = [_[1] for _ in app_tech]
@@ -1852,17 +1860,14 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
 
 def get_count_app_for_driver(current_day):
     out = []
-    _status_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
-    _status_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
-
     _tech_drv = [_[0] for _ in TechnicDriver.objects.filter(
         date=current_day,
         status=True,
         driver__status=True).values_list('id')]
     _app = [_[0] for _ in ApplicationTechnic.objects.filter(
         Q(app_for_day__date=current_day),
-        Q(app_for_day__status=_status_approved) |
-        Q(app_for_day__status=_status_send)).values_list('technic_driver_id')]
+        Q(app_for_day__status=STATUS_APP_approved) |
+        Q(app_for_day__status=STATUS_APP_send)).values_list('technic_driver_id')]
 
     for _td in set(_tech_drv):
         _count = _app.count(_td)
@@ -1980,16 +1985,14 @@ def success_application(request, id_application):
     current_day = current_application.date
 
     if is_admin(request.user):
-        approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
-        send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
         _status = current_application.status.status
 
         if _status == STATUS_AP['submitted']:
-            current_application.status = approved
+            current_application.status = STATUS_APP_approved
         elif _status == STATUS_AP['approved']:
-            current_application.status = send
+            current_application.status = STATUS_APP_send
     else:
-        current_application.status = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
+        current_application.status = STATUS_APP_submitted
         try:
             _var = Variable.objects.get(name='status_sended_app', date=current_day)
             if _var.flag:
@@ -2099,7 +2102,7 @@ def prepare_application_today(day):
         for constr_site in construction_site_list:
             _app, _ = ApplicationToday.objects.get_or_create(construction_site=constr_site, date=current_day)
             if _:
-                _app.status = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
+                _app.status = STATUS_APP_absent
                 _app.save()
         print('AP created')
     else:
@@ -2168,7 +2171,7 @@ def test_bot(request, id_user):
 
 
 def send_message(id_user, message):
-    if TeleBot.objects.filter(user_bot=id_user).count() != 0:
+    if TeleBot.objects.filter(user_bot=id_user).exists():
         chat_id = TeleBot.objects.get(user_bot=id_user)
 
         if chat_id and chat_id.id_chat:
@@ -2177,14 +2180,13 @@ def send_message(id_user, message):
 
 def send_task_for_drv(current_day):
     out = []
-    _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
 
     for _id_drv in _driver_list:
         _app = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
             technic_driver__driver__driver=_id_drv.driver.id,
-            app_for_day__status=_status).order_by('priority').exclude(var_check=True)
+            app_for_day__status=STATUS_APP_send).order_by('priority').exclude(var_check=True)
         out.append((_id_drv, _app))
 
     for drv, app in out:
@@ -2202,13 +2204,12 @@ def send_task_for_drv(current_day):
 
 def send_status_app_for_foreman(current_day):
     out = []
-    _status = ApplicationStatus.objects.get(status=STATUS_AP['send'])
 
     id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
     id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
 
-    _app = ApplicationToday.objects.filter(date=current_day, status=_status)
+    _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
 
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
@@ -2300,8 +2301,6 @@ def check_table(day):
 
 def send_debug_messages(messages='Test'):
     admin_id_list = User.objects.filter(is_superuser=True)
-
-
     mess = f"{TODAY}\n{messages}"
 
     for _id in admin_id_list:
@@ -2361,8 +2360,6 @@ def find_view(request, day):
             _app = app_tech.filter(app_for_day__construction_site__address=a_t[0])
             out['application_technic'].append((a_t, _app))
 
-
-
         tech_name_list = list(technic.values_list('technic__name__name', flat=True).distinct())
         out['tech_inf'] = []
 
@@ -2372,9 +2369,6 @@ def find_view(request, day):
             all_c = all_t.count()
             work_c = work_t.count()
             out['tech_inf'].append((tn, all_c, work_c, all_c - work_c))
-
-
-
 
     return render(request, 'find.html', out)
 
