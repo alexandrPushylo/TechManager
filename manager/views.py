@@ -2286,7 +2286,7 @@ def check_table(day):
         prepare_work_day_table(day)
 
     _today = WorkDayTabel.objects.get(date=date)
-    if _today.date >= TODAY and _today.status:
+    if _today.status and _today.date >= TODAY:
         if not DriverTabel.objects.filter(date=date).exists():
             prepare_driver_table(day)
 
@@ -2295,6 +2295,11 @@ def check_table(day):
 
         prepare_application_today(day)
         print('workday')
+    elif _today.date < TODAY:
+        app = ApplicationToday.objects.filter(date__lt=date, status=STATUS_APP_absent)
+        if app.exists():
+            app.delete()
+
     else:
         print('weekend')
 
