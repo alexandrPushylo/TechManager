@@ -1621,7 +1621,7 @@ def signup_view(request):
     if request.method == 'POST':
         username = request.POST['username']
 
-        if User.objects.filter(username=username).count() == 0:
+        if not User.objects.filter(username=username).exists():
             password = request.POST['password']
             first_name = request.POST['first_name']
             telephone = request.POST['telephone']
@@ -2173,7 +2173,7 @@ def test_bot(request, id_user):
 
 
 def send_message(id_user, message):
-    if TeleBot.objects.filter(user_bot=id_user).count() != 0:
+    if TeleBot.objects.filter(user_bot=id_user).exists():
         chat_id = TeleBot.objects.get(user_bot=id_user)
 
         if chat_id and chat_id.id_chat:
