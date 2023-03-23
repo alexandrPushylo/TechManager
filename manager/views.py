@@ -1322,10 +1322,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
             Q(app_for_day__status=STATUS_APP_send)
         ).exclude(var_check=True)
     else:
-        app_tech_day = _app.filter(
-            Q(app_for_day__status=STATUS_APP_approved) |
-            Q(app_for_day__status=STATUS_APP_send)
-        ).exclude(var_check=True)
+        app_tech_day = _app.filter(app_for_day__status=STATUS_APP_send).exclude(var_check=True)
 
     driver_technic = app_tech_day.values_list(
         'technic_driver__driver__driver__last_name',
