@@ -16,6 +16,18 @@ dict_Staff = {'admin': 'Администратор', 'foreman': 'Прораб', 
 status_application = {'absent': 'Отсутствует', 'saved': 'Сохранена', 'submitted': 'Подана', 'approved': 'Одобрена', 'send': 'Отправлена'}
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 
+variable = {
+    'sent_app': 'STATUS_sended_app',
+    'font_size': 'font_size',
+    'panel_for_supply': 'supply_panel'
+}
+text_templates = {
+    'dismiss': 'ОТВЕРГНУТА\r\n',
+    'constr_site_supply_name': 'Снабжение',
+    'constr_site_spec_name': 'Спец. задание',
+    'default_mess_for_spec': 'Хоз. работы или за свой счет',
+}
+
 TELE_URL = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
 BOT = telebot.TeleBot(TOKEN, parse_mode=None)
 # --FUNCTIONS-------------------------------------------------

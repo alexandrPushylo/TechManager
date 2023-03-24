@@ -26,6 +26,8 @@ from manager.utilities import MONTH
 from manager.utilities import dict_Staff as POST_USER
 from manager.utilities import status_application as STATUS_AP
 from manager.utilities import status_constr_site as STATUS_CS
+from manager.utilities import variable as VAR
+from manager.utilities import text_templates as TEXT_TEMPLATES
 # -----------------
 from manager.utilities import get_day_in_days
 from manager.utilities import get_difference
@@ -93,7 +95,7 @@ def print_material_view(request, day):
     )
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
 
-    _font_size = get_var('font_size', user=request.user)
+    _font_size = get_var(VAR['font_size'], user=request.user)
     if _font_size and _font_size.value.isnumeric():
         out['font_size'] = _font_size.value
     else:
@@ -222,7 +224,7 @@ def supply_today_app_view(request, day):
 
 
 def cancel_supply_app(request, id_app):
-    temp_str = 'ОТВЕРГНУТА\n'
+    temp_str = TEXT_TEMPLATES['dismiss']
     _app_tech = ApplicationTechnic.objects.get(id=id_app)
     if not _app_tech.var_check:
         _tmp_desc = _app_tech.description
@@ -231,7 +233,7 @@ def cancel_supply_app(request, id_app):
         _app_tech.save()
     elif temp_str in _app_tech.description:
         _tmp_desc = _app_tech.description
-        _app_tech.description = _tmp_desc.replace('ОТВЕРГНУТА\n', '')
+        _app_tech.description = _tmp_desc.replace(temp_str, '')
         _app_tech.var_check = False
         _app_tech.save()
 
@@ -239,11 +241,10 @@ def cancel_supply_app(request, id_app):
 
 def move_supply_app(request, day, id_app):
     current_day = convert_str_to_date(day)
-
     app_for_day = ApplicationToday.objects.get(
         construction_site__foreman=None,
         date=current_day,
-        construction_site__address='Снабжение')
+        construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
 
     supply_list = Post.objects.filter(
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
@@ -255,7 +256,7 @@ def move_supply_app(request, day, id_app):
         cur_app_tech.save()
         cur_app_tech.pk = None
         cur_app_tech.var_check = False
-        cur_app_tech.description = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\n{cur_app_tech.description}'
+        cur_app_tech.description = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
         cur_app_tech.app_for_day = app_for_day
         cur_app_tech.var_ID_orig = _id
         cur_app_tech.save()
@@ -278,7 +279,7 @@ def supply_app_view(request, day):
     app_for_day = ApplicationToday.objects.get(
         construction_site__foreman=None,
         date=current_day,
-        construction_site__address='Снабжение')
+        construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
 
     out['app_today'] = app_for_day
 
@@ -287,7 +288,7 @@ def supply_app_view(request, day):
     #     _flag = str(_flag).capitalize()
     #     set_var('supply_panel', value=request.user.id, flag=_flag, user=request.user)
 
-    out['var_supply_panel'] = get_var('supply_panel', user=request.user)
+    out['var_supply_panel'] = get_var(VAR['panel_for_supply'], user=request.user)
 
     apps_tech = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
     out['apps_tech'] = apps_tech.order_by('technic_driver__technic__name__name')
@@ -335,6 +336,8 @@ def del_technic(request, id_tech):
 
 
 def show_technic_view(request):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     get_prepare_data(out, request)
     all_technic_list = Technic.objects.all()
@@ -344,6 +347,8 @@ def show_technic_view(request):
 
 
 def edit_technic_view(request, id_tech=None):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     get_prepare_data(out, request)
 
@@ -456,17 +461,24 @@ def copy_app_view(request, id_application):
     return HttpResponseRedirect(f'/applications/{current_day}')
 
 
-def append_in_hos_tech(request, id_drv):
+def append_in_spec_tech(request, id_drv):
     _driver_table = DriverTabel.objects.get(id=id_drv)
     status = _driver_table.status
     date = _driver_table.date
     driver = _driver_table.driver
+
+    var_message, _ = Variable.objects.get_or_create(name='DEF_MESS_FOR_SPEC')
+    if not var_message.value:
+        message = TEXT_TEMPLATES['default_mess_for_spec']
+    else:
+        message = var_message.value
+
     if not status:
         return HttpResponseRedirect(f'/applications/{date}')
 
 
     constr_site, _ = ConstructionSite.objects.get_or_create(
-        address='Спец. задание',
+        address=TEXT_TEMPLATES['constr_site_spec_name'],
         foreman=None)
     constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
     constr_site.save()
@@ -486,7 +498,7 @@ def append_in_hos_tech(request, id_drv):
     ApplicationTechnic.objects.get_or_create(
         app_for_day=app_for_day,
         technic_driver=technic_driver,
-        description='Хоз. работы или за свой счет'
+        description=message
     )
 
     return HttpResponseRedirect(f"/applications/{date}")
@@ -1507,7 +1519,7 @@ def create_new_application(request, id_application):
             v_d_app = TechnicDriver.objects.get(id=id_tech_drv_list[i])
             l_of_v.technic_driver = v_d_app
 
-            if l_of_v.description == description_app_list[i]:
+            if description_app_list[i] in l_of_v.description:
                 l_of_v.description = description_app_list[i]
             else:
                 l_of_v.description = description_app_list[i]
@@ -1690,7 +1702,10 @@ def send_all_applications(request, day):
             app.status = STATUS_APP_send
             app.save()
 
-        set_var('status_sended_app', date=current_day, flag=True)
+        _var, _ = Variable.objects.get_or_create(name=VAR['sent_app'], date=current_day)
+        _var.time = NOW.isoformat(timespec='minutes')
+        _var.flag = True
+        _var.save()
 
         send_task_for_drv(day)
         send_status_app_for_foreman(day)
@@ -2258,7 +2273,7 @@ def setting_view(request):
 
         if setting_id_list:
             for n, _id in enumerate(setting_id_list, 1):
-                var = Variable.objects.get(id=_id, user=current_user)
+                var = Variable.objects.get(id=_id)
                 value = request.POST.get(f"setting_value_{n}")
                 _time = request.POST.get(f"setting_time_{n}")
                 if not _time:
@@ -2272,7 +2287,10 @@ def setting_view(request):
                 else:
                     flag = False
 
-                var.value = value
+                if value == 'None':
+                    var.value = None
+                else:
+                    var.value = value
                 var.time = _time
                 var.date = _date
                 var.flag = flag

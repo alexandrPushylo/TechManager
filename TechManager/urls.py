@@ -62,7 +62,7 @@ from manager.views import Technic_Driver_view
 from manager.views import driver_app_list_view
 from manager.views import foreman_app_list_view
 
-from manager.views import append_in_hos_tech
+from manager.views import append_in_spec_tech
 from manager.views import copy_app_view
 from manager.views import setting_view
 
@@ -77,7 +77,7 @@ urlpatterns = [
     path('', show_start_page, name='start_page'),
     path('applications/<str:day>', show_applications_view, name='application_list'),
     path('applications/<int:id_user>/<str:day>', show_applications_view, name='application_list'),
-    path('append_in_hos_tech/<int:id_drv>', append_in_hos_tech, name='append_in_hos_tech'),
+    path('append_in_spec_tech/<int:id_drv>', append_in_spec_tech, name='append_in_spec_tech'),
     path('copy_app/<int:id_application>', copy_app_view, name='copy_app'),
 
     path('construction_sites/', show_construction_sites_view, name='construction_sites'),
