@@ -1044,7 +1044,7 @@ def show_applications_view(request, day, id_user=None):
 
     out = {"constr_site_list": []}
 
-    _var_cache = get_var('no_cache')
+    _var_cache = get_var(VAR['cache'])
     out["var_cache"] = _var_cache.flag
 
     if id_user:
@@ -1071,11 +1071,11 @@ def show_applications_view(request, day, id_user=None):
     if request.POST.get('filter'):
         # technics, all, materials
         _filter = request.POST.get('filter')
-        set_var('filter_main_apps', value=_filter, user=request.user)
-    var_filter_apps = get_var('filter_main_apps', user=request.user)
+        set_var(VAR['FILTER_main_page'], value=_filter, user=request.user)
+    var_filter_apps = get_var(VAR['FILTER_main_page'], user=request.user)
     out['var_filter_apps'] = var_filter_apps
 
-    _var_reload_main_page = get_var('reload_main_page')
+    _var_reload_main_page = get_var(VAR['TIMEOUT_main_page'])
     out["var_reload_main_page"] = _var_reload_main_page
 
     if request.POST.get('td_from') and request.POST.get('td_to'):
@@ -1109,7 +1109,7 @@ def show_applications_view(request, day, id_user=None):
 
         driver_table_list = DriverTabel.objects.filter(date=current_day)
         technic_driver_table = TechnicDriver.objects.filter(date=current_day)
-        var_sort_driver_panel = get_var('var_sort_driver_panel', user=request.user)
+        var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
 
         if var_sort_driver_panel and var_sort_driver_panel.value:
             dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
@@ -1155,7 +1155,7 @@ def show_applications_view(request, day, id_user=None):
 
         if saved_ap_list.count() != 0:
             out['inf_btn_status'] = True
-            out['inf_btn_content'] = 'Имеются не поданные заявки'
+            out['inf_btn_content'] = TEXT_TEMPLATES['message_not_submitted']
             out['saved_ap_list'] = saved_ap_list
 
         materials_list = _Application_material.filter(status_checked=True)
@@ -1185,7 +1185,7 @@ def show_applications_view(request, day, id_user=None):
 
 
 
-    out['style_font_color'] = get_var('style_font_color', user=request.user)
+    out['style_font_color'] = get_var(VAR['font_color_main_page'], user=request.user)
     out['today_applications_list'] = []
 
     if var_filter_apps:
@@ -1272,7 +1272,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
 
-    _FILTER = get_var('FILTER_APP_TODAY', value=True, user=request.user)
+    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
     if not _FILTER:
         _FILTER = ['all', 'all']    # foreman, constr_site
     else:
@@ -1285,7 +1285,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
             _FILTER[0] = filter_foreman
         if filter_csite != _FILTER[1]:
             _FILTER[1] = filter_csite
-        set_var('FILTER_APP_TODAY', value=f"{_FILTER[0]},{_FILTER[1]}", user=request.user)
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{_FILTER[0]},{_FILTER[1]}", user=request.user)
 
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
@@ -1293,8 +1293,9 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     _application_today = ApplicationToday.objects.filter(date=current_day)
 
     if str(_FILTER[0]) == 'supply':
-        application_today = _application_today.filter(construction_site__address='Снабжение')
-        out['filter'] = 'Снабжение'
+        application_today = _application_today.filter(
+            construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
+        out['filter'] = TEXT_TEMPLATES['constr_site_supply_name']
 
     elif str(_FILTER[0]).isnumeric():
         _id_foreman = int(_FILTER[0])
@@ -1414,7 +1415,7 @@ def create_new_application(request, id_application):
     check_table(str(current_date))
     get_prepare_data(out, request, current_day=current_date)
 
-    var_submit_mat_app = get_var('time_limit_for_submission')
+    var_submit_mat_app = get_var(VAR['LIMIT_for_submission'])
     if var_submit_mat_app:
         out['check_time'] = NOW_IN_TIME(var_submit_mat_app.time)
     else:
@@ -1593,7 +1594,7 @@ def signin_view(request):
             return HttpResponseRedirect('/')
         else:
             out['message_status'] = True
-            out['message'] = 'Неверный логин или пороль'
+            out['message'] = TEXT_TEMPLATES['message_invalid_password']
 
     return render(request, 'signin.html', out)
 
@@ -1677,7 +1678,7 @@ def signup_view(request):
             return HttpResponseRedirect('/show_staff/')
         else:
             out['message_status'] = True
-            out['message'] = 'Такой пользователь уже существует'
+            out['message'] = TEXT_TEMPLATES['user_exists']
 
     return render(request, 'signup.html', out)
 
@@ -1751,7 +1752,8 @@ def submitted_all_applications(request, day):
     elif is_employee_supply(request.user):
         app_for_day = _Application_today.filter(
             construction_site__foreman=None,
-            construction_site__address='Снабжение')
+            construction_site__address=TEXT_TEMPLATES['constr_site_supply_name']
+        )
 
     current_applications = app_for_day.filter(
         status=STATUS_APP_saved,
@@ -2012,7 +2014,7 @@ def success_application(request, id_application):
     else:
         current_application.status = STATUS_APP_submitted
         try:
-            _var = Variable.objects.get(name='status_sended_app', date=current_day)
+            _var = Variable.objects.get(VAR['sent_app'], date=current_day)
             if _var.flag:
                 mess = f'Подана заявка требующая рассмотрение!'
                 send_message_for_admin(current_day, mess)
@@ -2210,7 +2212,7 @@ def send_task_for_drv(current_day):
     for drv, app in out:
         mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {current_day}\n\n"
         for s in app:
-            if s.app_for_day.construction_site.address == 'Снабжение':
+            if s.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{s.priority})\n"
             else:
                 mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
