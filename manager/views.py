@@ -1990,7 +1990,7 @@ def success_application(request, id_application):
         return HttpResponseRedirect('/')
 
     current_application = ApplicationToday.objects.get(id=id_application)
-    current_day = current_application.date
+    current_day = convert_str_to_date(current_application.date)
 
     if is_admin(request.user):
         _status = current_application.status.status
@@ -2002,7 +2002,7 @@ def success_application(request, id_application):
     else:
         current_application.status = STATUS_APP_submitted
         try:
-            _var = Variable.objects.get(VAR['sent_app'], date=current_day)
+            _var = Variable.objects.get(name=VAR['sent_app'], date=current_day)
             if _var.flag:
                 mess = f'Подана заявка требующая рассмотрение!'
                 send_message_for_admin(current_day, mess)
