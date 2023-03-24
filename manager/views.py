@@ -917,7 +917,7 @@ def tabel_workday_view(request, ch_week):
     out['week'] = []
 
     for _day in range(7):
-        out['week'].append((WorkDayTabel.objects.get(date=current_week[_day]), WEEKDAY[_day]))# TODO: fix creating
+        out['week'].append((WorkDayTabel.objects.get(date=current_week[_day]), WEEKDAY[_day]))
 
     if request.POST.get('id_day'):
         _id = request.POST.get('id_day')
@@ -998,8 +998,6 @@ def Technic_Driver_view(request, day):
 
         return HttpResponseRedirect(request.path)
 
-
-
     if 'tech_list' in request.path:
         return render(request, 'tech_list.html', out)
     else:
@@ -1014,6 +1012,7 @@ def clear_application_view(request, id_application):
 
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
+    current_day = convert_str_to_date(current_application.date)
 
     for _app in app_tech:
         try:
@@ -1030,7 +1029,7 @@ def clear_application_view(request, id_application):
     current_application.status = STATUS_APP_absent
     current_application.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{current_day}')
 
 # ===============================================================================================
 def show_applications_view(request, day, id_user=None):
@@ -1043,7 +1042,7 @@ def show_applications_view(request, day, id_user=None):
 
     out = {"constr_site_list": []}
 
-    _var_cache = get_var('no_cache')
+    _var_cache = get_var(VAR['cache'])
     out["var_cache"] = _var_cache.flag
 
     if id_user:
@@ -1059,22 +1058,16 @@ def show_applications_view(request, day, id_user=None):
     _Application_today = ApplicationToday.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
     _Application_material = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
-
-    # STATUS_absent = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
-    # STATUS_saved = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-    # STATUS_submitted = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
-    # STATUS_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
-    # STATUS_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
     # ---------------------------------------
 
     if request.POST.get('filter'):
         # technics, all, materials
         _filter = request.POST.get('filter')
-        set_var('filter_main_apps', value=_filter, user=request.user)
-    var_filter_apps = get_var('filter_main_apps', user=request.user)
+        set_var(VAR['FILTER_main_page'], value=_filter, user=request.user)
+    var_filter_apps = get_var(VAR['FILTER_main_page'], user=request.user)
     out['var_filter_apps'] = var_filter_apps
 
-    _var_reload_main_page = get_var('reload_main_page')
+    _var_reload_main_page = get_var(VAR['TIMEOUT_main_page'])
     out["var_reload_main_page"] = _var_reload_main_page
 
     if request.POST.get('td_from') and request.POST.get('td_to'):
@@ -1088,7 +1081,6 @@ def show_applications_view(request, day, id_user=None):
 
     else:
         print('NONE')
-
 
     if is_admin(current_user):
         app_for_day = _Application_today.filter(
@@ -1108,7 +1100,7 @@ def show_applications_view(request, day, id_user=None):
 
         driver_table_list = DriverTabel.objects.filter(date=current_day)
         technic_driver_table = TechnicDriver.objects.filter(date=current_day)
-        var_sort_driver_panel = get_var('var_sort_driver_panel', user=request.user)
+        var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
 
         if var_sort_driver_panel and var_sort_driver_panel.value:
             dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
@@ -1152,15 +1144,15 @@ def show_applications_view(request, day, id_user=None):
         saved_ap_list = _Application_today.filter(
             status=STATUS_APP_saved).order_by('construction_site__foreman__last_name')
 
-        if saved_ap_list.count() != 0:
+        if saved_ap_list.exists():
             out['inf_btn_status'] = True
-            out['inf_btn_content'] = 'Имеются не поданные заявки'
+            out['inf_btn_content'] = TEXT_TEMPLATES['message_not_submitted']
             out['saved_ap_list'] = saved_ap_list
 
         materials_list = _Application_material.filter(status_checked=True)
 
         out['technic_driver_table_TT'] = technic_driver_table.filter(
-            status=True, driver__status=True).order_by('driver__driver__last_name')  #########
+            status=True, driver__status=True).order_by('driver__driver__last_name')
 
         out['app_technic_today'] = _Application_technic.values(
             'technic_driver_id',
@@ -1182,9 +1174,7 @@ def show_applications_view(request, day, id_user=None):
     else:
         return HttpResponseRedirect('/')
 
-
-
-    out['style_font_color'] = get_var('style_font_color', user=request.user)
+    out['style_font_color'] = get_var(VAR['font_color_main_page'], user=request.user)
     out['today_applications_list'] = []
 
     if var_filter_apps:
@@ -1244,7 +1234,6 @@ def show_application_for_driver(request, day, id_user):
     else:
         print('no')
 
-
     out["current_user"] = current_user
     out["date_of_target"] = current_day.strftime('%d %B')
     applications = ApplicationTechnic.objects.filter(
@@ -1271,7 +1260,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
 
-    _FILTER = get_var('FILTER_APP_TODAY', value=True, user=request.user)
+    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
     if not _FILTER:
         _FILTER = ['all', 'all']    # foreman, constr_site
     else:
@@ -1284,7 +1273,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
             _FILTER[0] = filter_foreman
         if filter_csite != _FILTER[1]:
             _FILTER[1] = filter_csite
-        set_var('FILTER_APP_TODAY', value=f"{_FILTER[0]},{_FILTER[1]}", user=request.user)
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{_FILTER[0]},{_FILTER[1]}", user=request.user)
 
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
@@ -1292,8 +1281,9 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     _application_today = ApplicationToday.objects.filter(date=current_day)
 
     if str(_FILTER[0]) == 'supply':
-        application_today = _application_today.filter(construction_site__address='Снабжение')
-        out['filter'] = 'Снабжение'
+        application_today = _application_today.filter(
+            construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
+        out['filter'] = TEXT_TEMPLATES['constr_site_supply_name']
 
     elif str(_FILTER[0]).isnumeric():
         _id_foreman = int(_FILTER[0])
@@ -1413,7 +1403,7 @@ def create_new_application(request, id_application):
     check_table(str(current_date))
     get_prepare_data(out, request, current_day=current_date)
 
-    var_submit_mat_app = get_var('time_limit_for_submission')
+    var_submit_mat_app = get_var(VAR['LIMIT_for_submission'])
     if var_submit_mat_app:
         out['check_time'] = NOW_IN_TIME(var_submit_mat_app.time)
     else:
@@ -1592,7 +1582,7 @@ def signin_view(request):
             return HttpResponseRedirect('/')
         else:
             out['message_status'] = True
-            out['message'] = 'Неверный логин или пороль'
+            out['message'] = TEXT_TEMPLATES['message_invalid_password']
 
     return render(request, 'signin.html', out)
 
@@ -1676,7 +1666,7 @@ def signup_view(request):
             return HttpResponseRedirect('/show_staff/')
         else:
             out['message_status'] = True
-            out['message'] = 'Такой пользователь уже существует'
+            out['message'] = TEXT_TEMPLATES['user_exists']
 
     return render(request, 'signup.html', out)
 
@@ -1750,7 +1740,8 @@ def submitted_all_applications(request, day):
     elif is_employee_supply(request.user):
         app_for_day = _Application_today.filter(
             construction_site__foreman=None,
-            construction_site__address='Снабжение')
+            construction_site__address=TEXT_TEMPLATES['constr_site_supply_name']
+        )
 
     current_applications = app_for_day.filter(
         status=STATUS_APP_saved,
@@ -2011,7 +2002,7 @@ def success_application(request, id_application):
     else:
         current_application.status = STATUS_APP_submitted
         try:
-            _var = Variable.objects.get(name='status_sended_app', date=current_day)
+            _var = Variable.objects.get(VAR['sent_app'], date=current_day)
             if _var.flag:
                 mess = f'Подана заявка требующая рассмотрение!'
                 send_message_for_admin(current_day, mess)
@@ -2060,7 +2051,6 @@ def prepare_work_day_table(day):
 
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
-    ch_day = get_CH_day(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
 
     if current_day > TODAY:
@@ -2209,7 +2199,7 @@ def send_task_for_drv(current_day):
     for drv, app in out:
         mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {current_day}\n\n"
         for s in app:
-            if s.app_for_day.construction_site.address == 'Снабжение':
+            if s.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{s.priority})\n"
             else:
                 mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"

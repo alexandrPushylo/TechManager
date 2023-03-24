@@ -19,13 +19,23 @@ status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 variable = {
     'sent_app': 'STATUS_sended_app',
     'font_size': 'font_size',
-    'panel_for_supply': 'supply_panel'
+    'panel_for_supply': 'supply_panel',
+    'FILTER_main_page': 'filter_main_apps',
+    'cache': 'no_cache',
+    'TIMEOUT_main_page': 'reload_main_page',
+    'sort_drv_panel': 'var_sort_driver_panel',
+    'font_color_main_page': 'style_font_color',
+    'FILTER_APP_TODAY': 'FILTER_APP_TODAY',
+    'LIMIT_for_submission': 'time_limit_for_submission',
 }
 text_templates = {
     'dismiss': 'ОТВЕРГНУТА\r\n',
     'constr_site_supply_name': 'Снабжение',
     'constr_site_spec_name': 'Спец. задание',
     'default_mess_for_spec': 'Хоз. работы или за свой счет',
+    'message_not_submitted': 'Имеются не поданные заявки',
+    'message_invalid_password': 'Неверный логин или пороль',
+    'user_exists': 'Такой пользователь уже существует',
 }
 
 TELE_URL = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
