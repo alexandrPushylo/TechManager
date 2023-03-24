@@ -1014,6 +1014,7 @@ def clear_application_view(request, id_application):
 
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
+    current_day = convert_str_to_date(current_application.date)
 
     for _app in app_tech:
         try:
@@ -1030,7 +1031,7 @@ def clear_application_view(request, id_application):
     current_application.status = STATUS_APP_absent
     current_application.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(f'/applications/{current_day}')
 
 # ===============================================================================================
 def show_applications_view(request, day, id_user=None):
