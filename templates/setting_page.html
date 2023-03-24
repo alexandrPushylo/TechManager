@@ -24,8 +24,8 @@
     <tr id="row_{{ forloop.counter }}" class="setting_row {% if not setting.user %} border border-success{% endif %}" >
       <th scope="row">{{ forloop.counter }}</th>
       <td>{{ setting.name }}</td>
-      <td><input class="form-control" type="text" name="setting_value_{{ forloop.counter }}" value="{{ setting.value }}" /></td>
-      <td><input class="form-control" type="time" name="setting_time_{{ forloop.counter }}" value="{{ setting.time }}"></td>
+      <td><input class="form-control" type="text" name="setting_value_{{ forloop.counter }}" value="{% if setting.value %}{{ setting.value }}{% endif %}" /></td>
+      <td><input class="form-control" type="time" name="setting_time_{{ forloop.counter }}" value="{{ setting.time.isoformat }}"></td>
       <td><input class="form-control" type="date" name="setting_date_{{ forloop.counter }}" value="{{ setting.date.isoformat }}"></td>
       <td><input {% if setting.flag %} checked {% endif %} id="inp_{{ forloop.counter }}" type="checkbox" name="setting_flag_{{ forloop.counter }}"/></td>
       <td>{{ setting.description }}</td>

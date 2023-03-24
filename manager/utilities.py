@@ -5,7 +5,7 @@ import telebot
 import requests
 from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
 # ---------------------------------------------------
-
+NOW = datetime.now().time()
 ONE_DAY = timedelta(days=1)
 STATUS_APPLICATION = {"Подтвержден", "Не подтвержден", "Отменен"}
 WEEKDAY = ("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
@@ -15,6 +15,18 @@ TOMORROW = TODAY + ONE_DAY
 dict_Staff = {'admin': 'Администратор', 'foreman': 'Прораб', 'master': 'Мастер', 'driver': 'Водитель', 'mechanic': 'Механик', 'employee_supply': 'Снабжение'}
 status_application = {'absent': 'Отсутствует', 'saved': 'Сохранена', 'submitted': 'Подана', 'approved': 'Одобрена', 'send': 'Отправлена'}
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
+
+variable = {
+    'sent_app': 'STATUS_sended_app',
+    'font_size': 'font_size',
+    'panel_for_supply': 'supply_panel'
+}
+text_templates = {
+    'dismiss': 'ОТВЕРГНУТА\r\n',
+    'constr_site_supply_name': 'Снабжение',
+    'constr_site_spec_name': 'Спец. задание',
+    'default_mess_for_spec': 'Хоз. работы или за свой счет',
+}
 
 TELE_URL = f'https://api.telegram.org/bot{TOKEN}/getUpdates'
 BOT = telebot.TeleBot(TOKEN, parse_mode=None)
@@ -75,6 +87,6 @@ def check_time(stop_time):
     if not stop_time:
         stop_time = datetime.now().time().replace(hour=16, minute=00)
 
-    now = datetime.now().time()
-    if now < stop_time:
+    NOW = datetime.now().time()
+    if NOW < stop_time:
         return stop_time
