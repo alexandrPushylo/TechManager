@@ -917,7 +917,7 @@ def tabel_workday_view(request, ch_week):
     out['week'] = []
 
     for _day in range(7):
-        out['week'].append((WorkDayTabel.objects.get(date=current_week[_day]), WEEKDAY[_day]))# TODO: fix creating
+        out['week'].append((WorkDayTabel.objects.get(date=current_week[_day]), WEEKDAY[_day]))
 
     if request.POST.get('id_day'):
         _id = request.POST.get('id_day')
@@ -998,8 +998,6 @@ def Technic_Driver_view(request, day):
 
         return HttpResponseRedirect(request.path)
 
-
-
     if 'tech_list' in request.path:
         return render(request, 'tech_list.html', out)
     else:
@@ -1060,12 +1058,6 @@ def show_applications_view(request, day, id_user=None):
     _Application_today = ApplicationToday.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
     _Application_material = ApplicationMeterial.objects.filter(app_for_day__date=current_day)
-
-    # STATUS_absent = ApplicationStatus.objects.get(status=STATUS_AP['absent'])
-    # STATUS_saved = ApplicationStatus.objects.get(status=STATUS_AP['saved'])
-    # STATUS_submitted = ApplicationStatus.objects.get(status=STATUS_AP['submitted'])
-    # STATUS_approved = ApplicationStatus.objects.get(status=STATUS_AP['approved'])
-    # STATUS_send = ApplicationStatus.objects.get(status=STATUS_AP['send'])
     # ---------------------------------------
 
     if request.POST.get('filter'):
@@ -1089,7 +1081,6 @@ def show_applications_view(request, day, id_user=None):
 
     else:
         print('NONE')
-
 
     if is_admin(current_user):
         app_for_day = _Application_today.filter(
@@ -1153,7 +1144,7 @@ def show_applications_view(request, day, id_user=None):
         saved_ap_list = _Application_today.filter(
             status=STATUS_APP_saved).order_by('construction_site__foreman__last_name')
 
-        if saved_ap_list.count() != 0:
+        if saved_ap_list.exists():
             out['inf_btn_status'] = True
             out['inf_btn_content'] = TEXT_TEMPLATES['message_not_submitted']
             out['saved_ap_list'] = saved_ap_list
@@ -1161,7 +1152,7 @@ def show_applications_view(request, day, id_user=None):
         materials_list = _Application_material.filter(status_checked=True)
 
         out['technic_driver_table_TT'] = technic_driver_table.filter(
-            status=True, driver__status=True).order_by('driver__driver__last_name')  #########
+            status=True, driver__status=True).order_by('driver__driver__last_name')
 
         out['app_technic_today'] = _Application_technic.values(
             'technic_driver_id',
@@ -1182,8 +1173,6 @@ def show_applications_view(request, day, id_user=None):
 
     else:
         return HttpResponseRedirect('/')
-
-
 
     out['style_font_color'] = get_var(VAR['font_color_main_page'], user=request.user)
     out['today_applications_list'] = []
@@ -1244,7 +1233,6 @@ def show_application_for_driver(request, day, id_user):
         out['material_list'] = app_material_list
     else:
         print('no')
-
 
     out["current_user"] = current_user
     out["date_of_target"] = current_day.strftime('%d %B')
@@ -2063,7 +2051,6 @@ def prepare_work_day_table(day):
 
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
-    ch_day = get_CH_day(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
 
     if current_day > TODAY:
