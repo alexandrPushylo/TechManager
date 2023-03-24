@@ -35,6 +35,7 @@ from manager.utilities import choice as rand_choice
 from manager.utilities import convert_str_to_date
 
 from manager.utilities import check_time as NOW_IN_TIME
+from manager.utilities import NOW
 from manager.utilities import get_json
 from manager.utilities import get_id_chat
 from manager.utilities import BOT

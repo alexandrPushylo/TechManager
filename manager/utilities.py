@@ -5,7 +5,7 @@ import telebot
 import requests
 from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
 # ---------------------------------------------------
-
+NOW = datetime.now().time()
 ONE_DAY = timedelta(days=1)
 STATUS_APPLICATION = {"Подтвержден", "Не подтвержден", "Отменен"}
 WEEKDAY = ("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
@@ -75,6 +75,6 @@ def check_time(stop_time):
     if not stop_time:
         stop_time = datetime.now().time().replace(hour=16, minute=00)
 
-    now = datetime.now().time()
-    if now < stop_time:
+    NOW = datetime.now().time()
+    if NOW < stop_time:
         return stop_time
