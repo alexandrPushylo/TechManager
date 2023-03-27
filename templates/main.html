@@ -9,6 +9,7 @@
     {% if conflicts_vehicles_list %}<a href="{% url 'conflict_resolution' cw_day %}" class="btn btn-sm btn-danger ">Недостаток техники</a>
      {% elif not conflicts_vehicles_list and submitted_app_list %}<a href="{% url 'approv_all_applications' cw_day %}" class="btn btn-sm btn-success ">Одобрить все заявки</a>
      {% elif not conflicts_vehicles_list and send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-warning ">Отправить все заявки</a>
+     {% elif not conflicts_vehicles_list and not send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-outline-secondary ">Повторно отправить заявки</a>
     {% else %}{% endif %}
 {% elif post == 'foreman' or 'master' or 'employee_supply' %}
     {% if saved_app_list %}

@@ -51,7 +51,11 @@ STATUS_APP_saved = ApplicationStatus.objects.get_or_create(status=STATUS_AP['sav
 STATUS_APP_submitted = ApplicationStatus.objects.get_or_create(status=STATUS_AP['submitted'])[0]
 STATUS_APP_approved = ApplicationStatus.objects.get_or_create(status=STATUS_AP['approved'])[0]
 STATUS_APP_send = ApplicationStatus.objects.get_or_create(status=STATUS_AP['send'])[0]
+# STATUS construction_site------------------------------------------------------------------
+STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['closed'])[0]
+STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
+
 
 
 # ------FUNCTION VIEW----------------------
@@ -109,6 +113,7 @@ def print_material_view(request, day):
     )
 
     return render(request, 'print_page.html', out)
+
 
 def supply_materials_view(request, day):
     if request.user.is_anonymous:
@@ -262,6 +267,11 @@ def move_supply_app(request, day, id_app):
         cur_app_tech.save()
         app_for_day.status = STATUS_APP_saved
         app_for_day.save()
+    else:
+        if TEXT_TEMPLATES['dismiss'] in cur_app_tech.description:
+            cur_app_tech.description = cur_app_tech.description.replace(TEXT_TEMPLATES['dismiss'], '')
+        cur_app_tech.var_check = False
+        cur_app_tech.save()
 
     return HttpResponseRedirect('/')
 
@@ -480,7 +490,7 @@ def append_in_spec_tech(request, id_drv):
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address=TEXT_TEMPLATES['constr_site_spec_name'],
         foreman=None)
-    constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+    constr_site.status = STATUS_CS_opened
     constr_site.save()
 
     app_for_day, _ = ApplicationToday.objects.get_or_create(
@@ -648,10 +658,10 @@ def show_construction_sites_view(request):
         return HttpResponseRedirect('/')
 
     out["construction_sites_list"] = construction_sites_list.filter(
-        status=ConstructionSiteStatus.objects.get(status='Открыт'))
+        status=STATUS_CS_opened)
 
     out["constr_sites_list_close"] = construction_sites_list.filter(
-        status=ConstructionSiteStatus.objects.get(status='Закрыт'))
+        status=STATUS_CS_closed)
 
     return render(request, 'construction_sites.html', out)
 
@@ -704,10 +714,10 @@ def delete_construction_sites_view(request, id_construction_sites):
 def change_status_construction_site(request, id_construction_sites):
     constr_site = ConstructionSite.objects.get(id=id_construction_sites)
 
-    if constr_site.status.status == STATUS_CS['opened']:
-        constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['closed'])
+    if constr_site.status == STATUS_CS_opened:
+        constr_site.status = STATUS_CS_closed
     else:
-        constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+        constr_site.status = STATUS_CS_opened
     constr_site.save()
     return HttpResponseRedirect('/construction_sites/')
 
@@ -753,7 +763,7 @@ def add_construction_sites_view(request):
         else:
             construction_sites.foreman = None
 
-        construction_sites.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+        construction_sites.status = STATUS_CS_opened
         construction_sites.save()
 
         return HttpResponseRedirect('/construction_sites/')
@@ -1474,12 +1484,12 @@ def create_new_application(request, id_application):
 
         for i in get_difference(set([i[0] for i in list_of_vehicles.filter().values_list('id')]), set(int(i) for i in id_app_tech)):
             _app = ApplicationTechnic.objects.get(app_for_day=current_application, id=i)
-            try:
-                _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
-                _a_tmp.var_check = False
-                _a_tmp.save()
-            except:
-                pass
+            # try:
+            #     _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
+            #     _a_tmp.var_check = False
+            #     _a_tmp.save()
+            # except:
+            #     pass
 
             _app.delete()
 
@@ -1692,14 +1702,14 @@ def send_all_applications(request, day):
             app.status = STATUS_APP_send
             app.save()
 
+        send_task_for_drv(current_day)
+        send_status_app_for_foreman(current_day)
+        send_message_for_admin(current_day)
+
         _var, _ = Variable.objects.get_or_create(name=VAR['sent_app'], date=current_day)
         _var.time = NOW.isoformat(timespec='minutes')
         _var.flag = True
         _var.save()
-
-        send_task_for_drv(day)
-        send_status_app_for_foreman(day)
-        send_message_for_admin(day)
 
     return HttpResponseRedirect(f'/applications/{day}')
 
@@ -1992,22 +2002,28 @@ def success_application(request, id_application):
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = convert_str_to_date(current_application.date)
 
-    if is_admin(request.user):
-        _status = current_application.status.status
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
 
-        if _status == STATUS_AP['submitted']:
+
+    if is_admin(request.user):
+        _status = current_application.status
+
+        if _status == STATUS_APP_submitted:
             current_application.status = STATUS_APP_approved
-        elif _status == STATUS_AP['approved']:
+        elif _status == STATUS_APP_approved:
             current_application.status = STATUS_APP_send
+
+            send_task_for_drv(current_day, id_app_today=id_application)
+            send_status_app_for_foreman(current_day, id_app_today=id_application)
+            send_message_for_admin(current_day, id_app_today=id_application)
+
     else:
         current_application.status = STATUS_APP_submitted
-        try:
-            _var = Variable.objects.get(name=VAR['sent_app'], date=current_day)
-            if _var.flag:
-                mess = f'Подана заявка требующая рассмотрение!'
-                send_message_for_admin(current_day, mess)
-        except Variable.DoesNotExist:
-            pass
+        if send_flag:
+            mess = f'Подана заявка требующая рассмотрение!'
+            send_message_for_admin(current_day, mess)
+
 
     current_application.save()
 
@@ -2100,8 +2116,7 @@ def prepare_technic_driver_table(day):
 
 def prepare_application_today(day):
     current_day = convert_str_to_date(day)
-    construction_site_list = ConstructionSite.objects.filter(
-        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened']))
+    construction_site_list = ConstructionSite.objects.filter(status=STATUS_CS_opened)
 
     applications_today_list_all = ApplicationToday.objects.filter(date=current_day)
 
@@ -2185,19 +2200,40 @@ def send_message(id_user, message):
             BOT.send_message(chat_id.id_chat, message)
 
 
-def send_task_for_drv(current_day):
+def send_task_for_drv(current_day, messages=None, id_app_today=None):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+
+    if id_app_today:
+        _App = ApplicationTechnic.objects.filter(app_for_day_id=id_app_today)
+        for _a in _App:
+            if send_flag:
+                mss = f"{_a.technic_driver.driver.driver.last_name} {_a.technic_driver.driver.driver.first_name}\nОбновленная заявка на:\n {_day}\n\n"
+            else:
+                mss = f"{_a.technic_driver.driver.driver.last_name} {_a.technic_driver.driver.driver.first_name}\nЗаявка на {_day}\n\n"
+            if _a.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
+                mss += f"\t{_a.priority})\n"
+            else:
+                mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address} ({_a.app_for_day.construction_site.foreman}):\n"
+
+            mss += f"{_a.description}\n\n"
+            send_message(_a.technic_driver.driver.driver.id, mss)
+        return
 
     for _id_drv in _driver_list:
         _app = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
-            technic_driver__driver__driver=_id_drv.driver.id,
-            app_for_day__status=STATUS_APP_send).order_by('priority').exclude(var_check=True)
+            app_for_day__status=STATUS_APP_send,
+            technic_driver__driver__driver=_id_drv.driver.id).order_by('priority').exclude(var_check=True)
         out.append((_id_drv, _app))
 
     for drv, app in out:
-        mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {current_day}\n\n"
+        if send_flag:
+            mss = f"{drv.driver.last_name} {drv.driver.first_name}\nОбновленная заявка на:\n {_day}\n\n"
+        else:
+            mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {_day}\n\n"
         for s in app:
             if s.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{s.priority})\n"
@@ -2205,18 +2241,26 @@ def send_task_for_drv(current_day):
                 mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
 
             mss += f"{s.description}\n\n"
-
+        if messages:
+            mss = messages
+        print(mss)
         send_message(drv.driver.id, mss)
 
 
-def send_status_app_for_foreman(current_day):
+def send_status_app_for_foreman(current_day, messages=None, id_app_today=None):
     out = []
 
     id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
     id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
 
-    _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
+    if id_app_today:
+        _app = ApplicationToday.objects.filter(id=id_app_today)
+    else:
+        _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
+
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
 
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
@@ -2229,20 +2273,36 @@ def send_status_app_for_foreman(current_day):
             out.append((_id.user_post.id, _a))
 
     for _id, app in out:
-        mss = f"{current_day}\n\n"
+        if send_flag:
+            mss = f"Повторное уведомление:\n{_day}\n\n"
+        else:
+            mss = f"{_day}\n\n"
         for a in app:
             mss += f"Заявка на [ {a.construction_site.address} ] одобрена\n"
-
+        if messages:
+            mss = messages
         send_message(_id, mss)
 
 
-def send_message_for_admin(current_day, messages=False):
+def send_message_for_admin(current_day, messages=False, id_app_today=None):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    if id_app_today:
+        _app = ApplicationToday.objects.get(id=id_app_today)
+        if send_flag:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена повторно"
+        else:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена"
+
     if messages:
         mess = messages
     else:
-        mess = f"Заявки на {current_day} отправлены"
+        if send_flag:
+            mess = f"Заявки на:\n{_day} отправлены повторно"
+        else:
+            mess = f"Заявки на:\n{_day} отправлены"
 
     for _id in admin_id_list:
         send_message(_id, mess)
@@ -2309,6 +2369,9 @@ def check_table(day):
         app = ApplicationToday.objects.filter(date__lt=date, status=STATUS_APP_absent)
         if app.exists():
             app.delete()
+        _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=date)
+        if _var.exists():
+            _var.delete()
 
     else:
         print('weekend')
@@ -2334,9 +2397,7 @@ def find_view(request, day):
     application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
     technic_driver = TechnicDriver.objects.filter(date=current_day)
     driver = DriverTabel.objects.filter(date=current_day)
-    construction_site = ConstructionSite.objects.filter(
-        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
-    )
+    construction_site = ConstructionSite.objects.filter(status=STATUS_CS_opened)
 
     if request.method == 'POST':
         str_find = request.POST.get('find_input')
