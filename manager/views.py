@@ -1997,6 +1997,10 @@ def success_application(request, id_application):
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = convert_str_to_date(current_application.date)
 
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+
+
     if is_admin(request.user):
         _status = current_application.status.status
 
@@ -2004,15 +2008,17 @@ def success_application(request, id_application):
             current_application.status = STATUS_APP_approved
         elif _status == STATUS_AP['approved']:
             current_application.status = STATUS_APP_send
+
+            send_task_for_drv(current_day, id_app_today=id_application)
+            send_status_app_for_foreman(current_day, id_app_today=id_application)
+            send_message_for_admin(current_day, id_app_today=id_application)
+            
     else:
         current_application.status = STATUS_APP_submitted
-        try:
-            _var = Variable.objects.get(name=VAR['sent_app'], date=current_day)
-            if _var.flag:
-                mess = f'Подана заявка требующая рассмотрение!'
-                send_message_for_admin(current_day, mess)
-        except Variable.DoesNotExist:
-            pass
+        if send_flag:
+            mess = f'Подана заявка требующая рассмотрение!'
+            send_message_for_admin(current_day, mess)
+
 
     current_application.save()
 
@@ -2190,17 +2196,33 @@ def send_message(id_user, message):
             BOT.send_message(chat_id.id_chat, message)
 
 
-def send_task_for_drv(current_day):
+def send_task_for_drv(current_day, messages=None, id_app_today=None):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
     _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
 
+    if id_app_today:
+        _App = ApplicationTechnic.objects.filter(app_for_day_id=id_app_today)
+        for _a in _App:
+            if send_flag:
+                mss = f"{_a.technic_driver.driver.driver.last_name} {_a.technic_driver.driver.driver.first_name}\nОбновленная заявка на:\n {_day}\n\n"
+            else:
+                mss = f"{_a.technic_driver.driver.driver.last_name} {_a.technic_driver.driver.driver.first_name}\nЗаявка на {_day}\n\n"
+            if _a.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
+                mss += f"\t{_a.priority})\n"
+            else:
+                mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address} ({_a.app_for_day.construction_site.foreman}):\n"
+
+            mss += f"{_a.description}\n\n"
+            send_message(_a.technic_driver.driver.driver.id, mss)
+        return
+
     for _id_drv in _driver_list:
         _app = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
-            technic_driver__driver__driver=_id_drv.driver.id,
-            app_for_day__status=STATUS_APP_send).order_by('priority').exclude(var_check=True)
+            app_for_day__status=STATUS_APP_send,
+            technic_driver__driver__driver=_id_drv.driver.id).order_by('priority').exclude(var_check=True)
         out.append((_id_drv, _app))
 
     for drv, app in out:
@@ -2215,18 +2237,23 @@ def send_task_for_drv(current_day):
                 mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
 
             mss += f"{s.description}\n\n"
-
+        if messages:
+            mss = messages
+        print(mss)
         send_message(drv.driver.id, mss)
 
 
-def send_status_app_for_foreman(current_day):
+def send_status_app_for_foreman(current_day, messages=None, id_app_today=None):
     out = []
 
     id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
     id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
 
-    _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
+    if id_app_today:
+        _app = ApplicationToday.objects.filter(id=id_app_today)
+    else:
+        _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
     _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
@@ -2248,20 +2275,28 @@ def send_status_app_for_foreman(current_day):
             mss = f"{_day}\n\n"
         for a in app:
             mss += f"Заявка на [ {a.construction_site.address} ] одобрена\n"
-
+        if messages:
+            mss = messages
         send_message(_id, mss)
 
 
-def send_message_for_admin(current_day, messages=False):
+def send_message_for_admin(current_day, messages=False, id_app_today=None):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
     _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    if id_app_today:
+        _app = ApplicationToday.objects.get(id=id_app_today)
+        if send_flag:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена повторно"
+        else:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена"
+
     if messages:
         mess = messages
     else:
         if send_flag:
-            mess = f"Заявки на:\n{_day} обновлены"
+            mess = f"Заявки на:\n{_day} отправлены повторно"
         else:
             mess = f"Заявки на:\n{_day} отправлены"
 
