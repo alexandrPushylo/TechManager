@@ -128,8 +128,12 @@
                 <textarea class="form-control app_description mt-1" readonly>{{ t.description }}</textarea>
                   {%endif%}
                         <div class="btn-group mt-1">
-                <a href="{% url 'move_supply_app' cw_day t.id %}" class="btn btn-outline-success  btn-sm me-2" aria-current="page"><i class="fa-solid fa-backward"></i> </a>
-                <a href="{% url 'cancel_supply_app' t.id %}" class="btn btn-outline-danger  btn-sm ms-2" aria-current="page"><i class="fa-solid fa-xmark"></i> Отвергнуть </a>
+                            {% if not t.var_check %}
+                <a href="{% url 'move_supply_app' cw_day t.id %}" class="btn btn-outline-success  btn-sm me-2" aria-current="page"><i class="fa-solid fa-backward"></i> Принять</a>
+                            {% else %}
+                <a href="{% url 'move_supply_app' cw_day t.id %}" class="btn btn-outline-primary  btn-sm me-2" aria-current="page">Отменить</a>
+                            {% endif %}
+                <a href="{% url 'cancel_supply_app' t.id %}" class="btn btn-outline-danger  btn-sm ms-2" aria-current="page"><i class="fa-solid fa-xmark"></i> Отклонить </a>
                 </div>
                     {% endfor %}
 {#                  <hr>#}

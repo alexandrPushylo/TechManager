@@ -262,6 +262,11 @@ def move_supply_app(request, day, id_app):
         cur_app_tech.save()
         app_for_day.status = STATUS_APP_saved
         app_for_day.save()
+    else:
+        if TEXT_TEMPLATES['dismiss'] in cur_app_tech.description:
+            cur_app_tech.description = cur_app_tech.description.replace(TEXT_TEMPLATES['dismiss'], '')
+        cur_app_tech.var_check = False
+        cur_app_tech.save()
 
     return HttpResponseRedirect('/')
 
@@ -1474,12 +1479,12 @@ def create_new_application(request, id_application):
 
         for i in get_difference(set([i[0] for i in list_of_vehicles.filter().values_list('id')]), set(int(i) for i in id_app_tech)):
             _app = ApplicationTechnic.objects.get(app_for_day=current_application, id=i)
-            try:
-                _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
-                _a_tmp.var_check = False
-                _a_tmp.save()
-            except:
-                pass
+            # try:
+            #     _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
+            #     _a_tmp.var_check = False
+            #     _a_tmp.save()
+            # except:
+            #     pass
 
             _app.delete()
 
