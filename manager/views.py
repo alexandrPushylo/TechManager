@@ -51,6 +51,9 @@ STATUS_APP_saved = ApplicationStatus.objects.get_or_create(status=STATUS_AP['sav
 STATUS_APP_submitted = ApplicationStatus.objects.get_or_create(status=STATUS_AP['submitted'])[0]
 STATUS_APP_approved = ApplicationStatus.objects.get_or_create(status=STATUS_AP['approved'])[0]
 STATUS_APP_send = ApplicationStatus.objects.get_or_create(status=STATUS_AP['send'])[0]
+# STATUS construction_site------------------------------------------------------------------
+STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['closed'])[0]
+STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
 
 
