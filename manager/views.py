@@ -1697,14 +1697,14 @@ def send_all_applications(request, day):
             app.status = STATUS_APP_send
             app.save()
 
+        send_task_for_drv(current_day)
+        send_status_app_for_foreman(current_day)
+        send_message_for_admin(current_day)
+
         _var, _ = Variable.objects.get_or_create(name=VAR['sent_app'], date=current_day)
         _var.time = NOW.isoformat(timespec='minutes')
         _var.flag = True
         _var.save()
-
-        send_task_for_drv(day)
-        send_status_app_for_foreman(day)
-        send_message_for_admin(day)
 
     return HttpResponseRedirect(f'/applications/{day}')
 
@@ -2193,6 +2193,8 @@ def send_message(id_user, message):
 def send_task_for_drv(current_day):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
 
     for _id_drv in _driver_list:
         _app = ApplicationTechnic.objects.filter(
@@ -2202,7 +2204,10 @@ def send_task_for_drv(current_day):
         out.append((_id_drv, _app))
 
     for drv, app in out:
-        mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {current_day}\n\n"
+        if send_flag:
+            mss = f"{drv.driver.last_name} {drv.driver.first_name}\nОбновленная заявка на:\n {_day}\n\n"
+        else:
+            mss = f"{drv.driver.last_name} {drv.driver.first_name}\nЗаявка на {_day}\n\n"
         for s in app:
             if s.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{s.priority})\n"
@@ -2223,6 +2228,9 @@ def send_status_app_for_foreman(current_day):
 
     _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
 
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
         if _a:
@@ -2234,7 +2242,10 @@ def send_status_app_for_foreman(current_day):
             out.append((_id.user_post.id, _a))
 
     for _id, app in out:
-        mss = f"{current_day}\n\n"
+        if send_flag:
+            mss = f"Повторное уведомление:\n{_day}\n\n"
+        else:
+            mss = f"{_day}\n\n"
         for a in app:
             mss += f"Заявка на [ {a.construction_site.address} ] одобрена\n"
 
@@ -2244,10 +2255,15 @@ def send_status_app_for_foreman(current_day):
 def send_message_for_admin(current_day, messages=False):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
+    send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
     if messages:
         mess = messages
     else:
-        mess = f"Заявки на {current_day} отправлены"
+        if send_flag:
+            mess = f"Заявки на:\n{_day} обновлены"
+        else:
+            mess = f"Заявки на:\n{_day} отправлены"
 
     for _id in admin_id_list:
         send_message(_id, mess)
