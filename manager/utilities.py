@@ -29,7 +29,7 @@ variable = {
     'LIMIT_for_submission': 'time_limit_for_submission',
 }
 text_templates = {
-    'dismiss': 'ОТВЕРГНУТА\r\n',
+    'dismiss': 'ОТКЛОНЕНА\r\n',
     'constr_site_supply_name': 'Снабжение',
     'constr_site_spec_name': 'Спец. задание',
     'default_mess_for_spec': 'Хоз. работы или за свой счет',
