@@ -57,6 +57,7 @@ STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS
 # ------------------------------------------------------------------------------------------
 
 
+
 # ------FUNCTION VIEW----------------------
 
 
@@ -112,6 +113,7 @@ def print_material_view(request, day):
     )
 
     return render(request, 'print_page.html', out)
+
 
 def supply_materials_view(request, day):
     if request.user.is_anonymous:
@@ -488,7 +490,7 @@ def append_in_spec_tech(request, id_drv):
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address=TEXT_TEMPLATES['constr_site_spec_name'],
         foreman=None)
-    constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+    constr_site.status = STATUS_CS_opened
     constr_site.save()
 
     app_for_day, _ = ApplicationToday.objects.get_or_create(
@@ -656,10 +658,10 @@ def show_construction_sites_view(request):
         return HttpResponseRedirect('/')
 
     out["construction_sites_list"] = construction_sites_list.filter(
-        status=ConstructionSiteStatus.objects.get(status='Открыт'))
+        status=STATUS_CS_opened)
 
     out["constr_sites_list_close"] = construction_sites_list.filter(
-        status=ConstructionSiteStatus.objects.get(status='Закрыт'))
+        status=STATUS_CS_closed)
 
     return render(request, 'construction_sites.html', out)
 
@@ -712,10 +714,10 @@ def delete_construction_sites_view(request, id_construction_sites):
 def change_status_construction_site(request, id_construction_sites):
     constr_site = ConstructionSite.objects.get(id=id_construction_sites)
 
-    if constr_site.status.status == STATUS_CS['opened']:
-        constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['closed'])
+    if constr_site.status == STATUS_CS_opened:
+        constr_site.status = STATUS_CS_closed
     else:
-        constr_site.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+        constr_site.status = STATUS_CS_opened
     constr_site.save()
     return HttpResponseRedirect('/construction_sites/')
 
@@ -761,7 +763,7 @@ def add_construction_sites_view(request):
         else:
             construction_sites.foreman = None
 
-        construction_sites.status = ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
+        construction_sites.status = STATUS_CS_opened
         construction_sites.save()
 
         return HttpResponseRedirect('/construction_sites/')
@@ -2005,17 +2007,17 @@ def success_application(request, id_application):
 
 
     if is_admin(request.user):
-        _status = current_application.status.status
+        _status = current_application.status
 
-        if _status == STATUS_AP['submitted']:
+        if _status == STATUS_APP_submitted:
             current_application.status = STATUS_APP_approved
-        elif _status == STATUS_AP['approved']:
+        elif _status == STATUS_APP_approved:
             current_application.status = STATUS_APP_send
 
             send_task_for_drv(current_day, id_app_today=id_application)
             send_status_app_for_foreman(current_day, id_app_today=id_application)
             send_message_for_admin(current_day, id_app_today=id_application)
-            
+
     else:
         current_application.status = STATUS_APP_submitted
         if send_flag:
@@ -2114,8 +2116,7 @@ def prepare_technic_driver_table(day):
 
 def prepare_application_today(day):
     current_day = convert_str_to_date(day)
-    construction_site_list = ConstructionSite.objects.filter(
-        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened']))
+    construction_site_list = ConstructionSite.objects.filter(status=STATUS_CS_opened)
 
     applications_today_list_all = ApplicationToday.objects.filter(date=current_day)
 
@@ -2393,9 +2394,7 @@ def find_view(request, day):
     application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
     technic_driver = TechnicDriver.objects.filter(date=current_day)
     driver = DriverTabel.objects.filter(date=current_day)
-    construction_site = ConstructionSite.objects.filter(
-        status=ConstructionSiteStatus.objects.get(status=STATUS_CS['opened'])
-    )
+    construction_site = ConstructionSite.objects.filter(status=STATUS_CS_opened)
 
     if request.method == 'POST':
         str_find = request.POST.get('find_input')
