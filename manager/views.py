@@ -1052,9 +1052,6 @@ def show_applications_view(request, day, id_user=None):
 
     out = {"constr_site_list": []}
 
-    _var_cache = get_var(VAR['cache'])
-    out["var_cache"] = _var_cache.flag
-
     if id_user:
         current_user = User.objects.get(id=id_user)
         out['current_user'] = current_user
@@ -1079,6 +1076,9 @@ def show_applications_view(request, day, id_user=None):
 
     _var_reload_main_page = get_var(VAR['TIMEOUT_main_page'])
     out["var_reload_main_page"] = _var_reload_main_page
+
+    _var_cache = get_var(VAR['cache'])
+    out["var_cache"] = _var_cache.flag
 
     _var_sent_app = Variable.objects.filter(name=VAR['sent_app'], date=current_day)
     if _var_sent_app.exists():
