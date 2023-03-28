@@ -75,7 +75,12 @@
 
           <div class="card-body mt-1" >
             <h6 class="card-title  fw-bold text-center " style="color:{{ style_font_color.value }};">{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.last_name %}({{ a.app_today.construction_site.foreman.last_name }}){% endif %}</h6>
-            <h6 class="card-title" >{{a.app_today.date}}</h6>
+            <h6 class="card-title text-center" >{{a.app_today.date}}</h6>
+          {% if a.app_today.description %}
+              <hr>
+              <label class="small">Примечание к объекту</label>
+          <textarea readonly class="form-control small fw-bold app_description">{{ a.app_today.description }}</textarea>
+          {% endif %}
 
 
 {#          {% if var_filter_apps.value == 'technics' and not a.apps_tech %}#}

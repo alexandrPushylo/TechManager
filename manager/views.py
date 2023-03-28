@@ -1036,6 +1036,7 @@ def clear_application_view(request, id_application):
         ApplicationMeterial.objects.get(app_for_day=current_application).delete()
     except ApplicationMeterial.DoesNotExist:
         pass
+    current_application.description = ''
     current_application.status = STATUS_APP_absent
     current_application.save()
 
@@ -1389,6 +1390,7 @@ def show_info_application(request, id_application):
     out["application_id"] = id_application
     out["construction_site"] = current_application.construction_site
     out["date_of_target"] = current_application.date
+    out['applications_today_desc'] = current_application.description
     get_prepare_data(out, request, current_day=current_application.date)
 
     list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
@@ -1427,6 +1429,7 @@ def create_new_application(request, id_application):
 
     out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site
+    out['applications_today_desc'] = current_application.description
     out["date_of_target"] = str(current_application.date)
     conflicts_vehicles_list = get_conflicts_vehicles_list(current_application.date, 1)
     out['conflicts_vehicles_list'] = conflicts_vehicles_list
@@ -1479,12 +1482,18 @@ def create_new_application(request, id_application):
         pass
 
     if request.method == "POST":
+        app_today_desc = request.POST.get('app_today_desc')
         id_app_tech = request.POST.getlist('io_id_app_tech')
         id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
         vehicle_list = request.POST.getlist('io_technic')
         driver_list = request.POST.getlist('io_driver')
         description_app_list = request.POST.getlist('description_app_list')
         materials = request.POST.get('desc_meterials')
+
+        if app_today_desc:
+            app_today_desc = str(app_today_desc).strip()
+
+
 
         # ------------delete--------------TODO:list
 
@@ -1559,8 +1568,12 @@ def create_new_application(request, id_application):
         else:
             _material.delete()
 
-        if ApplicationTechnic.objects.filter(app_for_day=current_application).count() == 0 and \
-                ApplicationMeterial.objects.filter(app_for_day=current_application).count() == 0:
+        current_application.description = app_today_desc
+        current_application.save()
+
+        if not ApplicationTechnic.objects.filter(app_for_day=current_application).exists() and \
+                not ApplicationMeterial.objects.filter(app_for_day=current_application).exists() \
+                and not app_today_desc:
             _status = STATUS_APP_absent
         elif is_admin(request.user):
             _status = STATUS_APP_submitted

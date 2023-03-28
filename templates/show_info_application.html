@@ -14,6 +14,9 @@
             <b class="fs-5">{{ date_of_target }}</b>
             <hr>
         </p>
+      <label class="small">Примечание к объекту</label>
+      <textarea class="form-control app_description" disabled>{{ applications_today_desc }}</textarea>
+      <hr>
 
         <ul class="container-fluid" >
             {% for v in list_of_vehicles %}
