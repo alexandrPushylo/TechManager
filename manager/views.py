@@ -1419,7 +1419,9 @@ def create_new_application(request, id_application):
 
     var_submit_mat_app = get_var(VAR['LIMIT_for_submission'])
     if var_submit_mat_app:
-        out['check_time'] = NOW_IN_TIME(var_submit_mat_app.time)
+        _limit = var_submit_mat_app.time
+        out['check_time'] = NOW_IN_TIME(_limit)
+        out['LIMIT_for_submission'] = _limit
     else:
         out['check_time'] = NOW_IN_TIME()
 
