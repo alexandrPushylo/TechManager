@@ -1052,9 +1052,6 @@ def show_applications_view(request, day, id_user=None):
 
     out = {"constr_site_list": []}
 
-    _var_cache = get_var(VAR['cache'])
-    out["var_cache"] = _var_cache.flag
-
     if id_user:
         current_user = User.objects.get(id=id_user)
         out['current_user'] = current_user
@@ -1079,6 +1076,13 @@ def show_applications_view(request, day, id_user=None):
 
     _var_reload_main_page = get_var(VAR['TIMEOUT_main_page'])
     out["var_reload_main_page"] = _var_reload_main_page
+
+    _var_cache = get_var(VAR['cache'])
+    out["var_cache"] = _var_cache.flag
+
+    _var_sent_app = Variable.objects.filter(name=VAR['sent_app'], date=current_day)
+    if _var_sent_app.exists():
+        out['var_sent_app'] = _var_sent_app.first()
 
     if request.POST.get('td_from') and request.POST.get('td_to'):
         td_from = request.POST.get('td_from')
@@ -1415,7 +1419,9 @@ def create_new_application(request, id_application):
 
     var_submit_mat_app = get_var(VAR['LIMIT_for_submission'])
     if var_submit_mat_app:
-        out['check_time'] = NOW_IN_TIME(var_submit_mat_app.time)
+        _limit = var_submit_mat_app.time
+        out['check_time'] = NOW_IN_TIME(_limit)
+        out['LIMIT_for_submission'] = _limit
     else:
         out['check_time'] = NOW_IN_TIME()
 
@@ -1709,6 +1715,7 @@ def send_all_applications(request, day):
         _var, _ = Variable.objects.get_or_create(name=VAR['sent_app'], date=current_day)
         _var.time = NOW.isoformat(timespec='minutes')
         _var.flag = True
+        _var.value = TODAY
         _var.save()
 
     return HttpResponseRedirect(f'/applications/{day}')
