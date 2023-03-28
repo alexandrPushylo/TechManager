@@ -120,7 +120,7 @@ class ApplicationToday(models.Model):
                                           verbose_name="Строительный объект")
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.ForeignKey(ApplicationStatus, on_delete=models.SET_NULL, null=True, verbose_name="Статус заявки")
-    description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Примечание для объекта")
+    description = models.TextField(max_length=1024, null=True, blank=True, default='', verbose_name="Примечание для объекта")
     var_aptd = models.CharField(max_length=256, null=True, blank=True)
     def __str__(self): return f"{self.construction_site} [{self.date}] - {self.status}"
     class Meta:
