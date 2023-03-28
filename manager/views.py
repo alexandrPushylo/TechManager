@@ -1080,6 +1080,10 @@ def show_applications_view(request, day, id_user=None):
     _var_reload_main_page = get_var(VAR['TIMEOUT_main_page'])
     out["var_reload_main_page"] = _var_reload_main_page
 
+    _var_sent_app = Variable.objects.filter(name=VAR['sent_app'], date=current_day)
+    if _var_sent_app.exists():
+        out['var_sent_app'] = _var_sent_app.first()
+
     if request.POST.get('td_from') and request.POST.get('td_to'):
         td_from = request.POST.get('td_from')
         td_to = request.POST.get('td_to')
@@ -1709,6 +1713,7 @@ def send_all_applications(request, day):
         _var, _ = Variable.objects.get_or_create(name=VAR['sent_app'], date=current_day)
         _var.time = NOW.isoformat(timespec='minutes')
         _var.flag = True
+        _var.value = TODAY
         _var.save()
 
     return HttpResponseRedirect(f'/applications/{day}')
