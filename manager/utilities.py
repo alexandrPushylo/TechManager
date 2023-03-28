@@ -93,7 +93,7 @@ def get_id_chat(key, result):
                 return (upd['message']['chat']['id'])
 
 
-def check_time(stop_time):
+def check_time(stop_time=None):
     if not stop_time:
         stop_time = datetime.now().time().replace(hour=16, minute=00)
 
