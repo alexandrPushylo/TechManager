@@ -2224,7 +2224,7 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
 
     if id_app_today:
         _App = ApplicationTechnic.objects.filter(app_for_day_id=id_app_today)
@@ -2280,7 +2280,7 @@ def send_status_app_for_foreman(current_day, messages=None, id_app_today=None):
         _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
 
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
@@ -2308,7 +2308,7 @@ def send_message_for_admin(current_day, messages=False, id_app_today=None):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
     if id_app_today:
         _app = ApplicationToday.objects.get(id=id_app_today)
         if send_flag:
