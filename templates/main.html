@@ -44,7 +44,7 @@
 
 
 
-    <div id="container" class="container-fluid mt-5 app_container" style="margin-left: 70px">
+    <div id="container" class="container-fluid mt-5 ms-4 app_container">
 {#        <div class="container">#}
         {% for a in today_applications_list %}
             <div id="per_{{ a.app_today.id }}" class="item">
@@ -83,12 +83,6 @@
           {% endif %}
 
 
-{#          {% if var_filter_apps.value == 'technics' and not a.apps_tech %}#}
-{#          <div class="card-text text-center"><hr><label><b>Только материалы</b></label><hr> </div>#}
-{#              {% elif var_filter_apps.value == 'materials' and not a.app_mater %}#}
-{#          <div class="card-text text-center"><hr><label><b>Только техника</b></label><hr> </div>#}
-{#          {% endif %}#}
-
           {% if a.apps_tech %}
           <hr style="border-width: medium; border-color: green">
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
@@ -113,7 +107,7 @@
                     </div>
 
                   {% if v.description %}
-                <textarea class="form-control app_description" readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
+                <textarea class="form-control app_description" readonly {% if v.var_check %} style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
                 {%endif%}
                   <hr>
               {% endfor %}
