@@ -47,8 +47,8 @@ def get_day_in_days(day: date, count_days: int):
     return day + timedelta(count_days)
 
 
-def get_difference(a: set, b: set):
-    return list(a.difference(b))
+# def get_difference(a: set, b: set):
+#     return list(a.difference(b))
 
 
 def get_week(c_date, week=None):
