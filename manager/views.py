@@ -1062,8 +1062,8 @@ def show_applications_view(request, day, id_user=None):
         current_user = request.user
 
     get_prepare_data(out, request, current_day)
-    check_table(current_day)
-
+    status_day = check_table(current_day)
+    out['status_day'] = status_day
     # ---------------------------------------
     _Application_today = ApplicationToday.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
@@ -2397,6 +2397,8 @@ def check_table(day):
 
     else:
         print('weekend')
+        return False
+    return True
 
 
 def send_debug_messages(messages='Test'):

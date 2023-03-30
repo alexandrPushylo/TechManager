@@ -83,12 +83,6 @@
           {% endif %}
 
 
-{#          {% if var_filter_apps.value == 'technics' and not a.apps_tech %}#}
-{#          <div class="card-text text-center"><hr><label><b>Только материалы</b></label><hr> </div>#}
-{#              {% elif var_filter_apps.value == 'materials' and not a.app_mater %}#}
-{#          <div class="card-text text-center"><hr><label><b>Только техника</b></label><hr> </div>#}
-{#          {% endif %}#}
-
           {% if a.apps_tech %}
           <hr style="border-width: medium; border-color: green">
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
@@ -155,8 +149,28 @@
             </div>
         {% endfor %}
 {#    </div>#}
+
+
     </div>
 
+    {% if not status_day %}
+    <div class="card position-relative start-50 translate-middle-x shadow-lg" style="width: 18rem;">
+        <div class="card-header">
+            <p class="card-text text-center">{{ WEEKDAY }}, {{ DAY }}<br>отмечен как выходной день.</p>
+        </div>
+        <div class="card-body">
+            {% if post == 'admin' %}
+            <p class="card-text text-center">Вы желаете {{ DAY }} отметить как робочий день?</p>
+            {% else %}
+            <p class="card-text text-center">Вы все равно желаете дать заявку на {{ DAY }}?</p>
+            {% endif %}
+        </div>
+        <div class="card-footer d-flex justify-content-evenly">
+            <a href="{% url 'application_list' nw_day %}" class="btn btn-primary" aria-current="page">Нет</a>
+            <a href="{% url 'change_workday' cw_day %}" class="btn btn-success" aria-current="page">Да</a>
+        </div>
+    </div>
+    {% endif %}
 
 
 </div>
