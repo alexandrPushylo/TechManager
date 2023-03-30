@@ -2479,3 +2479,16 @@ def find_view(request, day):
 
     return render(request, 'find.html', out)
 
+
+def change_workday(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+
+    current_day = convert_str_to_date(day)
+    try:
+        work_day = WorkDayTabel.objects.get(date=current_day)
+        work_day.status = True
+        work_day.save()
+    except WorkDayTabel.DoesNotExist:
+        print('this day DoesNotExist')
+    return HttpResponseRedirect(f'/applications/{day}')

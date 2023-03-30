@@ -71,6 +71,7 @@ from manager.views import test_bot
 from manager.views import notice_submitt
 
 from manager.views import find_view
+from manager.views import change_workday
 
 
 urlpatterns = [
@@ -110,6 +111,7 @@ urlpatterns = [
     path('logout', logout_view, name="logout"),
 
     path('find/<str:day>', find_view, name='find'),
+    path('change_workday/<str:day>', change_workday, name='change_workday'),
 
     path('today_app/<str:day>', show_today_applications, name="show_today_applications"),
     path('today_app/<str:day>/<str:filter_foreman>/<str:filter_csite>', show_today_applications, name="show_today_applications"),
