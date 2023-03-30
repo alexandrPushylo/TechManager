@@ -1104,7 +1104,7 @@ def show_applications_view(request, day, id_user=None):
                 Q(status=STATUS_APP_send)
               ))
 
-        out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day)
+        out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
         if _Application_today.filter(status=STATUS_APP_submitted).exists():
