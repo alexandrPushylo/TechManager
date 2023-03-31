@@ -1,33 +1,36 @@
 const count_vehicles = $('.tech_driver_list').length;
 
-for (let i=1;i<=count_vehicles;i++){
-    const io_technic = '#io_technic_'+i;
-    const io_driver = '#io_driver_'+i;
+for (let i=1;i<=count_vehicles;i++){    //OK
+    const io_id_tech_driver = '#io_id_tech_driver_'+i;
+    const io_tech_name_id = '#io_tech_name_id_'+i;
 
+    let v1 = $(io_id_tech_driver).val()
+    let v2 = $(io_tech_name_id).val()
+
+    $('#select_add_technic_'+i+' option[value='+v2+']').prop('selected', true);
+    $('.select_add_driver_'+i+'.select_td_'+v2).prop('hidden', false);
+    $('.select_add_driver_'+i+'.select_td_'+v2+' option[value='+v1+']').prop('selected', true);
 
     $('#select_add_technic_'+i).change(function () {
-    $('#select_add_driver_'+i+' > option').prop('hidden',true);
-    const th_value = this.value
-    let short_name = th_value.replace(' ','').replace('.','');
-    $('#select_add_driver_'+i+' > option[short_name="'+short_name+'"]').prop('hidden',false);
-    $('#select_add_driver_'+i+' > option:first').prop('selected',true);
+    $('.select_add_driver_'+i).prop('hidden',true);
 
-    if ($('#select_add_driver_'+i+" option[hidden!='hidden']").length < 2){
-        $('#select_add_driver_'+i+" option[hidden!='hidden']:last").prop('selected', true);
-        }
-        else {
-            // $('#select_add_driver_'+i+" option[hidden!='hidden']:first").prop('selected', true);
+    let tech_name_id = this.value;
+    $('.select_add_driver_'+i+'.select_td_'+tech_name_id).prop('hidden', false);
+
+    if ($('.select_add_driver_'+i+'.select_td_'+tech_name_id+" option[hidden!='hidden']").length === 2){
+        $('.select_add_driver_'+i+'.select_td_'+tech_name_id+" option[hidden!='hidden']:last").prop('selected', true);
         }
     })
-};
-$('#add_vehicle_btn').click(function () {
-    const checked_tech = $("#input_tech_add > option:checked").text();
-    const inp_tech_cls = $("#input_tech_add").val()
-    const checked_driver = $("."+inp_tech_cls+" > option:checked").val();
-    let id_tech_driver = $("."+inp_tech_cls+" > option:checked").attr('id_dt');
+}
 
-    if(checked_tech==='---'){return false;}
-    if(id_tech_driver===''){id_tech_driver='';}
+$('#add_vehicle_btn').click(function () {
+    const tech_NAME = $("#input_tech_add > option:checked").text();
+    const tech_ID = $("#input_tech_add > option:checked").val();
+
+    let driver_ID = $(".select_td_add_"+tech_ID+" > option:checked").val();
+    const driver_NAME = $(".select_td_add_"+tech_ID+" > option:checked").text();
+
+    if(tech_NAME==='---'){return false;}
 
     const descr_app = $('#description_app_add').val();
     const element_ul = $('.ul_tech_list');
@@ -36,15 +39,19 @@ $('#add_vehicle_btn').click(function () {
     const textaria = $('<textarea class="form-control app_description mt-1" name="description_app_list" rows="1">'+descr_app+'</textarea>');
     const div_droup_text_aria = $('<div className="input-group mt-1">');
     const el_btn = $('<button role="button" class="btn btn-danger col-auto btn_del_io"><i class="fa-solid fa-trash"></i></button>');
-    const io_dr = $(' <input name="io_driver" type="text" id="io_driver_'+current_id+'" readonly class="form-control" value="'+checked_driver+'">');
-    const io_tech = $('<input name="io_technic" type="text" id="io_technic_'+current_id+'" readonly class="form-control" value="'+checked_tech+'">');
-    const io_id_td = $('<input name="io_id_tech_driver" type="hidden" value="'+id_tech_driver+'">');
+
+    const io_dr = $(' <input type="text" id="io_driver_'+current_id+'" readonly class="form-control" value="'+driver_NAME+'">');
+    const io_tech = $('<input type="text" id="io_technic_'+current_id+'" readonly class="form-control" value="'+tech_NAME+'">');
+
+    const io_id_td = $('<input name="io_id_tech_driver" type="hidden" value="'+driver_ID+'">');
+    const io_id_tech = $('<input name="io_id_tech_name" type="hidden" value="'+tech_ID+'">');
+
     const div_gr = $('<div class="input-group  tech_driver_list" id="'+current_id+'">');
     const container = $('<div class=" mt-4" id="'+current_id+'">');
 
     div_droup_text_aria.append(textaria)
-    div_gr.append(io_id_td,io_tech, io_dr,el_btn);
-    container.append(div_gr,div_droup_text_aria);
+    div_gr.append(io_id_tech, io_id_td, io_tech, io_dr,el_btn);
+    container.append(div_gr, div_droup_text_aria);
     element_ul.append(container);
 
     $('.btn_del_io').click(function (e) {
@@ -63,39 +70,40 @@ $('#add_vehicle_btn').click(function () {
     return false;
 });
 
-$("#input_tech_add").change(function (){
+$("#input_tech_add").change(function (){    //OK
     $('.driver_add').prop('hidden',true);
-    let v = this.value;
-    $('.driver_add.'+v).prop('hidden',false);
+    let tech_name_id = this.value;
+    $('.select_td_add_'+tech_name_id).prop('hidden',false);
 
-    if ($('.driver_add.'+v+" option[hidden!='hidden']").length < 3){
-        $('.driver_add.'+v+" option[hidden!='hidden']:last").prop('selected', true);
-        }
-        else {
-            // $('.driver_add.'+v+" option[hidden!='hidden']:first").prop('selected', true);
+    if ($('.select_td_add_'+tech_name_id+" option[hidden!='hidden']").length < 3){
+        $('.select_td_add_'+tech_name_id+" option[hidden!='hidden']:last").prop('selected', true);
         }
     return false
 });
 
-$('.btn_check_new_tech').click(function () {
+$('.btn_check_new_tech').click(function () {    //OK
     const parentEl = this.parentElement.previousElementSibling.id;
 
     const curr_io_id_tech_driver = $('#io_id_tech_driver_'+parentEl);
+    const io_tech_name_id = $('#io_tech_name_id_'+parentEl);
+
     const curr_io_tech = $('#io_technic_'+parentEl);
     const curr_io_driver = $('#io_driver_'+parentEl);
-    const select_add_technic_id = this.parentElement.firstElementChild.id;
-    const select_add_driver_id = this.previousElementSibling.id;
 
-    let curr_id_val = $('#'+select_add_driver_id+' option:checked').attr('id_dt');
-    const curr_select_tech_val = $('#'+select_add_technic_id).val();
-    const curr_select_driver_val = $('#'+select_add_driver_id).val();
+    const tech_name_NAME = $('#select_add_technic_'+parentEl+' option:checked').text();
+    const tech_name_ID = $('#select_add_technic_'+parentEl+' option:checked').val();
 
-    if(curr_id_val===''){curr_id_val='';}
+    const driver_NAME = $('.select_td_'+tech_name_ID+'.select_add_driver_'+parentEl+' option:checked').text();
+    const driver_ID = $('.select_td_'+tech_name_ID+'.select_add_driver_'+parentEl+' option:checked').val();
 
-    if (curr_select_tech_val === ''){return false}
-    curr_io_id_tech_driver.val(curr_id_val);
-    curr_io_tech.val(curr_select_tech_val);
-    curr_io_driver.val(curr_select_driver_val);
+    if (tech_name_ID != ''){
+        curr_io_id_tech_driver.val(driver_ID);
+        io_tech_name_id.val(tech_name_ID);
+
+        curr_io_tech.val(tech_name_NAME);
+        curr_io_driver.val(driver_NAME);
+        }
+
     const parEl = this.parentElement.id;
     $('#'+parEl).prop('hidden',true);
     return false;
@@ -122,9 +130,3 @@ $('.btn_del_io').click(function (e) {
 $('.app_description').each(function () {
     this.style.height = ""+(this.scrollHeight)+"px";
 });
-
-// $('.app_description').on('input', function(){
-// 	// this.style.height = '1px';
-// 	this.style.height = (this.scrollHeight + 6) + 'px';
-// });
-
