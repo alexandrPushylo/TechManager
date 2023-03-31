@@ -2012,6 +2012,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
+    out['referer'] = request.headers.get('Referer')
 
     return out
 
