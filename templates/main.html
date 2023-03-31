@@ -8,10 +8,10 @@
 {% block indicator %}
     {% if cw_day >= lw_day %}
 {% if post == 'admin' %}
-    {% if conflicts_vehicles_list %}<a href="{% url 'conflict_resolution' cw_day %}" class="btn btn-sm btn-danger ">Недостаток техники</a>
-     {% elif not conflicts_vehicles_list and submitted_app_list %}<a href="{% url 'approv_all_applications' cw_day %}" class="btn btn-sm btn-success ">Одобрить все заявки</a>
-     {% elif not conflicts_vehicles_list and send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-warning ">Отправить все заявки</a>
-     {% elif var_sent_app.flag and not conflicts_vehicles_list and not send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-outline-secondary ">Повторно отправить заявки</a>
+    {% if conflicts_vehicles_list_id %}<a href="{% url 'conflict_resolution' cw_day %}" class="btn btn-sm btn-danger ">Недостаток техники</a>
+     {% elif not conflicts_vehicles_list_id and submitted_app_list %}<a href="{% url 'approv_all_applications' cw_day %}" class="btn btn-sm btn-success ">Одобрить все заявки</a>
+     {% elif not conflicts_vehicles_list_id and send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-warning ">Отправить все заявки</a>
+     {% elif var_sent_app.flag and not conflicts_vehicles_list_id and not send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-outline-secondary ">Повторно отправить заявки</a>
     {% else %}{% endif %}
 {% elif post == 'foreman' or 'master' or 'employee_supply' %}
     {% if saved_app_list %}
@@ -47,7 +47,9 @@
 
 
 
+
     <div id="container" class="container-fluid mt-5 ms-5 app_container" style="width: inherit">
+
 {#        <div class="container">#}
         {% for a in today_applications_list %}
             <div id="per_{{ a.app_today.id }}" class="item">
@@ -110,7 +112,9 @@
                     </div>
 
                   {% if v.description %}
+
                 <textarea class="form-control app_description shadow-sm "  readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
+
                 {%endif%}
                   <hr class="m-0 mt-1" style="border-width: medium; border-color: rgba(0,0,0,0)">
               {% endfor %}
@@ -213,7 +217,7 @@
             <select id="select_from_drv" class="form-control">
             <option selected></option>
                 {% for app in app_technic_today %}
-                    <option value="{{ app.technic_driver_id}}">{{ app.technic_driver__driver__driver__last_name }} ({{ app.technic_driver__technic__name__name }})</option>
+                    <option {% if app.technic_driver__technic__name__name in conflicts_technic_name %}style="color: red;" {% endif %} value="{{ app.technic_driver_id}}">{{ app.technic_driver__driver__driver__last_name }} ({{ app.technic_driver__technic__name__name }})</option>
                 {% endfor %}
             </select>
           на:
@@ -222,7 +226,7 @@
             <select id="select_to_drv" class="form-control">
             <option selected></option>
                 {% for td in technic_driver_table_TT %}
-                    <option value="{{ td.id }}">{{ td.driver.driver }} ({{ td.technic.name }})</option>
+                    <option {% if td.technic.name.name in conflicts_technic_name %}style="color: red;" {% endif %} value="{{ td.id }}">{{ td.driver.driver }} ({{ td.technic.name }})</option>
                 {% endfor %}
             </select>
           </div>

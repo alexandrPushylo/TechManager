@@ -30,7 +30,7 @@ from manager.utilities import variable as VAR
 from manager.utilities import text_templates as TEXT_TEMPLATES
 # -----------------
 from manager.utilities import get_day_in_days
-from manager.utilities import get_difference
+# from manager.utilities import get_difference
 from manager.utilities import get_week
 from manager.utilities import timedelta
 from manager.utilities import choice as rand_choice
@@ -1106,7 +1106,7 @@ def show_applications_view(request, day, id_user=None):
                 Q(status=STATUS_APP_send)
               ))
 
-        out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day)
+        out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
 
         if _Application_today.filter(status=STATUS_APP_submitted).exists():
@@ -1414,11 +1414,10 @@ def create_new_application(request, id_application):
         return HttpResponseRedirect('/')
 
     out = {}
-    current_user = request.user
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
 
-    check_table(str(current_date))
+    check_table(current_date)
     get_prepare_data(out, request, current_day=current_date)
 
     var_submit_mat_app = get_var(VAR['LIMIT_for_submission'])
@@ -1429,153 +1428,129 @@ def create_new_application(request, id_application):
     else:
         out['check_time'] = NOW_IN_TIME()
 
-    out["current_user"] = current_user
     out["construction_site"] = current_application.construction_site
     out['applications_today_desc'] = current_application.description
-    out["date_of_target"] = str(current_application.date)
-    conflicts_vehicles_list = get_conflicts_vehicles_list(current_application.date, 1)
+    out["date_of_target"] = current_application.date
+
+    conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, 1, get_id_name=True)
     out['conflicts_vehicles_list'] = conflicts_vehicles_list
-    out['work_TD_list'] = get_work_TD_list(current_application.date, 0)
+    out['work_TD_list'] = get_work_TD_list(current_date, 0)
 
-    tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True)
-    tech_name_list = TechnicName.objects.all().order_by('name')
+    Tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True, driver__status=True)
+    Tech_name_list = TechnicName.objects.all().order_by('name')
 
-    work_tech_name_list = TechnicDriver.objects.filter(
-        date=current_date,
-        driver__isnull=False,
-        status=True).values_list('technic__name__name', flat=True).distinct()
-
+    work_tech_name_list = Tech_driver_list.values_list('id', flat=True).distinct()
     out['work_tech_name_list'] = work_tech_name_list
 
-    _tech_drv = []
-    for _tech_name in tech_name_list:
-        t_d = tech_driver_list.filter(
-            technic__name=_tech_name,
-            driver__isnull=False,
-            status=True,
-            driver__status=True).values_list('id', 'driver__driver__last_name').order_by('driver__driver__last_name')
-        _n = _tech_name.name.replace(' ', '').replace('.', '')
+    current_application_technic = ApplicationTechnic.objects.filter(app_for_day=current_application)
+    out["list_of_vehicles"] = current_application_technic.order_by('technic_driver__technic__name')
 
-        if (_n, _tech_name.name, t_d) not in _tech_drv:
-            _tech_drv.append((_n, _tech_name.name, t_d))
+    technic_name_id_list = Tech_driver_list.values_list('technic__name_id', flat=True).distinct()
+    technic_names = Tech_name_list.filter(id__in=technic_name_id_list)
+    out['technic_names'] = technic_names
 
-    out['D'] = _tech_drv
+    work_tech_drv_list = Tech_driver_list.values_list('technic__name_id', 'id', 'driver__driver__last_name')
+    out['work_tech_drv_list'] = work_tech_drv_list.order_by('driver__driver__last_name')
 
-    _tech_drv2 = []
-    for _t_d in tech_driver_list.filter(
-            driver__isnull=False).values_list(
-            'id', 'technic__name__name',
-            'driver__driver__last_name').order_by('driver__driver__last_name'):
-        _srt_name = _t_d[1].replace(' ', '').replace('.', '')
-        _des = (_t_d[0], _srt_name, _t_d[1], _t_d[2])
+    out['tech_driver_list'] = []
+    for tn in technic_names:
+        _td = Tech_driver_list.filter(technic__name=tn).values('id', 'driver__driver__last_name')
+        out['tech_driver_list'].append((tn, _td))
 
-        if _des not in _tech_drv2:
-            _tech_drv2.append(_des)
-
-    out['D2'] = _tech_drv2
-
-    list_of_vehicles = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    out["list_of_vehicles"] = list_of_vehicles.order_by('technic_driver__technic__name')
-
-    try:
-        _materials = ApplicationMeterial.objects.get(app_for_day=current_application).description
-        out['material_list_raw'] = _materials
-    except ApplicationMeterial.DoesNotExist:
-        pass
+    _materials = ApplicationMeterial.objects.filter(app_for_day=current_application)
+    if _materials.exists():
+        out['material_list_raw'] = _materials.values_list('description', flat=True).first()
 
     if request.method == "POST":
-        app_today_desc = request.POST.get('app_today_desc')
-        id_app_tech = request.POST.getlist('io_id_app_tech')
-        id_tech_drv_list = request.POST.getlist('io_id_tech_driver')
-        vehicle_list = request.POST.getlist('io_technic')
-        driver_list = request.POST.getlist('io_driver')
-        description_app_list = request.POST.getlist('description_app_list')
-        materials = request.POST.get('desc_meterials')
+        IOL_id_application_technic = request.POST.getlist('io_id_app_tech')
+        IOL_id_technic_name = request.POST.getlist('io_id_tech_name')
+        IOL_id_technic_driver = request.POST.getlist('io_id_tech_driver')
 
-        if app_today_desc:
-            app_today_desc = str(app_today_desc).strip()
+        IO_desc_application_today = request.POST.get('app_today_desc')
+        IO_desc_application_technic = request.POST.getlist('description_app_list')
+        IO_desc_application_materiial = request.POST.get('desc_meterials')
 
+        if IO_desc_application_today:
+            IO_desc_application_today = str(IO_desc_application_today).strip()
 
+        if IO_desc_application_materiial:
+            IO_desc_application_materiial = str(IO_desc_application_materiial).strip()
 
-        # ------------delete--------------TODO:list
+        # ------------delete------------------------------------------------
+        current_application_technic.exclude(id__in=IOL_id_application_technic).delete()
+        # ------------------------------------------------------------------
 
-        for i in get_difference(set([i[0] for i in list_of_vehicles.filter().values_list('id')]), set(int(i) for i in id_app_tech)):
-            _app = ApplicationTechnic.objects.get(app_for_day=current_application, id=i)
-            # try:
-            #     _a_tmp = ApplicationTechnic.objects.get(id=_app.var_ID_orig)
-            #     _a_tmp.var_check = False
-            #     _a_tmp.save()
-            # except:
-            #     pass
+        work_TD_list_F_saved = get_work_TD_list(current_date, 0, True)
 
-            _app.delete()
-
-        ## --------------------------------
-
-        work_TD_list_F_saved = get_work_TD_list(current_application.date, 0, True)
-        for n, _id in enumerate(id_tech_drv_list):
-            if _id == '' and driver_list[n] == '':
-                _td = tech_driver_list.filter(
-                    technic__name__name=vehicle_list[n],
-                    driver__isnull=False).values_list('id', 'driver__driver__last_name')
-
-                if _td.exclude(id__in=work_TD_list_F_saved).count() == 0:   # if not free td
-                    _td_ch = rand_choice(_td)
-                    id_tech_drv_list[n] = _td_ch[0]
-                    driver_list[n] = _td_ch[1]
+        # --------- --choosing a free driver ---------------------------------------------------------
+        for n, _id_td in enumerate(IOL_id_technic_driver):
+            if _id_td == '':
+                if work_TD_list_F_saved:
+                    free_driver_of_tech_id = Tech_driver_list.exclude(id__in=work_TD_list_F_saved).filter(
+                        technic__name=IOL_id_technic_name[n]).values_list('id', flat=True)
                 else:
-                    _tmp = rand_choice(_td.exclude(id__in=work_TD_list_F_saved))
-                    id_tech_drv_list[n] = _tmp[0]
-                    driver_list[n] = _tmp[1]
-                    work_TD_list_F_saved.append(id_tech_drv_list[n])
+                    free_driver_of_tech_id = Tech_driver_list.filter(
+                        technic__name=IOL_id_technic_name[n]).values_list('id', flat=True)
 
-        _len__id_app_list = len(id_app_tech)
+                if free_driver_of_tech_id.exists():
+                    _choice = rand_choice(free_driver_of_tech_id)
+                    IOL_id_technic_driver[n] = str(_choice)
+                    work_TD_list_F_saved.append(_choice)
+                else:
+                    _tmp_td_list = Tech_driver_list.filter(
+                        technic__name=IOL_id_technic_name[n]).values_list('id', flat=True)
 
-        for i, _id in enumerate(id_app_tech):
-            l_of_v = ApplicationTechnic.objects.get(id=int(_id))
-            v_d_app = TechnicDriver.objects.get(id=id_tech_drv_list[i])
-            l_of_v.technic_driver = v_d_app
-
-            if description_app_list[i] in l_of_v.description:
-                l_of_v.description = description_app_list[i]
+                    _choice = rand_choice(_tmp_td_list)
+                    IOL_id_technic_driver[n] = str(_choice)
             else:
-                l_of_v.description = description_app_list[i]
-                l_of_v.var_check = False
+                work_TD_list_F_saved.append(_id_td)
+        # ---------------------------------------------------------------------------------------------
 
-            l_of_v.save()
+        # --------saving modified applications-------------------------------------------------------
+        for i, _id_app_tech in enumerate(IOL_id_application_technic):
+            _app_technic = ApplicationTechnic.objects.get(id=_id_app_tech)
+            _app_technic.technic_driver = TechnicDriver.objects.get(id=IOL_id_technic_driver[i])
 
-        if len(id_app_tech) < len(vehicle_list):
-            n = len(vehicle_list) - _len__id_app_list
-            for i in range(0, n):
-                try:
-                    tech_drv = TechnicDriver.objects.get(
-                        driver__driver__last_name=driver_list[_len__id_app_list + i],
-                        technic__name__name=vehicle_list[_len__id_app_list + i],
-                        date=current_date, status=True)
-                    description = description_app_list[_len__id_app_list + i]
-                    ApplicationTechnic.objects.create(
-                        app_for_day=current_application,
-                        technic_driver=tech_drv,
-                        description=description).save()
-                except Exception as e:
-                    send_debug_messages(
-                        f'{e}\n{driver_list[_len__id_app_list + i], vehicle_list[_len__id_app_list + i]}')
+            if IO_desc_application_technic[i] in _app_technic.description:
+                _app_technic.description = IO_desc_application_technic[i]
+            else:
+                _app_technic.description = IO_desc_application_technic[i]
+                _app_technic.var_check = False
+            _app_technic.save()
+        # --------------------------------------------------------------------------------------------
 
+        # --------saving new applications-------------------------------------------------------
+        if len(IOL_id_application_technic) < len(IOL_id_technic_driver):
+            count_app_technic = len(IOL_id_application_technic)
+            count_technic_driver = len(IOL_id_technic_driver)
+            for i in range(count_app_technic, count_technic_driver):
+                tech_drv = Tech_driver_list.get(id=IOL_id_technic_driver[i])
+
+                ApplicationTechnic.objects.create(
+                    app_for_day=current_application,
+                    technic_driver=tech_drv,
+                    description=IO_desc_application_technic[i]
+                ).save()
+        # --------------------------------------------------------------------------------------
+
+        # -----materials app -------------------------------------------------------------------------
         _material, _ = ApplicationMeterial.objects.get_or_create(app_for_day=current_application)
-        if materials:
-            if materials != _material.description:
-                _material.description = materials
+        if IO_desc_application_materiial:
+            if IO_desc_application_materiial != _material.description:
+                _material.description = IO_desc_application_materiial
                 _material.status_checked = False
                 _material.save()
         else:
             _material.delete()
+        # --------------------------------------------------------------------------------------------
 
-        current_application.description = app_today_desc
+        current_application.description = IO_desc_application_today
         current_application.save()
 
+        # ---- set status app --------------------------------------------------------------------------
         if not ApplicationTechnic.objects.filter(app_for_day=current_application).exists() and \
                 not ApplicationMeterial.objects.filter(app_for_day=current_application).exists() \
-                and not app_today_desc:
+                and not IO_desc_application_today:
             _status = STATUS_APP_absent
         elif is_admin(request.user):
             _status = STATUS_APP_submitted
@@ -1584,12 +1559,12 @@ def create_new_application(request, id_application):
 
         current_application.status = _status
         current_application.save()
+        # --------------------------------------------------------------------------------------------
 
         if is_employee_supply(request.user):
             return HttpResponseRedirect(f'/supply_app/{current_date}')
 
         return HttpResponseRedirect(f'/applications/{current_date}')
-
     return render(request, "create_application.html", out)
 
 
@@ -1842,7 +1817,7 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
     return out
 
 
-def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_id=False, includeSave = False):
+def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_id=False, get_id_name=False, includeSave = False):
     """
         c_in - количество тех. которое может быть заказано, прежде чем попасть в список
         all - сравнение с всей в том числе нероботающей техникой
@@ -1894,6 +1869,12 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
         for _app in app_list_today:
             if _app.technic_driver.technic.name.name in l:
                 l_id.append(_app.id)
+        return l_id
+    elif get_id_name:
+        l_id = []
+        for _app in app_list_today:
+            if _app.technic_driver.technic.name.name in l:
+                l_id.append(_app.technic_driver.technic.name.id)
         return l_id
 
     return l
@@ -2014,6 +1995,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
     out['referer'] = request.headers.get('Referer')
+    out['weekend_flag'] = TODAY.weekday() < get_current_day('next_day').weekday() and current_day.weekday() == 0
 
     return out
 
