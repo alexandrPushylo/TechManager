@@ -77,8 +77,9 @@
 
 <div class="input-group d-flex justify-content-center align-items-center">
   <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
-
+    {% if cw_day >= lw_day %}
   <input form="technic_driver_form" class="btn btn-success  col-auto " type="submit" value="Сохранить">
+   {% endif %}
 </div>
 {% endblock %}
 <script type="text/javascript">

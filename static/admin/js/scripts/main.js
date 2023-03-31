@@ -7,10 +7,10 @@ cw_date.change(function () {
     location.href = '/applications/'+this.value;
 })
 
-$('.div_td').click(function () {
-    location.href = '/append_in_spec_tech/'+this.id;
-
-})
+// $('.div_td').click(function () {
+//     location.href = '/append_in_spec_tech/'+this.id;
+//
+// })
 
 const csrf = $('input[name="csrfmiddlewaretoken"]').val();
 const pathname = window.location.pathname;
