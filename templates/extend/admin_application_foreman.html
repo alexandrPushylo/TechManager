@@ -6,9 +6,9 @@
         <div class="btn-group position-relative start-50 translate-middle-x mt-4">
             {% if cw_day == nw_day %}
                 <a href="{% url 'application_list' current_user.id lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
+                <input class="form-control io_current_day border-success border border-3 p-0" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
             {% else %}
-                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
+                <input class="form-control io_current_day border-success border border-3 p-0" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
                 <a href="{% url 'application_list' current_user.id nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
