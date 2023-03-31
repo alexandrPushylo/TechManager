@@ -47,11 +47,11 @@
 
 
 
-    <div id="container" class="container-fluid mt-5 app_container" style="margin-left: 70px">
+    <div id="container" class="container-fluid mt-5 ms-5 app_container" style="width: inherit">
 {#        <div class="container">#}
         {% for a in today_applications_list %}
             <div id="per_{{ a.app_today.id }}" class="item">
-        <div id="{{ a.app_today.id }}" class="m-3">
+        <div id="{{ a.app_today.id }}" class="me-3 mb-4">
 
         <div class="card shadow-lg
             {% if  a.app_today.status.status  == 'Сохранена' %}
@@ -61,7 +61,7 @@
             {% elif a.app_today.status.status == 'Подана' %}
                 border border-3 border-primary
             {% endif %}
-    "style="width: 18rem;  background-color: rgba(248,248,247,0.75); ">
+    "style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
 
           <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2
                 {% if  a.app_today.status.status  == 'Сохранена' %}
@@ -76,29 +76,29 @@
                 fw-bold text-lowercase ps-2 pe-2">Заявка {{ a.app_today.status.status }}</label>
 
 
-          <div class="card-body mt-1" >
+          <div class="card-body w-100 p-0 pt-3" >
             <h6 class="card-title  fw-bold text-center " style="color:{{ style_font_color.value }};">{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.last_name %}({{ a.app_today.construction_site.foreman.last_name }}){% endif %}</h6>
             <h6 class="card-title text-center" >{{a.app_today.date}}</h6>
           {% if a.app_today.description %}
-              <hr>
-              <label class="small">Примечание к объекту</label>
-          <textarea readonly class="form-control small fw-bold app_description">{{ a.app_today.description }}</textarea>
+              <hr class="m-0">
+              <label class="small position-relative start-50 translate-middle-x fw-bold text-center">Примечание к объекту</label>
+          <textarea readonly class="form-control app_description ms-0">{{ a.app_today.description }}</textarea>
           {% endif %}
 
 
           {% if a.apps_tech %}
-          <hr style="border-width: medium; border-color: green">
-              <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
+          <hr class="mt-1 mb-0" style="border-width: medium; border-color: #0fb70f">
+              <h6 class="card-text mt-1 ms-2"><label><b>Список техники:</b></label> </h6>
               {% for v in a.apps_tech %}
-                  <div class="row " {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>
-                <div class="card-text fs-6 col-auto
+                  <div class="row mt-1 ms-2" {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>
+                <div class="card-text fs-6 col-auto mt-0
                         {% if v.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
                         {% if not v.technic_driver.status %}
                         text-decoration-line-through
                         {% endif %}
                             ">{{ v.technic_driver.technic.name }}</div>
-                <div id="{{ v.technic_driver.driver.driver.id }}" class="card-text fs-6 col-auto driver_name_link
+                <div id="{{ v.technic_driver.driver.driver.id }}" class="card-text fs-6 col-auto driver_name_link mt-0
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
                             {% if not  v.technic_driver.driver.status %}
@@ -110,19 +110,19 @@
                     </div>
 
                   {% if v.description %}
-                <textarea class="form-control app_description" readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
+                <textarea class="form-control app_description shadow-sm "  readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
                 {%endif%}
-                  <hr>
+                  <hr class="m-0 mt-1" style="border-width: medium; border-color: rgba(0,0,0,0)">
               {% endfor %}
           {% endif %}
 
           {% if a.app_mater  %}
-              <div class="card-text"><label><b>Список материалов:</b></label> </div>
+              <div class="card-text ms-2 mt-0"><label><b>Список материалов:</b></label> </div>
               <textarea class="form-control app_description" readonly>{{ a.app_mater }}</textarea>
-              <hr>
-          {% endif %}
 
-            <div class="btn-group">
+          {% endif %}
+            <hr class="m-0 mt-1">
+            <div class="btn-group d-flex justify-content-center m-0 mt-2">
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 {% if tense %}
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
@@ -135,14 +135,14 @@
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>
                 {% endif %}
                 {% endif %}
-                <div class="dropdown">
-                    <a class="btn m-1 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">...</a>
-                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                        <li><a class="dropdown-item" href="{% url 'copy_app' a.app_today.id %}">Копировать на следующий день</a></li>
+{#                <div class="dropdown">#}
+{#                    <a class="btn m-1 dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">...</a>#}
+{#                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">#}
+{#                        <li><a class="dropdown-item" href="{% url 'copy_app' a.app_today.id %}">Копировать на следующий день</a></li>#}
 {#                        <li><a class="dropdown-item" href="#">Другое действие</a></li>#}
 {#                        <li><a class="dropdown-item" href="#">Что-то еще здесь</a></li>#}
-                      </ul>
-                </div>
+{#                      </ul>#}
+{#                </div>#}
             </div>
 
 
