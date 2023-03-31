@@ -1799,7 +1799,8 @@ def get_priority_list(current_day):
     """
     return ApplicationTechnic_id
     """
-    _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+    _Application_technic = ApplicationTechnic.objects.filter(
+        app_for_day__date=current_day).exclude(app_for_day__status=STATUS_APP_saved)
     l = []
     app_tech = _Application_technic.values_list(
         'priority',
