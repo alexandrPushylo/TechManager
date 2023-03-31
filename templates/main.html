@@ -123,7 +123,7 @@
           {% endif %}
             <hr class="m-0 mt-1">
             <div class="btn-group d-flex justify-content-center m-0 mt-2">
-                <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
+                <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-info  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 {% if tense %}
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
                 <a href="{% url 'clear_application' a.app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
@@ -317,8 +317,8 @@
           Техника
       </button>
       <ul class="dropdown-menu" >
-           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item" aria-current="page">Всё</a>
-           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item" aria-current="page">Материалы</a>
+           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item fs-5" aria-current="page">Всё</a>
+           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item fs-5" aria-current="page">Материалы</a>
       </ul>
 
         {% elif var_filter_apps.value == 'materials' %}
@@ -326,8 +326,8 @@
           Материалы
       </button>
       <ul class="dropdown-menu">
-           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item" aria-current="page">Техника</a>
-           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item" aria-current="page">Всё</a>
+           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item fs-5" aria-current="page">Техника</a>
+           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item fs-5" aria-current="page">Всё</a>
       </ul>
 
         {% else %}
@@ -335,8 +335,8 @@
           Всё
       </button>
       <ul class="dropdown-menu">
-           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item" aria-current="page">Техника</a>
-           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item" aria-current="page">Материалы</a>
+           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item fs-5" aria-current="page">Техника</a>
+           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item fs-5" aria-current="page">Материалы</a>
       </ul>
 
         {% endif %}
