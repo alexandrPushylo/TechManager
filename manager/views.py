@@ -285,13 +285,15 @@ def supply_app_view(request, day):
     current_day = convert_str_to_date(day)
     current_user = request.user
     get_prepare_data(out, request, current_day)
+    status_day = check_table(current_day)
+    out['status_day'] = status_day
 
-    app_for_day = ApplicationToday.objects.get(
+    app_for_day = ApplicationToday.objects.filter(
         construction_site__foreman=None,
         date=current_day,
         construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
 
-    out['app_today'] = app_for_day
+    out['apps_today'] = app_for_day
 
     # if request.POST.get('panel'):
     #     _flag = request.POST.get('panel')
@@ -300,7 +302,7 @@ def supply_app_view(request, day):
 
     out['var_supply_panel'] = get_var(VAR['panel_for_supply'], user=request.user)
 
-    apps_tech = ApplicationTechnic.objects.filter(app_for_day=app_for_day)
+    apps_tech = ApplicationTechnic.objects.filter(app_for_day__in=app_for_day)
     out['apps_tech'] = apps_tech.order_by('technic_driver__technic__name__name')
 
     # -------------------------------------------
@@ -312,7 +314,7 @@ def supply_app_view(request, day):
         Q(date=current_day),
         Q(status=STATUS_APP_approved) |
         Q(status=STATUS_APP_submitted)
-    ).exclude(id=app_for_day.id)
+    ).exclude(construction_site__foreman=None, construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
 
     tech_drv = TechnicDriver.objects.filter(
         date=current_day,
@@ -1060,8 +1062,8 @@ def show_applications_view(request, day, id_user=None):
         current_user = request.user
 
     get_prepare_data(out, request, current_day)
-    check_table(current_day)
-
+    status_day = check_table(current_day)
+    out['status_day'] = status_day
     # ---------------------------------------
     _Application_today = ApplicationToday.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
@@ -1772,7 +1774,8 @@ def get_priority_list(current_day):
     """
     return ApplicationTechnic_id
     """
-    _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
+    _Application_technic = ApplicationTechnic.objects.filter(
+        app_for_day__date=current_day).exclude(app_for_day__status=STATUS_APP_saved)
     l = []
     app_tech = _Application_technic.values_list(
         'priority',
@@ -1991,6 +1994,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
+    out['referer'] = request.headers.get('Referer')
     out['weekend_flag'] = TODAY.weekday() < get_current_day('next_day').weekday() and current_day.weekday() == 0
 
     return out
@@ -2206,7 +2210,7 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
 
     if id_app_today:
         _App = ApplicationTechnic.objects.filter(app_for_day_id=id_app_today)
@@ -2262,7 +2266,7 @@ def send_status_app_for_foreman(current_day, messages=None, id_app_today=None):
         _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
 
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
@@ -2290,7 +2294,7 @@ def send_message_for_admin(current_day, messages=False, id_app_today=None):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
     if id_app_today:
         _app = ApplicationToday.objects.get(id=id_app_today)
         if send_flag:
@@ -2377,6 +2381,8 @@ def check_table(day):
 
     else:
         print('weekend')
+        return False
+    return True
 
 
 def send_debug_messages(messages='Test'):
@@ -2461,3 +2467,16 @@ def find_view(request, day):
 
     return render(request, 'find.html', out)
 
+
+def change_workday(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+
+    current_day = convert_str_to_date(day)
+    try:
+        work_day = WorkDayTabel.objects.get(date=current_day)
+        work_day.status = True
+        work_day.save()
+    except WorkDayTabel.DoesNotExist:
+        print('this day DoesNotExist')
+    return HttpResponseRedirect(f'/applications/{day}')

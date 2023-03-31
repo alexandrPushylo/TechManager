@@ -8,9 +8,9 @@
         <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
             {% if cw_day == nw_day %}
                 <a href="{% url 'technic_driver' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3" type="date"   value="{{ cw_day }}"/>
+                <input class="form-control io_current_day border-success border border-3 p-0" type="date"   value="{{ cw_day }}"/>
             {% else %}
-                <input class="form-control io_current_day border-success border border-3"  type="date"  value="{{ cw_day }}"/>
+                <input class="form-control io_current_day border-success border border-3 p-0"  type="date"  value="{{ cw_day }}"/>
                 <a href="{% url 'technic_driver' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
@@ -77,8 +77,9 @@
 
 <div class="input-group d-flex justify-content-center align-items-center">
   <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
-
+    {% if cw_day >= lw_day %}
   <input form="technic_driver_form" class="btn btn-success  col-auto " type="submit" value="Сохранить">
+   {% endif %}
 </div>
 {% endblock %}
 <script type="text/javascript">

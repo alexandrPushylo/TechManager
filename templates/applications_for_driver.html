@@ -11,9 +11,9 @@
         <div class="btn-group position-relative start-50 translate-middle-x">
             {% if cw_day == nw_day %}
                 <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
+                <input class="form-control io_current_day border-success border border-3 p-0" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
             {% else %}
-                <input class="form-control io_current_day border-success border border-3" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
+                <input class="form-control io_current_day border-success border border-3 p-0" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
                 <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
             {% endif %}
         </div>
@@ -21,11 +21,11 @@
     </div>
     {% endblock %}
 
-<div class="container-lg  mx-auto  mt-5"  >
-    <div class="container shadow-lg mb-5" style="background-color: rgba(247,247,248,0.71)">
+<div class="container-lg  mx-auto  mt-5 p-0"  >
+    <div class="container shadow-lg mb-5 p-0" style="background-color: rgba(247,247,248,0.71)">
       <div class="card-body">
 
-        <p class="card-text">
+        <p class="card-text ms-4">
             <b class="fs-5">{{ DAY }},</b>
             <br>
             <b class="fs-5">{{ current_user.last_name }} {{ current_user.first_name }}</b>
