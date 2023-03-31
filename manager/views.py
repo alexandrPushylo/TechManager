@@ -1991,6 +1991,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
+    out['weekend_flag'] = TODAY.weekday() < get_current_day('next_day').weekday() and current_day.weekday() == 0
 
     return out
 
