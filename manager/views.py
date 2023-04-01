@@ -1106,8 +1106,8 @@ def show_applications_view(request, day, id_user=None):
                 Q(status=STATUS_APP_send)
               ))
 
-        out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
-        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+        # out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
+        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
 
         if _Application_today.filter(status=STATUS_APP_submitted).exists():
             out['submitted_app_list'] = True
@@ -1364,7 +1364,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     out["today_technic_applications"] = app_list
     if is_admin(request.user):
         out["priority_list"] = get_priority_list(current_day)
-        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
 
     if request.method == 'POST':
@@ -1432,7 +1432,7 @@ def create_new_application(request, id_application):
     out['applications_today_desc'] = current_application.description
     out["date_of_target"] = current_application.date
 
-    conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, 1, get_id_name=True)
+    conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, c_in=1)
     out['conflicts_vehicles_list'] = conflicts_vehicles_list
     out['work_TD_list'] = get_work_TD_list(current_date, 0)
 
