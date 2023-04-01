@@ -1434,7 +1434,7 @@ def create_new_application(request, id_application):
 
     conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, c_in=1)
     out['conflicts_vehicles_list'] = conflicts_vehicles_list
-    out['work_TD_list'] = get_work_TD_list(current_date, 0)
+    out['work_TD_list'] = get_work_TD_list(current_date, 0, F_saved=True)
 
     Tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True, driver__status=True)
     Tech_name_list = TechnicName.objects.all().order_by('name')

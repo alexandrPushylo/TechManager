@@ -49,10 +49,11 @@
                     </select>
 
                     {% for d in tech_driver_list %}
+{#                        <input class="free_td_loop_{{forloop.parentloop.counter}} free_td_{{ d.0.id }}" type="hidden" value="{{ d.2 }}">#}
                     <select class="col-4 select_td_{{ d.0.id }} select_add_driver_{{forloop.parentloop.counter}}" hidden="" >
                         <option selected id_dt=""></option>
                         {% for td in d.1 %}
-                        <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} class="opt_{{ d.0.id }}" value="{{td.id}}">{{td.driver__driver__last_name}} {% if td.id in work_TD_list %} [занят] {% endif %}</option>
+                        <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} class="opt_{{ d.0.id }}" value="{{td.id}}">{{td.driver__driver__last_name}} {% if td.id in work_TD_list %}[занят]{% else %}[свободен]{% endif %}</option>
                         {% endfor %}
                     </select>
                     {% endfor %}
@@ -84,10 +85,11 @@
             </select>
 
         {% for d in tech_driver_list %}
+{#            <input class="free_add_td_{{ d.0.id }}" type="hidden" value="{{ d.2|safe }}">#}
             <select  class="col-auto  driver_add select_td_add_{{ d.0.id }}" hidden="">
                 <option selected></option>
                 {% for td in d.1 %}
-                    <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %} [занят] {% endif %}</option>
+                    <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %} [занят]{% else %}[свободен] {% endif %}</option>
                 {% endfor %}
             </select>
         {% endfor %}
