@@ -1106,8 +1106,8 @@ def show_applications_view(request, day, id_user=None):
                 Q(status=STATUS_APP_send)
               ))
 
-        out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
-        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+        # out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
+        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
 
         if _Application_today.filter(status=STATUS_APP_submitted).exists():
             out['submitted_app_list'] = True
@@ -1364,7 +1364,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     out["today_technic_applications"] = app_list
     if is_admin(request.user):
         out["priority_list"] = get_priority_list(current_day)
-        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+        out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_list'] = get_conflicts_vehicles_list(current_day)
 
     if request.method == 'POST':
@@ -1432,9 +1432,9 @@ def create_new_application(request, id_application):
     out['applications_today_desc'] = current_application.description
     out["date_of_target"] = current_application.date
 
-    conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, 1, get_id_name=True)
+    conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, c_in=1)
     out['conflicts_vehicles_list'] = conflicts_vehicles_list
-    out['work_TD_list'] = get_work_TD_list(current_date, 0)
+    out['work_TD_list'] = get_work_TD_list(current_date, 0, F_saved=True)
 
     Tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True, driver__status=True)
     Tech_name_list = TechnicName.objects.all().order_by('name')
@@ -1449,12 +1449,14 @@ def create_new_application(request, id_application):
     technic_names = Tech_name_list.filter(id__in=technic_name_id_list)
     out['technic_names'] = technic_names
 
-    work_tech_drv_list = Tech_driver_list.values_list('technic__name_id', 'id', 'driver__driver__last_name')
-    out['work_tech_drv_list'] = work_tech_drv_list.order_by('driver__driver__last_name')
+    # work_tech_drv_list = Tech_driver_list.values_list('technic__name_id', 'id', 'driver__driver__last_name')
+    # out['work_tech_drv_list'] = work_tech_drv_list.order_by('driver__driver__last_name')
 
     out['tech_driver_list'] = []
     for tn in technic_names:
         _td = Tech_driver_list.filter(technic__name=tn).values('id', 'driver__driver__last_name')
+        # free_drv = get_free_tech_driver_list(current_date, tn)
+        # out['tech_driver_list'].append((tn, _td, free_drv))
         out['tech_driver_list'].append((tn, _td))
 
     _materials = ApplicationMeterial.objects.filter(app_for_day=current_application)
@@ -1813,28 +1815,44 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
     for _i in set(tech_app_today):
         if tech_app_today.count(_i) > c_in:
             out.append(_i)
+    return out
+
+
+def get_free_tech_driver_list(current_day, technic_name):
+    out = []
+
+    _app_tech = ApplicationTechnic.objects.filter(
+        app_for_day__date=current_day
+    ).values_list('technic_driver_id', flat=True)
+
+    _technic_driver_free = TechnicDriver.objects.filter(
+        date=current_day,
+        status=True,
+        driver__status=True
+    ).exclude(id__in=_app_tech)
+    out = list(_technic_driver_free.filter(technic__name=technic_name).values_list('id', flat=True))
 
     return out
 
 
-def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_id=False, get_id_name=False, includeSave = False):
+def get_conflicts_vehicles_list(current_day, all=False, lack=False, c_in=0):
     """
         c_in - количество тех. которое может быть заказано, прежде чем попасть в список
         all - сравнение с всей в том числе нероботающей техникой
         lack - получить количество недостоющей техники
     """
-    out = {}
-    l = []
+    count_technics = {}
+    out = []
 
     if all:
         for _a in Technic.objects.all():
-            out[_a.name.name] = Technic.objects.filter(name=_a.name).count()
+            count_technics[_a.name.id] = Technic.objects.filter(name=_a.name).count()
     else:
         for f in Technic.objects.all():
-            out[f.name.name] = TechnicDriver.objects.filter(
+            count_technics[f.name.id] = TechnicDriver.objects.filter(
                 status=True,
                 date=current_day,
-                technic__name__name=f.name.name
+                technic__name=f.name
             ).count()
 
     app_list_today = ApplicationTechnic.objects.filter(
@@ -1842,42 +1860,22 @@ def get_conflicts_vehicles_list(current_day, c_in=0, all=False, lack=False, get_
         Q(technic_driver__status=False) |
         Q(var_check=True))
 
-    if includeSave:
-        app_list_submit_approv = app_list_today.filter(
-            Q(app_for_day__status=STATUS_APP_submitted) |
-            Q(app_for_day__status=STATUS_APP_approved) |
-            Q(app_for_day__status=STATUS_APP_saved)
+    app_list_submit_approv = app_list_today.filter(
+        Q(app_for_day__status=STATUS_APP_submitted) |
+        Q(app_for_day__status=STATUS_APP_approved)
         )
-    else:
-        app_list_submit_approv = app_list_today.filter(
-            Q(app_for_day__status=STATUS_APP_submitted) |
-            Q(app_for_day__status=STATUS_APP_approved)
-        )
-    app_list_priority = app_list_submit_approv.filter(priority=1)
-    app_tech = app_list_priority.values_list('technic_driver', 'technic_driver__technic__name__name')
-    work_app_tech_list = [_[1] for _ in app_tech]
-    for i in set(work_app_tech_list):
-        if work_app_tech_list.count(i)+c_in > out[i]:
+
+    list_of_work_tech = list(app_list_submit_approv.filter(priority=1).values_list(
+        'technic_driver__technic__name_id', flat=True))
+
+    for i in set(list_of_work_tech):
+        if list_of_work_tech.count(i)+c_in > count_technics[i]:
             if lack:
-                _c = work_app_tech_list.count(i) - out[i]
-                l.append((i, _c))
+                _c = list_of_work_tech.count(i) - count_technics[i]
+                out.append((i, _c))
             else:
-                l.append(i)
-
-    if get_id:
-        l_id = []
-        for _app in app_list_today:
-            if _app.technic_driver.technic.name.name in l:
-                l_id.append(_app.id)
-        return l_id
-    elif get_id_name:
-        l_id = []
-        for _app in app_list_today:
-            if _app.technic_driver.technic.name.name in l:
-                l_id.append(_app.technic_driver.technic.name.id)
-        return l_id
-
-    return l
+                out.append(i)
+    return out
 
 
 def get_count_app_for_driver(current_day):
@@ -1889,12 +1887,13 @@ def get_count_app_for_driver(current_day):
     _app = [_[0] for _ in ApplicationTechnic.objects.filter(
         Q(app_for_day__date=current_day),
         Q(app_for_day__status=STATUS_APP_approved) |
-        Q(app_for_day__status=STATUS_APP_send)).values_list('technic_driver_id')]
+        Q(app_for_day__status=STATUS_APP_submitted) |
+        Q(app_for_day__status=STATUS_APP_send)
+    ).values_list('technic_driver_id')]
 
     for _td in set(_tech_drv):
         _count = _app.count(_td)
         out.append((_td, _count))
-
     return out
 
 
