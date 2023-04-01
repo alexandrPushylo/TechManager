@@ -1813,6 +1813,22 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
     for _i in set(tech_app_today):
         if tech_app_today.count(_i) > c_in:
             out.append(_i)
+    return out
+
+
+def get_free_tech_driver_list(current_day, technic_name):
+    out = []
+
+    _app_tech = ApplicationTechnic.objects.filter(
+        app_for_day__date=current_day
+    ).values_list('technic_driver_id', flat=True)
+
+    _technic_driver_free = TechnicDriver.objects.filter(
+        date=current_day,
+        status=True,
+        driver__status=True
+    ).exclude(id__in=_app_tech)
+    out = list(_technic_driver_free.filter(technic__name=technic_name).values_list('id', flat=True))
 
     return out
 
