@@ -4,11 +4,11 @@
 <div class="container-sm mx-auto m-2 "  >
   <form method="post" id="create_new_appls_form" enctype="multipart/form-data">{% csrf_token %}
     <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
-      <div class="container-fluid">
+      <div class="container p-0">
 
 
       <div class="input-group">
-        <p class="card-text">
+        <p class="card-text ms-3">
             <label>Объект:</label>
             <input class="form-control form-control-sm" readonly type="text" name="construction_site" value="{{ construction_site.address }}">
         </p>
@@ -20,15 +20,15 @@
         </p>
       </div>
           <p>
-              <label class="small">Примечание к объекту</label>
+              <label class="small ms-3">Примечание к объекту</label>
               <textarea class="form-control app_description" name="app_today_desc" placeholder="Примечание к объекту">{{ applications_today_desc }}</textarea>
           </p>
 
       <hr>
-        <div class="container-fluid pb-3 ul_tech_list" >
+        <div class="container-fluid p-0 ul_tech_list" >
              {% for v in list_of_vehicles %}
-            <div class="mt-4" id="{{forloop.counter}}">
-                <div class="input-group tech_driver_list" id="{{forloop.counter}}">
+            <div class="mt-4 " id="{{forloop.counter}}">
+                <div class="input-group tech_driver_list " id="{{forloop.counter}}">
                     <input name="io_id_app_tech" type="hidden" value="{{ v.id }}">
                     <input name="io_id_tech_driver" type="hidden" value="{{ v.technic_driver.id }}" id="io_id_tech_driver_{{forloop.counter}}">
                     <input name="io_id_tech_name" type="hidden" value="{{ v.technic_driver.technic.name.id }}" id="io_tech_name_id_{{ forloop.counter }}">
@@ -40,8 +40,8 @@
                 </div>
 
 
-                <div hidden="" class="input-group mt-2 div_edit_io" id="div_edit_io_{{forloop.counter}}">
-                    <select class="col-4" id="select_add_technic_{{forloop.counter}}">
+                <div hidden="" class="p-1 input-group mt-2 div_edit_io" id="div_edit_io_{{forloop.counter}}">
+                    <select class="col-auto" id="select_add_technic_{{forloop.counter}}">
                     <option selected></option>
                     {% for tn in technic_names %}
                         <option {% if tn.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} </option>
@@ -50,7 +50,7 @@
 
                     {% for d in tech_driver_list %}
 {#                        <input class="free_td_loop_{{forloop.parentloop.counter}} free_td_{{ d.0.id }}" type="hidden" value="{{ d.2 }}">#}
-                    <select class="col-4 select_td_{{ d.0.id }} select_add_driver_{{forloop.parentloop.counter}}" hidden="" >
+                    <select class="col-auto select_td_{{ d.0.id }} select_add_driver_{{forloop.parentloop.counter}}" hidden="" >
                         <option selected id_dt=""></option>
                         {% for td in d.1 %}
                         <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} class="opt_{{ d.0.id }}" value="{{td.id}}">{{td.driver__driver__last_name}} {% if td.id in work_TD_list %}[занят]{% else %}[свободен]{% endif %}</option>
@@ -58,13 +58,13 @@
                     </select>
                     {% endfor %}
 
-                    <button role="button" class="btn btn-success btn-sm col-2 btn_check_new_tech" ><i class="fa-sharp fa-solid fa-check"></i></button>
-                    <button role="button" class="btn btn-danger btn-sm col-2 btn_check_cancel_tech" ><i class="fa-solid fa-ban"></i></button>
+                    <button role="button" class="btn btn-success btn-sm  btn_check_new_tech" ><i class="fa-sharp fa-solid fa-check"></i></button>
+                    <button role="button" class="btn btn-danger btn-sm btn_check_cancel_tech" ><i class="fa-solid fa-ban"></i></button>
                 </div>
 
 
-                <div class="input-group mt-1">
-                    <textarea class="form-control app_description" name="description_app_list" rows="1">{{ v.description }}</textarea>
+                <div class="mt-1 p-0">
+                    <textarea class="form-control app_description m-0" name="description_app_list" rows="1">{{ v.description }}</textarea>
                 </div>
 
             </div>
@@ -101,9 +101,9 @@
     </div>
 
     <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
-         <p class="card-text fs-5 fw-bold col-auto">Список материалов</p>
-         <hr>
+      <div class="card-body p-0">
+         <p class="card-text fs-5 m-0 ms-3 fw-bold col-auto">Список материалов</p>
+         <hr class="m-0 mt-1">
          <div >
             {% if check_time and cw_day == nw_day or weekend_flag %}
                 <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials" placeholder="Время подачи заявок на материалы ограниченно до {{ LIMIT_for_submission }}">{{ material_list_raw }}</textarea>
