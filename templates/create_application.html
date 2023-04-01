@@ -74,8 +74,8 @@
     </div>
 {#------------------------------------------------------------------------------------------------------------------#}
     <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
-        <div class="container-fluid row">
+      <div class="card-body p-0">
+        <div class="container d-flex mt-2">
 
             <select class="col-auto" id="input_tech_add">
                 <option selected>---</option>
@@ -94,7 +94,7 @@
             </select>
         {% endfor %}
 
-            <button role="button" class="btn btn-success   btn-sm  col-auto ms-2 fs-5" id = "add_vehicle_btn">+</button>
+            <button role="button" class="btn btn-success   btn-sm  col-auto  fs-5" id = "add_vehicle_btn">+</button>
         </div>
             <textarea class="form-control mt-3 app_description mx-auto" rows="3" id="description_app_add" placeholder="Описание для техники"></textarea>
       </div>
