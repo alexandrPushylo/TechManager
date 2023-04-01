@@ -1800,12 +1800,14 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
 
     if F_saved: #if ApplicationTechnic have status = 'saved'
         tech_app_status = ApplicationTechnic.objects.filter(
+            Q(app_for_day__status=STATUS_APP_send) |
             Q(app_for_day__status=STATUS_APP_submitted) |
             Q(app_for_day__status=STATUS_APP_approved) |
             Q(app_for_day__status=STATUS_APP_saved)
         )
     else:
         tech_app_status = ApplicationTechnic.objects.filter(
+            Q(app_for_day__status=STATUS_APP_send) |
             Q(app_for_day__status=STATUS_APP_submitted) |
             Q(app_for_day__status=STATUS_APP_approved)
         )
@@ -1861,6 +1863,7 @@ def get_conflicts_vehicles_list(current_day, all=False, lack=False, c_in=0):
         Q(var_check=True))
 
     app_list_submit_approv = app_list_today.filter(
+        Q(app_for_day__status=STATUS_APP_send) |
         Q(app_for_day__status=STATUS_APP_submitted) |
         Q(app_for_day__status=STATUS_APP_approved)
         )
