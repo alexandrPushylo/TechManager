@@ -59,9 +59,10 @@ $('#add_vehicle_btn').click(function () {
     return false;
     });
 
-    $('.driver').prop('hidden',true);
+    // $('.driver').prop('hidden',true);
     $('#description_app_add').val('');
     $("#input_tech_add > option:first").prop('selected', true);
+    $(".select_td_add_"+tech_ID+" > option:first").prop('selected', true);
     $('.driver_add').prop('hidden',true);
 
     $('.app_description').each(function () {
@@ -73,13 +74,22 @@ $('#add_vehicle_btn').click(function () {
 $("#input_tech_add").change(function (){    //OK
     $('.driver_add').prop('hidden',true);
     let tech_name_id = this.value;
+    // const free_td = $('.free_add_td_'+tech_name_id).val();
+    // let free_td_val = free_td.replace('[','').replace(']','').split(', ');
+
     $('.select_td_add_'+tech_name_id).prop('hidden',false);
 
     if ($('.select_td_add_'+tech_name_id+" option[hidden!='hidden']").length < 3){
         $('.select_td_add_'+tech_name_id+" option[hidden!='hidden']:last").prop('selected', true);
         }
+    // else {
+    //     let dfg = free_td_val.pop()
+    //     $('.select_td_add_'+tech_name_id+" option[value='"+dfg+"']").prop('selected', true);
+    //     $('.free_add_td_'+tech_name_id).val(dfg)
+    // }
     return false
 });
+
 
 $('.btn_check_new_tech').click(function () {    //OK
     const parentEl = this.parentElement.previousElementSibling.id;
