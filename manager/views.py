@@ -1449,12 +1449,14 @@ def create_new_application(request, id_application):
     technic_names = Tech_name_list.filter(id__in=technic_name_id_list)
     out['technic_names'] = technic_names
 
-    work_tech_drv_list = Tech_driver_list.values_list('technic__name_id', 'id', 'driver__driver__last_name')
-    out['work_tech_drv_list'] = work_tech_drv_list.order_by('driver__driver__last_name')
+    # work_tech_drv_list = Tech_driver_list.values_list('technic__name_id', 'id', 'driver__driver__last_name')
+    # out['work_tech_drv_list'] = work_tech_drv_list.order_by('driver__driver__last_name')
 
     out['tech_driver_list'] = []
     for tn in technic_names:
         _td = Tech_driver_list.filter(technic__name=tn).values('id', 'driver__driver__last_name')
+        # free_drv = get_free_tech_driver_list(current_date, tn)
+        # out['tech_driver_list'].append((tn, _td, free_drv))
         out['tech_driver_list'].append((tn, _td))
 
     _materials = ApplicationMeterial.objects.filter(app_for_day=current_application)
@@ -1885,12 +1887,13 @@ def get_count_app_for_driver(current_day):
     _app = [_[0] for _ in ApplicationTechnic.objects.filter(
         Q(app_for_day__date=current_day),
         Q(app_for_day__status=STATUS_APP_approved) |
-        Q(app_for_day__status=STATUS_APP_send)).values_list('technic_driver_id')]
+        Q(app_for_day__status=STATUS_APP_submitted) |
+        Q(app_for_day__status=STATUS_APP_send)
+    ).values_list('technic_driver_id')]
 
     for _td in set(_tech_drv):
         _count = _app.count(_td)
         out.append((_td, _count))
-
     return out
 
 
