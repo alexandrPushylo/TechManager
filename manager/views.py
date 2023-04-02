@@ -559,9 +559,28 @@ def driver_app_list_view(request, day):
     return render(request, 'driver_app_list.html', out)
 
 
+def get_id_app_from_tech_name(request, day, id_tech_name):
+    if is_admin(request.user):
+        current_day = convert_str_to_date(day)
+        _technic_name = TechnicName.objects.get(id=id_tech_name)
+        id_applications = ApplicationTechnic.objects.filter(
+            app_for_day__date=current_day,
+            technic_driver__status=True,
+            technic_driver__driver__status=True,
+            technic_driver__technic__name=_technic_name
+        ).values_list('id', flat=True)
+
+        return conflict_correction_view(request, day, id_applications)
+    return HttpResponseRedirect(request.headers.get('Referer'))
+
+
 def conflict_correction_view(request, day, id_applications):
     out = {}
-    id_application_list = id_applications.split(',')[:-1]
+    if isinstance(id_applications, str):
+        id_application_list = id_applications.split(',')[:-1]
+    else:
+        id_application_list = id_applications
+
     tech_app_list = ApplicationTechnic.objects.filter(id__in=id_application_list)
     current_user = request.user
     current_day = convert_str_to_date(day)

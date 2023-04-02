@@ -29,6 +29,7 @@ from manager.views import show_application_for_driver
 from manager.views import success_application
 from manager.views import conflict_resolution_view
 from manager.views import conflict_correction_view
+from manager.views import get_id_app_from_tech_name
 
 from manager.views import supply_app_view
 from manager.views import move_supply_app
@@ -129,6 +130,7 @@ urlpatterns = [
 
     path('conflict_resolution/<str:day>', conflict_resolution_view, name="conflict_resolution"),
     path('conflict_correction/<str:day>/<str:id_applications>', conflict_correction_view, name="conflict_correction"),
+    path('get_id_tech_name/<str:day>/<int:id_tech_name>', get_id_app_from_tech_name, name="get_id_tech_name"),
 
     path('personal_application/<str:day>/<str:id_user>', show_application_for_driver, name='application_for_driver'),
 
