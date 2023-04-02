@@ -2,37 +2,34 @@
 
 {% block content %}
 
-<div class="container-lg m-3 mx-auto p-3"  >
+<div class="container-lg m-0 mx-auto p-0"  >
 
     <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
-
+      <div class="card-body p-1 ms-2">
         <p class="card-text">
             <b class="fs-5"> {{ WEEKDAY }}, </b><b class="fs-5">{{ date_of_target }} </b>
         </p>
-
       </div>
     </div>
 
     {% if not today_technic_applications %}
         <div class="card mt-5 w-50 shadow-lg  start-50 translate-middle" style="background-color: rgba(247,247,248,0.71)">
             <div class="card-body">
-                <p class="card-text"> <b class="fs-5">Конфликты отсутствуют</b></p>
+                <p class="card-text text-center"> <b class="fs-5">Конфликты отсутствуют</b></p>
             </div>
         </div>
     {% endif %}
 
     {% for v in today_technic_applications %}
 
-    <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
+    <div class="card shadow-lg mt-3 " style="background-color: rgba(247,247,248,0.71)">
+      <div class="card-body p-0">
 
-        <ul class="container-fluid" >
+        <ul class="container" >
 
-
-                <div class=" mb-3 " id="vehicle_list">
-                    <label><b class="fs-5 me-5">{{ v.0 }}</b>
-                    <a href="/conflict_correction/{{ cw_day }}/{% for i in v.1 %}{{ i.id }},{% endfor %}" class="btn btn-outline-secondary  col-auto " aria-current="page">Редактировать</a>
+                <div class="mb-3" id="vehicle_list">
+                    <label class="mt-2"><b class="fs-5 me-4">{{ v.0 }}</b>
+                    <a href="/conflict_correction/{{ cw_day }}/{% for i in v.1 %}{{ i.id }},{% endfor %}" class="btn btn-sm btn-outline-primary  col-auto " aria-current="page">Редактировать</a>
                     </label>
                     {% for l in lack_list %}{% if v.0 in l.0 %}
                         <p class="text-danger mt-1">Не хватает {{ l.1 }} ед.  {{ v.0 }}</p>
