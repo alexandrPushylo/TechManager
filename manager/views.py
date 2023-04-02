@@ -643,19 +643,21 @@ def conflict_resolution_view(request, day):
 
     today_technic_applications_list = []
     for v in conflict_list:
+        tech_name = TechnicName.objects.get(id=v).name
         today_technic_applications = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
-            technic_driver__technic__name__name=v,
+            technic_driver__technic__name__id=v,
             technic_driver__status=True).values(
             'id',
             'technic_driver__driver__driver__last_name',
             'description',
             'app_for_day__construction_site__foreman__last_name',
             'app_for_day__construction_site__address',
-            'technic_driver_id'
-        ).order_by('app_for_day__construction_site__foreman__last_name').exclude(var_check=True)
+            'technic_driver_id',
+            'technic_driver__technic__name__name'
+        ).order_by('technic_driver__driver__driver__last_name').exclude(var_check=True)
 
-        today_technic_applications_list.append((v, today_technic_applications))
+        today_technic_applications_list.append((tech_name, today_technic_applications))
     out['today_technic_applications'] = today_technic_applications_list
 
     return render(request, 'conflict_resolution.html', out)
