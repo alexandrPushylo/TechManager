@@ -638,8 +638,8 @@ def conflict_resolution_view(request, day):
     out['conflicts_list'] = conflict_list
     out['work_TD_list'] = get_work_TD_list(current_day)
 
-    conflicts_vehicles_list_id = get_conflicts_vehicles_list(current_day, get_id=True)
-    out['conflicts_vehicles_list_id'] = conflicts_vehicles_list_id
+    # conflicts_vehicles_list_id = get_conflicts_vehicles_list(current_day)
+    # out['conflicts_vehicles_list_id'] = conflicts_vehicles_list_id
 
     today_technic_applications_list = []
     for v in conflict_list:
@@ -1858,7 +1858,7 @@ def get_free_tech_driver_list(current_day, technic_name):
     return out
 
 
-def get_conflicts_vehicles_list(current_day, all=False, lack=False, c_in=0):
+def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
     """
         c_in - количество тех. которое может быть заказано, прежде чем попасть в список
         all - сравнение с всей в том числе нероботающей техникой
@@ -1867,7 +1867,7 @@ def get_conflicts_vehicles_list(current_day, all=False, lack=False, c_in=0):
     count_technics = {}
     out = []
 
-    if all:
+    if all_app:
         for _a in Technic.objects.all():
             count_technics[_a.name.id] = Technic.objects.filter(name=_a.name).count()
     else:
