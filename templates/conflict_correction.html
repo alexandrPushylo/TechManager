@@ -17,26 +17,28 @@
                 <div class="row mb-4 border border-1 border-primary rounded p-1">
 
                  <div class="input-group">
-                    <input id="io_vehicle_{{ forloop.counter }}" type="hidden"   value="{{ v.technic_driver.technic.name.name }}"/>
-                    <select class="form-control col-4 input_tech" id="input_tech_{{ forloop.counter }}" name="vehicle_{{ v.id }}">
-                        {% for u in uniq_name_of_vehicles %}
-                    <option {% if u.0 in conflicts_vehicles_list %} style="color: blue" {% endif %} value="{{ u.0 }}">{{ u.0 }}</option>
+{#                    <input type="hidden"   value="{{ v.id }}" name="id_app_tech"/>#}
+                    <input id="io_vehicle_{{ forloop.counter }}" type="hidden"   value="{{ v.technic_driver.technic.name.id }}"/>
+
+                     <select class="form-control col-4 input_tech" id="select_tech_name_{{ forloop.counter }}">
+                        {% for tn in technic_name_list %}
+                    <option {% if tn.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }}</option>
                          {% endfor %}
                     </select>
 
-                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.driver.driver.last_name }}">
+                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.id }}" >
 
-                    <select class="form-control col-4 input_driver" id="input_driver_{{ forloop.counter }}" name="driver_{{ v.id }}">
-
-                        {% for veh in vehicle_and_driver %}
-                    <option {% if veh.2 in work_TD_list %} style="color: blue" {% endif %} hidden value="{{ veh.1 }}" veh = "{{ veh.0 }}">{{ veh.1 }}</option>
-
+                     {% for td_l in tech_driver_list %}
+                    <select class="form-control col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ v.id }}">
+                        {% for td in td_l.1 %}
+                    <option {% if td.id in work_TD_list %} style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %}[занят]{% else %}[своб.]{% endif %}</option>
                         {% endfor %}
                     </select>
+                    {% endfor %}
 
                     <button role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-primary btn-sm col-auto" >Вернуть</button>
                     <button role="button" class="btn btn-danger btn-sm col-auto" onclick="
-                            this.parentNode.remove();
+                            this.parentNode.parentNode.remove();
                             return false;
                             "  >X
                     </button>

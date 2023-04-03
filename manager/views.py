@@ -581,48 +581,50 @@ def conflict_correction_view(request, day, id_applications):
         id_application_list = id_applications.split(',')[:-1]
     else:
         id_application_list = id_applications
-
-    tech_app_list = ApplicationTechnic.objects.filter(id__in=id_application_list)
-    current_user = request.user
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
+
+    _Application_technic = ApplicationTechnic.objects.filter(id__in=id_application_list)
+    _Tech_driver_list = TechnicDriver.objects.filter(
+        date=current_day,
+        status=True,
+        driver__status=True
+    )
+    _tech_driver_name_id_list = _Tech_driver_list.values_list('technic__name_id', flat=True).distinct()
+    _Technic_name_list = TechnicName.objects.filter(id__in=_tech_driver_name_id_list)
+    out['technic_name_list'] = _Technic_name_list.order_by('name')
+
+    out['tech_driver_list'] = []
+    for _tn in _Technic_name_list:
+        _td = _Tech_driver_list.filter(technic__name=_tn).values('id', 'driver__driver__last_name')
+        out['tech_driver_list'].append((_tn, _td))
+
+
+    current_user = request.user
+
     out["date_of_target"] = current_day
-    out['tech_app_list'] = tech_app_list.order_by('technic_driver__driver__driver__last_name')
-    out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, 1)
-    out['work_TD_list'] = get_work_TD_list(current_day, 0)
+    out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
+    out['work_TD_list'] = get_work_TD_list(current_day, c_in=0)
+    out['tech_app_list'] = _Application_technic.order_by('technic_driver__driver__driver__last_name')
 
-    vehicle_and_driver = TechnicDriver.objects.filter(
-        date=current_day,
-        driver__isnull=False,
-        status=True).values_list(
-        'technic__name__name',
-        'driver__driver__last_name',
-        'id')
-
-    out['vehicle_and_driver'] = vehicle_and_driver
-
-    out["uniq_name_of_vehicles"] = TechnicDriver.objects.filter(
-        date=current_day,
-        driver__isnull=False,
-        status=True).values_list(
-        'technic__name__name').order_by('technic__name__name').distinct()
 
     if request.method == 'POST':
-        app_id_list = request.POST.getlist('id_list')
-        for app_id in app_id_list:
-            app = ApplicationTechnic.objects.get(id=app_id)
-            if request.POST.get(f"vehicle_{app_id}"):
-                app.technic_driver = TechnicDriver.objects.get(
-                    date=current_day,
-                    driver__driver__last_name=request.POST.get(f"driver_{app_id}"),
-                    technic__name__name=request.POST.get(f"vehicle_{app_id}"),
-                    status=True)
-                app.description = request.POST.get(f"description_{app_id}")
-                app.priority = request.POST.get(f"priority_{app_id}")
+        print(request.POST)
+        app_technic_id_list = request.POST.getlist('id_list')
 
-                app.save()
+        # technic_driver_id_list = request.POST.getlist('technic_driver')
+        # priority_list = request.POST.getlist('priority')
+        # description_list = request.POST.getlist('description')
+
+        for _id_app_tech in app_technic_id_list:
+            _app = ApplicationTechnic.objects.get(id=_id_app_tech)
+            if request.POST.get(f"technic_driver_{_id_app_tech}"):
+                _app.technic_driver = TechnicDriver.objects.get(id=request.POST.get(f"technic_driver_{_id_app_tech}"))
+                _app.description = str(request.POST.get(f"description_{_id_app_tech}")).strip()
+                _app.priority = request.POST.get(f"priority_{_id_app_tech}")
+                _app.save()
             else:
-                app.delete()
+                _app.delete()
 
         return HttpResponseRedirect(f'/conflict_resolution/{day}')
     return render(request, 'conflict_correction.html', out)
