@@ -628,6 +628,7 @@ def conflict_resolution_view(request, day):
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
     lack_list = get_conflicts_vehicles_list(current_day, lack=True)
+    print(lack_list)
     out['lack_list'] = lack_list
     conflict_list = get_conflicts_vehicles_list(current_day)
     out['conflicts_list'] = conflict_list
@@ -1890,7 +1891,8 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
         if list_of_work_tech.count(i)+c_in > count_technics[i]:
             if lack:
                 _c = list_of_work_tech.count(i) - count_technics[i]
-                out.append((i, _c))
+                _name = TechnicName.objects.get(id=i).name
+                out.append((_name, _c))
             else:
                 out.append(i)
     return out
