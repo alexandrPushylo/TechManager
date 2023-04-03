@@ -58,7 +58,7 @@
               <h6 class="card-text"><label><b>Список техники:</b></label> </h6>
               {% for v in apps_tech %}
                   <div class="row">
-                <div class="card-text fs-6 col-auto {% if v.id in conflicts_vehicles_list_id %}text-danger{% endif %}">{{ v.technic_driver.technic.name }}</div>
+                <div class="card-text fs-6 col-auto {% if v.technic_driver.technic.name.id in conflicts_vehicles_list_id %}text-danger{% endif %}">{{ v.technic_driver.technic.name }}</div>
                 <div class="card-text fs-6 col-auto"> ({{ v.technic_driver.driver.driver }})
                 {% for count in count_app_list %}{% if v.technic_driver.id == count.0 %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
                 </div>
