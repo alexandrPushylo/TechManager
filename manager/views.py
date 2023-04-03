@@ -1875,6 +1875,7 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
         for f in Technic.objects.all():
             count_technics[f.name.id] = TechnicDriver.objects.filter(
                 status=True,
+                driver__status=True,
                 date=current_day,
                 technic__name=f.name
             ).count()
@@ -2019,7 +2020,6 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
     out['referer'] = request.headers.get('Referer')
-    # out['weekend_flag'] = TODAY.weekday() < get_current_day('next_day').weekday() and current_day.weekday() == 0
     out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day('next_day').weekday() == 5 and current_day.weekday() == 0
 
 
