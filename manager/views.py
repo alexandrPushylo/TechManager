@@ -1890,7 +1890,8 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
         if list_of_work_tech.count(i)+c_in > count_technics[i]:
             if lack:
                 _c = list_of_work_tech.count(i) - count_technics[i]
-                out.append((i, _c))
+                _name = TechnicName.objects.get(id=i).name
+                out.append((_name, _c))
             else:
                 out.append(i)
     return out
