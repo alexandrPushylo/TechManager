@@ -2019,7 +2019,9 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
     out['referer'] = request.headers.get('Referer')
-    out['weekend_flag'] = TODAY.weekday() < get_current_day('next_day').weekday() and current_day.weekday() == 0
+    # out['weekend_flag'] = TODAY.weekday() < get_current_day('next_day').weekday() and current_day.weekday() == 0
+    out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day('next_day').weekday() == 5 and current_day.weekday() == 0
+
 
     return out
 
