@@ -628,7 +628,6 @@ def conflict_resolution_view(request, day):
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
     lack_list = get_conflicts_vehicles_list(current_day, lack=True)
-    print(lack_list)
     out['lack_list'] = lack_list
     conflict_list = get_conflicts_vehicles_list(current_day)
     out['conflicts_list'] = conflict_list
