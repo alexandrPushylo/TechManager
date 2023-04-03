@@ -600,21 +600,13 @@ def conflict_correction_view(request, day, id_applications):
         out['tech_driver_list'].append((_tn, _td))
 
 
-    current_user = request.user
-
     out["date_of_target"] = current_day
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
     out['work_TD_list'] = get_work_TD_list(current_day, c_in=0)
     out['tech_app_list'] = _Application_technic.order_by('technic_driver__driver__driver__last_name')
 
-
     if request.method == 'POST':
-        print(request.POST)
         app_technic_id_list = request.POST.getlist('id_list')
-
-        # technic_driver_id_list = request.POST.getlist('technic_driver')
-        # priority_list = request.POST.getlist('priority')
-        # description_list = request.POST.getlist('description')
 
         for _id_app_tech in app_technic_id_list:
             _app = ApplicationTechnic.objects.get(id=_id_app_tech)
@@ -641,8 +633,6 @@ def conflict_resolution_view(request, day):
     out['conflicts_list'] = conflict_list
     out['work_TD_list'] = get_work_TD_list(current_day)
 
-    # conflicts_vehicles_list_id = get_conflicts_vehicles_list(current_day)
-    # out['conflicts_vehicles_list_id'] = conflicts_vehicles_list_id
 
     today_technic_applications_list = []
     for v in conflict_list:
