@@ -604,6 +604,7 @@ def conflict_correction_view(request, day, id_applications):
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
     out['work_TD_list'] = get_work_TD_list(current_day, c_in=0)
     out['tech_app_list'] = _Application_technic.order_by('technic_driver__driver__driver__last_name')
+    out['free_tech_name'] = get_free_tech_driver_list(current_day=current_day)
 
     if request.method == 'POST':
         app_technic_id_list = request.POST.getlist('id_list')
@@ -1449,6 +1450,7 @@ def create_new_application(request, id_application):
     conflicts_vehicles_list = get_conflicts_vehicles_list(current_date, c_in=1)
     out['conflicts_vehicles_list'] = conflicts_vehicles_list
     out['work_TD_list'] = get_work_TD_list(current_date, 0, F_saved=True)
+    out['free_tech_name'] = get_free_tech_driver_list(current_day=current_date)
 
     Tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True, driver__status=True)
     Tech_name_list = TechnicName.objects.all().order_by('name')
@@ -1834,7 +1836,7 @@ def get_work_TD_list(current_day, c_in=1, F_saved=False):
     return out
 
 
-def get_free_tech_driver_list(current_day, technic_name):
+def get_free_tech_driver_list(current_day, technic_name=None):
     out = []
 
     _app_tech = ApplicationTechnic.objects.filter(
@@ -1846,7 +1848,10 @@ def get_free_tech_driver_list(current_day, technic_name):
         status=True,
         driver__status=True
     ).exclude(id__in=_app_tech)
-    out = list(_technic_driver_free.filter(technic__name=technic_name).values_list('id', flat=True))
+    if not technic_name:
+        out = list(_technic_driver_free.values_list('technic__name_id', flat=True))
+    else:
+        out = list(_technic_driver_free.filter(technic__name=technic_name).values_list('id', flat=True))
 
     return out
 
