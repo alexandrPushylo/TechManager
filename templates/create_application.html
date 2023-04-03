@@ -44,7 +44,7 @@
                     <select class="col-auto" id="select_add_technic_{{forloop.counter}}">
                     <option selected></option>
                     {% for tn in technic_names %}
-                        <option {% if tn.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} </option>
+                        <option {% if tn.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} {% if tn.id in conflicts_vehicles_list %}[занят]{% endif %}</option>
                     {% endfor %}
                     </select>
 
@@ -80,7 +80,7 @@
             <select class="col-auto" id="input_tech_add">
                 <option selected>---</option>
                 {% for v in technic_names %}
-                    <option {% if v.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ v.id }}">{{ v.name }}</option>
+                    <option {% if v.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ v.id }}">{{ v.name }} {% if v.id in conflicts_vehicles_list %}[занят]{% endif %}</option>
                 {% endfor %}
             </select>
 
