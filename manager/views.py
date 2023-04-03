@@ -328,7 +328,7 @@ def supply_app_view(request, day):
         technic_driver__in=tech_drv)
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
-    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True, includeSave=True)
+    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
 
     out['today_applications_list'] = []
     for _app_today in app_today_list:
