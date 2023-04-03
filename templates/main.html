@@ -93,7 +93,7 @@
               <h6 class="card-text mt-1 ms-2"><label><b>Список техники:</b></label> </h6>
               {% for v in a.apps_tech %}
                   <div class="row mt-1 ms-2" {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>
-                <div class="card-text fs-6 col-auto mt-0
+                <div id="{{ v.technic_driver.technic.name.id }}" class="card-text fs-6 col-auto mt-0 technic_name_link
                         {% if v.technic_driver.technic.name.id in conflicts_vehicles_list_id %}
                         text-danger{% endif %}
                         {% if not v.technic_driver.status %}

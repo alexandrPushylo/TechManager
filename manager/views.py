@@ -559,9 +559,29 @@ def driver_app_list_view(request, day):
     return render(request, 'driver_app_list.html', out)
 
 
+def get_id_app_from_tech_name(request, day, id_tech_name):
+    if is_admin(request.user):
+        current_day = convert_str_to_date(day)
+        _technic_name = TechnicName.objects.get(id=id_tech_name)
+        id_applications = ApplicationTechnic.objects.filter(
+            app_for_day__date=current_day,
+            technic_driver__status=True,
+            technic_driver__driver__status=True,
+            var_check=False,
+            technic_driver__technic__name=_technic_name
+        ).values_list('id', flat=True)
+
+        return conflict_correction_view(request, day, id_applications)
+    return HttpResponseRedirect(request.headers.get('Referer'))
+
+
 def conflict_correction_view(request, day, id_applications):
     out = {}
-    id_application_list = id_applications.split(',')[:-1]
+    if isinstance(id_applications, str):
+        id_application_list = id_applications.split(',')[:-1]
+    else:
+        id_application_list = id_applications
+
     tech_app_list = ApplicationTechnic.objects.filter(id__in=id_application_list)
     current_user = request.user
     current_day = convert_str_to_date(day)
@@ -619,24 +639,26 @@ def conflict_resolution_view(request, day):
     out['conflicts_list'] = conflict_list
     out['work_TD_list'] = get_work_TD_list(current_day)
 
-    conflicts_vehicles_list_id = get_conflicts_vehicles_list(current_day, get_id=True)
-    out['conflicts_vehicles_list_id'] = conflicts_vehicles_list_id
+    # conflicts_vehicles_list_id = get_conflicts_vehicles_list(current_day)
+    # out['conflicts_vehicles_list_id'] = conflicts_vehicles_list_id
 
     today_technic_applications_list = []
     for v in conflict_list:
+        tech_name = TechnicName.objects.get(id=v).name
         today_technic_applications = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
-            technic_driver__technic__name__name=v,
+            technic_driver__technic__name__id=v,
             technic_driver__status=True).values(
             'id',
             'technic_driver__driver__driver__last_name',
             'description',
             'app_for_day__construction_site__foreman__last_name',
             'app_for_day__construction_site__address',
-            'technic_driver_id'
-        ).order_by('app_for_day__construction_site__foreman__last_name').exclude(var_check=True)
+            'technic_driver_id',
+            'technic_driver__technic__name__name'
+        ).order_by('technic_driver__driver__driver__last_name').exclude(var_check=True)
 
-        today_technic_applications_list.append((v, today_technic_applications))
+        today_technic_applications_list.append((tech_name, today_technic_applications))
     out['today_technic_applications'] = today_technic_applications_list
 
     return render(request, 'conflict_resolution.html', out)
@@ -1837,7 +1859,7 @@ def get_free_tech_driver_list(current_day, technic_name):
     return out
 
 
-def get_conflicts_vehicles_list(current_day, all=False, lack=False, c_in=0):
+def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
     """
         c_in - количество тех. которое может быть заказано, прежде чем попасть в список
         all - сравнение с всей в том числе нероботающей техникой
@@ -1846,7 +1868,7 @@ def get_conflicts_vehicles_list(current_day, all=False, lack=False, c_in=0):
     count_technics = {}
     out = []
 
-    if all:
+    if all_app:
         for _a in Technic.objects.all():
             count_technics[_a.name.id] = Technic.objects.filter(name=_a.name).count()
     else:
