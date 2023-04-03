@@ -207,7 +207,7 @@ def supply_today_app_view(request, day):
 
     out["today_technic_applications"] = app_list
     out["priority_list"] = get_priority_list(current_day)
-    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day, get_id=True)
+    out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
 
     if request.method == 'POST':
         prior_id_list = request.POST.getlist('prior_id')
