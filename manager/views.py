@@ -1875,6 +1875,7 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
         for f in Technic.objects.all():
             count_technics[f.name.id] = TechnicDriver.objects.filter(
                 status=True,
+                driver__status=True,
                 date=current_day,
                 technic__name=f.name
             ).count()
