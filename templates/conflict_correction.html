@@ -22,7 +22,7 @@
 
                      <select class="form-control col-4 input_tech" id="select_tech_name_{{ forloop.counter }}">
                         {% for tn in technic_name_list %}
-                    <option {% if tn.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }}</option>
+                    <option {% if tn.id in conflicts_vehicles_list %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} {% if tn.id in conflicts_vehicles_list %}[занят]{% endif %}</option>
                          {% endfor %}
                     </select>
 
