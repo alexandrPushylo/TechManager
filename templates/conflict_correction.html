@@ -1,66 +1,180 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container-lg mx-auto "  >
+<div class="container-fluid mx-auto "  >
   <form method="post" id="conf_corr_form" enctype="multipart/form-data">{% csrf_token %}
-    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body p-0">
 
-      <p class="card-text mt-1 text-center">
-            <b class="fs-5">{{ WEEKDAY }},</b> <b class="fs-5">{{ date_of_target }}</b>
+
+{# -----------------------------------------------------------------------------------------------------------#}
+<p class="card-text mt-1 text-center">
+    <b class="fs-5">{{ WEEKDAY }},</b> <b class="fs-5">{{ date_of_target }}</b>
             <hr>
-        </p>
+</p>
+<div id="container" class="container-fluid mt-2 ms-5 app_container" style="width: inherit">
+        {% for app in tech_app_list %}
+            <div class="item">
+        <div class="me-3 mb-4 ">
+        <input type="hidden" value="{{ app.id }}" name="id_list"/>
+        <div class="card shadow-lg border {% if app.technic_driver.technic.name.id in conflicts_list %} border-2 border-danger {% endif %}"style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
 
-        <ul class="container-fluid" id="vehicle_list">
-            {% for v in tech_app_list %}
-                <input type="hidden" value="{{ v.id }}" name="id_list"/>
-                <div class="row mb-4 border border-1 border-primary rounded p-1">
+          <div class="card-body w-100 p-1" >
+          <div class="row ps-2">
+              <input type="number" id="priority_{{ app.id }}" name="priority_{{ app.id }}" class="form-control w-25 ms-1 fs-3 {% if app.id in priority_list %} border border-3 border-primary {% endif %}" value="{{ app.priority }}" />
+            <div class="col pt-3">
+                <h6 class="card-title  fw-bold text-center " style="color:{{ style_font_color.value }};">{{ app.technic_driver.driver.driver.last_name }} ({{ app.technic_driver.technic.name.name }})</h6>
+                <h6 class="card-title text-center" >{{ app.app_for_day.construction_site.address }} ({{ app.app_for_day.construction_site.foreman.last_name }})</h6>
+            </div>
+          </div>
 
-                 <div class="input-group">
-{#                    <input type="hidden"   value="{{ v.id }}" name="id_app_tech"/>#}
-                    <input id="io_vehicle_{{ forloop.counter }}" type="hidden"   value="{{ v.technic_driver.technic.name.id }}"/>
+          <hr class="mt-1 mb-0" style="border-width: medium;">
 
-                     <select class="form-control col-4 input_tech" id="select_tech_name_{{ forloop.counter }}">
+              <div class="row mt-1">
+                <input id="io_vehicle_{{ forloop.counter }}" type="hidden"   value="{{ app.technic_driver.technic.name.id }}"/>
+                <div class="card-text fs-6  mt-0">
+                    <select class="form-control col-4 input_tech" id="select_tech_name_{{ forloop.counter }}">
                         {% for tn in technic_name_list %}
                     <option {% if tn.id not in free_tech_name %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} {% if tn.id not in free_tech_name %}[занят]{% endif %}</option>
                          {% endfor %}
                     </select>
+                </div>
 
-                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.id }}" >
-
-                     {% for td_l in tech_driver_list %}
-                    <select class="form-control col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ v.id }}">
+                <div class="card-text fs-6 mt-0">
+                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ app.technic_driver.id }}" >
+                    {% for td_l in tech_driver_list %}
+                    <select class="form-control col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ app.id }}">
                         {% for td in td_l.1 %}
                     <option {% if td.id in work_TD_list %} style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %}[занят]{% else %}[своб.]{% endif %}</option>
                         {% endfor %}
                     </select>
                     {% endfor %}
-
-                    <button role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-primary btn-sm col-auto" >Вернуть</button>
-                    <button role="button" class="btn btn-danger btn-sm col-auto" onclick="
-                            this.parentNode.parentNode.remove();
-                            return false;
-                            "  >X
-                    </button>
-
                 </div>
-                      <div class="input-group form-floating p-0">
-                        <span class="input-group-text mt-2">
-                        <input type="number" id="priority_{{ v.id }}" name="priority_{{ v.id }}" class="  col-auto  " value="{{ v.priority }}" style="max-width: 50px; margin-left: -5px;"/></span>
-                        <textarea class="form-control app_description mt-2" aria-label="With textarea" id="floatingInputValue" name="description_{{ v.id }}" rows="1">{{ v.description }}</textarea>
-                        <label for="floatingInputValue" class="fw-bold " style="color: black; margin-left: 100px; margin-top: 0px">{{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman.last_name }})</label>
                     </div>
-                </div>
+                  {% if app.description %}
+                <div class="input-groupp-0">
+                        <textarea class="form-control app_description mt-2"  id="floatingInputValue" name="description_{{ app.id }}" >{{ app.description }}</textarea>
+                    </div>
 
+                {%endif%}
+                  <hr class="m-0" style="border-width: medium; border-color: rgba(0,0,0,0)">
 
+            <hr class="m-0 mt-1">
+            <div class="btn-group d-flex justify-content-center m-0 mt-2">
+                <button role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-outline-primary btn-sm col-auto" >Вернуть</button>
+                    <button role="button" class="btn btn-outline-danger btn-sm col-auto" onclick="
+                            this.parentNode.parentNode.parentNode.remove();
+                            return false;
+                            "  >Удалить
+                    </button>
+            </div>
+          </div>
+        </div>
+        </div>
+            </div>
+        {% endfor %}
 
-            {% endfor %}
-        </ul>
-      </div>
     </div>
+
+{#-----------------------------------------------------------------------------------------------------------  #}
+
+
+{#    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">#}
+{#      <div class="card-body p-0">#}
+{#      <p class="card-text mt-1 text-center">#}
+{#            <b class="fs-5">{{ WEEKDAY }},</b> <b class="fs-5">{{ date_of_target }}</b>#}
+{#            <hr>#}
+{#        </p>#}
+{#        <ul class="container-fluid" id="vehicle_list">#}
+{#            {% for v in tech_app_list %}#}
+{#                <input type="hidden" value="{{ v.id }}" name="id_list"/>#}
+{#                <div class="row mb-4 border border-1 border-primary rounded p-1">#}
+{##}
+{#                 <div class="input-group">#}
+{#                    <input type="hidden"   value="{{ v.id }}" name="id_app_tech"/>#}
+{#                    <input id="io_vehicle_{{ forloop.counter }}" type="hidden"   value="{{ v.technic_driver.technic.name.id }}"/>#}
+{##}
+{#                     <select class="form-control col-4 input_tech" id="select_tech_name_{{ forloop.counter }}">#}
+{#                        {% for tn in technic_name_list %}#}
+{#                    <option {% if tn.id not in free_tech_name %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} {% if tn.id not in free_tech_name %}[занят]{% endif %}</option>#}
+{#                         {% endfor %}#}
+{#                    </select>#}
+{##}
+{#                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.id }}" >#}
+{##}
+{#                     {% for td_l in tech_driver_list %}#}
+{#                    <select class="form-control col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ v.id }}">#}
+{#                        {% for td in td_l.1 %}#}
+{#                    <option {% if td.id in work_TD_list %} style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %}[занят]{% else %}[своб.]{% endif %}</option>#}
+{#                        {% endfor %}#}
+{#                    </select>#}
+{#                    {% endfor %}#}
+{##}
+{#                    <button role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-primary btn-sm col-auto" >Вернуть</button>#}
+{#                    <button role="button" class="btn btn-danger btn-sm col-auto" onclick="#}
+{#                            this.parentNode.parentNode.remove();#}
+{#                            return false;#}
+{#                            "  >X#}
+{#                    </button>#}
+{##}
+{#                </div>#}
+{#                      <div class="input-group form-floating p-0">#}
+{#                        <span class="input-group-text mt-2">#}
+{#                        <input type="number" id="priority_{{ v.id }}" name="priority_{{ v.id }}" class="  col-auto  " value="{{ v.priority }}" style="max-width: 50px; margin-left: -5px;"/></span>#}
+{#                        <textarea class="form-control app_description mt-2" aria-label="With textarea" id="floatingInputValue" name="description_{{ v.id }}" rows="1">{{ v.description }}</textarea>#}
+{#                        <label for="floatingInputValue" class="fw-bold " style="color: black; margin-left: 100px; margin-top: 0px">{{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman.last_name }})</label>#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#      </div>#}
+{#    </div>#}
   </form>
 </div>
 
+{% endblock %}
+
+{% block rigth_tab %}
+    {% if post == 'admin' %}
+    <div class="driver_panel  col-auto   position-fixed end-0 translate-middle-y top-50 mt-4" style="height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
+        <div class="card-body overflow-auto " style="height: 90%;" >
+
+            {% for drv, count, attach_drv, tech_drv in DRV_LIST %}
+            <ol class="list-group" >
+                <li class="list-group-item d-flex justify-content-between align-items-start" >
+                <div class="div_td" style="margin-left: -5px; margin-right: -10px;" id="{{ drv.id }}">
+                  <div class="fw-bold small
+                    {% if not drv.status %} text-danger
+                    {% elif count == 0 %}
+                    {% elif not count == 0 %} text-success
+                    {% endif %}
+                    ">{{drv.driver.last_name}}</div>
+                    <div class=" small ">
+
+                        {% if tech_drv %}
+                            {% for tech in tech_drv %}
+                                {% if tech.status %}
+                                    {% if not count == 0 %}<div class="lh-sm text-success text-truncate">{{ tech.technic.name.name }}</div>
+                                    {% else %}<div class="lh-sm text-truncate">{{ tech.technic.name.name }}</div>
+                                    {% endif %}
+                                {% else %} <div class="lh-sm text-danger text-truncate">{{ tech.technic.name.name }}</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for tech in attach_drv %}
+                                <div class="lh-sm text-danger text-truncate">{{ tech.0 }}</div>
+                            {% endfor %}
+                        {% endif %}
+
+
+                    </div>
+                </div>
+                <span class="badge bg-primary rounded-pill"></span>
+              </li>
+            </ol>
+        {% endfor %}
+
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block script %}{% load static %}
@@ -69,9 +183,7 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-{#  <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page"><i class="fa-solid fa-list"></i> Все заявки</a>#}
-{#    <a href="{% url 'conflict_resolution' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page"> Отмена</a>#}
-    <a href="{{ referer }}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page"> Отмена</a>
+    <a href="{{ referer }}" class="btn btn-outline-primary active  col-auto " aria-current="page"> Отмена</a>
   <input form="conf_corr_form" class="btn btn-success  col-auto m-1" type="submit" value="Сохранить">
 </div>
 {% endblock %}

@@ -584,9 +584,10 @@ def conflict_correction_view(request, day, id_applications):
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
 
+    driver_table_list = DriverTabel.objects.filter(date=current_day)
+    technic_driver_table = TechnicDriver.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(id__in=id_application_list)
-    _Tech_driver_list = TechnicDriver.objects.filter(
-        date=current_day,
+    _Tech_driver_list = technic_driver_table.filter(
         status=True,
         driver__status=True
     )
@@ -602,9 +603,29 @@ def conflict_correction_view(request, day, id_applications):
 
     out["date_of_target"] = current_day
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
+    out['conflicts_list'] = get_conflicts_vehicles_list(current_day, c_in=0)
+    out['priority_list'] = get_priority_list(current_day)
     out['work_TD_list'] = get_work_TD_list(current_day, c_in=0)
-    out['tech_app_list'] = _Application_technic.order_by('technic_driver__driver__driver__last_name')
     out['free_tech_name'] = get_free_tech_driver_list(current_day=current_day)
+    out['tech_app_list'] = _Application_technic.order_by('technic_driver__driver__driver__last_name')
+
+    l_out = []
+
+    for _drv in driver_table_list.order_by('driver__last_name'):
+        app = _Application_technic.filter(technic_driver__driver=_drv)
+        tech_drv = technic_driver_table.filter(driver=_drv)
+        if not tech_drv:
+            tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
+        attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
+        count = app.count()
+
+        if not _drv in [_[0] for _ in l_out]:
+            l_out.append((_drv, count, attach_drv, tech_drv))
+
+    out["DRV_LIST"] = l_out
+
+
+
 
     if request.method == 'POST':
         app_technic_id_list = request.POST.getlist('id_list')
@@ -619,7 +640,8 @@ def conflict_correction_view(request, day, id_applications):
             else:
                 _app.delete()
 
-        return HttpResponseRedirect(f'/conflict_resolution/{day}')
+        # return HttpResponseRedirect(f'/conflict_resolution/{day}')
+        return HttpResponseRedirect('')
     return render(request, 'conflict_correction.html', out)
 
 
