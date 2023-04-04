@@ -1,5 +1,4 @@
 const count_vehicles = $('.input_tech').length;
-
 for(let i=1;i<=count_vehicles;i++){
     const btn_reset = '#btn_reset_'+i;
     const io_vehicle = '#io_vehicle_'+i;
@@ -30,4 +29,22 @@ for(let i=1;i<=count_vehicles;i++){
 
 $('.app_description').each(function () {
     this.style.height = ""+(this.scrollHeight)+"px";
+});
+
+$('#container').masonry({
+// указываем элемент-контейнер в котором расположены блоки для динамической верстки
+	  itemSelector: '.item',
+    // columnWidth: 200,
+// указываем класс элемента являющегося блоком в нашей сетке
+          singleMode: true,
+// true - если у вас все блоки одинаковой ширины
+	  isResizable: true,
+// перестраивает блоки при изменении размеров окна
+	  isAnimated: true,
+// анимируем перестроение блоков
+          animationOptions: {
+	      queue: false,
+	      duration: 500
+	  }
+// опции анимации - очередь и продолжительность анимации
 });
