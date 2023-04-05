@@ -600,6 +600,20 @@ def conflict_correction_view(request, day, id_applications):
         _td = _Tech_driver_list.filter(technic__name=_tn).values('id', 'driver__driver__last_name')
         out['tech_driver_list'].append((_tn, _td))
 
+    tech_name_list = _Application_technic.values_list(
+        'technic_driver__technic__name_id',
+        'technic_driver__technic__name__name').distinct()
+
+
+    for tn in tech_name_list:
+        all_t = technic_driver_table.filter(technic__name__id=tn[0])
+        work_t = all_t.filter(status=True)
+        all_c = all_t.count()
+        work_c = work_t.count()
+        free_td_id = get_free_tech_driver_list(current_day=current_day, technic_name=tn[0])
+        free_td = technic_driver_table.filter(id__in=free_td_id).values_list('driver__driver__last_name', 'driver__driver__first_name')
+        out['tech_inf'] = (tn[1], all_c, work_c, all_c - work_c, free_td)
+
 
     out["date_of_target"] = current_day
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
@@ -612,7 +626,7 @@ def conflict_correction_view(request, day, id_applications):
     l_out = []
 
     for _drv in driver_table_list.order_by('driver__last_name'):
-        app = _Application_technic.filter(technic_driver__driver=_drv)
+        app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
         tech_drv = technic_driver_table.filter(driver=_drv)
         if not tech_drv:
             tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
@@ -624,9 +638,6 @@ def conflict_correction_view(request, day, id_applications):
 
     out["DRV_LIST"] = l_out
 
-
-
-
     if request.method == 'POST':
         app_technic_id_list = request.POST.getlist('id_list')
 
@@ -634,7 +645,10 @@ def conflict_correction_view(request, day, id_applications):
             _app = ApplicationTechnic.objects.get(id=_id_app_tech)
             if request.POST.get(f"technic_driver_{_id_app_tech}"):
                 _app.technic_driver = TechnicDriver.objects.get(id=request.POST.get(f"technic_driver_{_id_app_tech}"))
-                _app.description = str(request.POST.get(f"description_{_id_app_tech}")).strip()
+                if request.POST.get(f"description_{_id_app_tech}"):
+                    _app.description = str(request.POST.get(f"description_{_id_app_tech}")).strip()
+                else:
+                    _app.description = None
                 _app.priority = request.POST.get(f"priority_{_id_app_tech}")
                 _app.save()
             else:
