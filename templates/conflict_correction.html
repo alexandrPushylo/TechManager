@@ -11,6 +11,23 @@
             <hr>
 </p>
 <div id="container" class="container-fluid mt-2 ms-3 app_container" style="width: inherit">
+
+<div class="item card shadow-lg m-2" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
+          <div class="card-body p-1">
+            <h6 class="card-title  fw-bold text-center " > {{ tech_inf.0 }} </h6>
+            <h6 class="card-text m-0" ><label class="small">Общее кол.во:</label> {{ tech_inf.1 }}</h6>
+            <h6 class="card-text text-success m-0" ><label class="small">Кол.во в робочим сост.:</label> {{ tech_inf.2 }}</h6>
+            <h6 class="card-text text-danger m-0" ><label class="small">Кол.во в не робочим сост.:</label> {{ tech_inf.3 }}</h6>
+          <hr class="m-0">
+          <h6 class="card-text small text-center m-0" ><label class="small">Свободные водители на {{ tech_inf.0 }}:</label></h6>
+              {% if tech_inf.4 %}{% for free_drv in tech_inf.4 %}
+            <h6 class="card-text m-0 ms-2 fw-bold" >{{ free_drv.0 }} {{ free_drv.1 }}</h6>
+              {% endfor %}{% else %}
+            <h6 class="card-text m-0 ms-2" >Отсутствуют</h6>
+              {% endif %}
+          </div>
+        </div>
+
         {% for app in tech_app_list %}
             <div class="item">
         <div class="me-3 mb-4 ">
@@ -19,7 +36,7 @@
 
           <div class="card-body w-100 p-1" >
           <div class="row ps-2">
-              <input type="number" id="priority_{{ app.id }}" name="priority_{{ app.id }}" class="form-control w-25 ms-1 fs-3 {% if app.id in priority_list %} border border-3 border-primary {% endif %}" value="{{ app.priority }}" />
+              <input type="number" min="1" id="priority_{{ app.id }}" name="priority_{{ app.id }}" class="form-control w-25 ms-1 fs-3 {% if app.id in priority_list %} border border-3 border-primary {% endif %}" value="{{ app.priority }}" />
             <div class="col pt-3">
                 <h6 class="card-title  fw-bold text-center " style="color:{{ style_font_color.value }};">{{ app.technic_driver.driver.driver.last_name }} ({{ app.technic_driver.technic.name.name }})</h6>
                 <h6 class="card-title text-center" >{{ app.app_for_day.construction_site.address }} ({{ app.app_for_day.construction_site.foreman.last_name }})</h6>
@@ -183,7 +200,8 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-    <a href="{{ referer }}" class="btn btn-outline-primary active  col-auto " aria-current="page"> Отмена</a>
+{#    <a href="{{ referer }}" class="btn btn-outline-primary active  col-auto " aria-current="page"> Отмена</a>#}
+    <a href="{% url 'conflict_resolution' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page"> Назад</a>
   <input form="conf_corr_form" class="btn btn-success  col-auto m-1" type="submit" value="Сохранить">
 </div>
 {% endblock %}
