@@ -371,8 +371,9 @@ def edit_technic_view(request, id_tech=None):
     _attach_drv = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     out['attach_drv'] = _attach_drv.order_by('user_post__last_name')
 
-    _director_drv_list = User.objects.all()
-    out['director_drv'] = _director_drv_list.order_by('last_name')
+    _director_drv_list = Post.objects.filter(
+        post_name__name_post=POST_USER['mechanic']).values_list('user_post_id', flat=True)
+    out['director_drv'] = User.objects.filter(id__in=_director_drv_list)
 
     _name_technic = TechnicName.objects.all()
     out['name_technic'] = _name_technic.order_by('name')
