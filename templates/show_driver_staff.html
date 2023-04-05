@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container m-3 mx-auto "  >
+        <p class="card-text ms-3"> <b class="fs-5">Водители </b> </p>
+        <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Фамилия</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Телефон</th>
+    </tr>
+  </thead>
+  <tbody>{% for user, post, tel in user_post %}
+
+    <tr id="{{ user.id }}" class="user_row">
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ user.last_name }}</td>
+      <td>{{ user.first_name }}</td>
+      <td>{{ tel }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/show_staff.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+
+    <a href="/signup/" class="btn btn-outline-success active col-auto m-1" aria-current="page">Добавить сотрудника</a>
+</div>
+{% endblock %}
