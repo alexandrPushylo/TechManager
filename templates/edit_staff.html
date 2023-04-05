@@ -70,7 +70,7 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-{% if post == 'admin' %}
+{% if post == 'admin' or post == 'mechanic' %}
   <a href="{% url 'show_staff' %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
   <a href="{% url 'del_staff' current_user.id %}" class="btn btn-outline-danger  col-auto m-1" aria-current="page">Удалить</a>
 {% else %}
