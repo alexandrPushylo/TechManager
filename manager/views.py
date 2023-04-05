@@ -371,8 +371,9 @@ def edit_technic_view(request, id_tech=None):
     _attach_drv = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     out['attach_drv'] = _attach_drv.order_by('user_post__last_name')
 
-    _director_drv_list = User.objects.all()
-    out['director_drv'] = _director_drv_list.order_by('last_name')
+    _director_drv_list = Post.objects.filter(
+        post_name__name_post=POST_USER['mechanic']).values_list('user_post_id', flat=True)
+    out['director_drv'] = User.objects.filter(id__in=_director_drv_list)
 
     _name_technic = TechnicName.objects.all()
     out['name_technic'] = _name_technic.order_by('name')
@@ -841,7 +842,10 @@ def show_staff_view(request):
             _post = POST_USER[get_current_post(_user)]
         else:
             _post = None
-        _tel = get_current_post(_user)
+        try:
+            _tel = Post.objects.get(user_post=_user).telephone#get_current_post(_user)
+        except:
+            _tel = None
         _user_post.append((_user, _post, _tel))
 
     out['telecon'] = TeleBot.objects.all()
@@ -889,7 +893,10 @@ def edit_staff_view(request, id_staff):
         else:
             supervisor = None
 
-        tel = request.POST.get('telephone')
+        if request.POST.get('telephone'):
+            tel = str(request.POST.get('telephone')).strip()
+        else:
+            tel = ''
 
         selected_post.post_name = selected_post_name
         selected_post.supervisor = supervisor
