@@ -842,7 +842,10 @@ def show_staff_view(request):
             _post = POST_USER[get_current_post(_user)]
         else:
             _post = None
-        _tel = get_current_post(_user)
+        try:
+            _tel = Post.objects.get(user_post=_user).telephone#get_current_post(_user)
+        except:
+            _tel = None
         _user_post.append((_user, _post, _tel))
 
     out['telecon'] = TeleBot.objects.all()
@@ -890,7 +893,10 @@ def edit_staff_view(request, id_staff):
         else:
             supervisor = None
 
-        tel = request.POST.get('telephone')
+        if request.POST.get('telephone'):
+            tel = str(request.POST.get('telephone')).strip()
+        else:
+            tel = ''
 
         selected_post.post_name = selected_post_name
         selected_post.supervisor = supervisor
