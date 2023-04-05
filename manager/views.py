@@ -1666,6 +1666,11 @@ def del_staff(request, id_staff):
 
     user = User.objects.get(id=id_staff)
     post = Post.objects.get(user_post=user)
+    tech_drv = TechnicDriver.objects.filter(
+        driver__driver=user,
+        date__lt=TODAY
+    )
+    tech_drv.delete()
     post.delete()
     user.delete()
 
