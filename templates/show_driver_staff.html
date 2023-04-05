@@ -2,37 +2,24 @@
 
 {% block content %}
 
-<div class="container mt-3 mx-auto"  >
-        <p class="card-text text-center"> <b class="fs-5">Все сотрудники </b> </p>
+<div class="container mx-auto border border-2"  >
+        <p class="card-text text-center"> <b class="fs-5">Водители </b> </p>
         <table class="table table-bordered table-hover w-auto mx-auto">
   <thead>
     <tr>
       <th scope="col">#</th>
-      <th scope="col">username</th>
       <th scope="col">Фамилия</th>
       <th scope="col">Имя</th>
-      <th scope="col">Должность</th>
       <th scope="col">Телефон</th>
-      <th scope="col">Последний вход</th>
     </tr>
   </thead>
   <tbody>{% for user, post, tel in user_post %}
 
     <tr id="{{ user.id }}" class="user_row">
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ user.username }}</td>
       <td>{{ user.last_name }}</td>
       <td>{{ user.first_name }}</td>
-      <td>{{ post }}</td>
       <td>{{ tel }}</td>
-      <td>{% for id_chat in telecon %}
-          {% if id_chat.user_bot.id == user.id and id_chat.id_chat %}
-              <i class="fa-solid fa-paper-plane"></i> |
-          {% endif %}
-          {% endfor %}
-          {{ user.last_login }}
-
-      </td>
     </tr>
     {% endfor %}
   </tbody>

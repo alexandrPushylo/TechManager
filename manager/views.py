@@ -834,9 +834,13 @@ def show_staff_view(request):
 
     out = {}
     get_prepare_data(out, request)
-    staff_list = User.objects.all().order_by('last_name')
-    _user_post = []
+    if is_mechanic(request.user):
+        _post = Post.objects.filter(post_name__name_post=POST_USER['driver']).values_list('user_post_id', flat=True)
+        staff_list = User.objects.filter(id__in=_post).order_by('last_name')
+    else:
+        staff_list = User.objects.all().order_by('last_name')
 
+    _user_post = []
     for _user in staff_list:
         if get_current_post(_user):
             _post = POST_USER[get_current_post(_user)]
@@ -845,12 +849,14 @@ def show_staff_view(request):
         try:
             _tel = Post.objects.get(user_post=_user).telephone#get_current_post(_user)
         except:
-            _tel = None
+            _tel = ''
         _user_post.append((_user, _post, _tel))
 
     out['telecon'] = TeleBot.objects.all()
     out['user_post'] = _user_post
     out['staff_list'] = staff_list
+    if is_mechanic(request.user):
+        return render(request, 'show_driver_staff.html', out)
 
     return render(request, 'show_staff.html', out)
 
