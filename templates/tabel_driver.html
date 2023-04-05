@@ -19,9 +19,10 @@
     {% endblock %}
 
 <div class="container-sm m-3 mt-5 mx-auto">
-      <div><hr>
+      <div class="m-0">
+      <p class="card-text m-0 text-center"> <b class="fs-5">Водители</b> </p>
     <form method="post" id="drivers_form" enctype="multipart/form-data">{% csrf_token %}
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover mx-auto w-auto">
   <thead>
     <tr>
       <th scope="col">#</th>
