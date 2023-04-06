@@ -573,10 +573,12 @@ def get_id_app_from_tech_name(request, day, id_tech_name):
         ).values_list('id', flat=True)
 
         return conflict_correction_view(request, day, id_applications)
-    return HttpResponseRedirect(request.headers.get('Referer'))
+    return HttpResponseRedirect('/')
 
 
 def conflict_correction_view(request, day, id_applications):
+    if not is_admin(request.user):
+        return HttpResponseRedirect('/')
     out = {}
     if isinstance(id_applications, str):
         id_application_list = id_applications.split(',')[:-1]
