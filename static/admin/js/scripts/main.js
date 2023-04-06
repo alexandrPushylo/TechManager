@@ -39,11 +39,11 @@ $('.driver_name_link').click(function () {
     }
 })
 
-$('.technic_name_link').click(function () {
-    if(this.id){
-        location.href = '/get_id_tech_name/'+$('.io_current_day').val()+'/'+this.id;
-    }
-})
+// $('.technic_name_link').click(function () {
+//     if(this.id){
+//         location.href = '/get_id_tech_name/'+$('.io_current_day').val()+'/'+this.id;
+//     }
+// })
 
 $('#btn_show_tech').click(function () {
     sent('technics')

@@ -95,11 +95,13 @@
                   <div class="row mt-1 ms-2" {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>
                 <div id="{{ v.technic_driver.technic.name.id }}" class="card-text fs-6 col-auto mt-0 technic_name_link
                         {% if v.technic_driver.technic.name.id in conflicts_vehicles_list_id %}
-                        text-danger{% endif %}
+                            text-danger{% endif %}
                         {% if not v.technic_driver.status %}
-                        text-decoration-line-through
-                        {% endif %}
-                            ">{{ v.technic_driver.technic.name }}</div>
+                            text-decoration-line-through
+                        {% endif %}"
+                     {% if cw_day >= lw_day %}onclick="location.href = '/get_id_tech_name/{{ cw_day }}/'+this.id;"{% endif %} >
+                    {{ v.technic_driver.technic.name }}
+                </div>
                 <div id="{{ v.technic_driver.driver.driver.id }}" class="card-text fs-6 col-auto driver_name_link mt-0
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
