@@ -37,16 +37,15 @@ $('.btn_del').click(function () {
             $('#chack'+app_id).val('False');
             $('#desc'+app_id).prop('readonly',false);
             $('#btn_reset'+app_id).prop('hidden',false);
-            $('#btn_del_back'+app_id).prop('hidden',true);
-            $('#btn_del'+app_id).prop('hidden',false);
+            $('#btn_del'+app_id).text('Удалить');
             }
         else {
             desc_area.text(del_str+desc_area.text());
             $('#chack'+app_id).val('True');
             $('#desc'+app_id).prop('readonly',true);
             $('#btn_reset'+app_id).prop('hidden',true);
-            $('#btn_del_back'+app_id).prop('hidden',false);
-            $('#btn_del'+app_id).prop('hidden',true);
+            $('#btn_del'+app_id).text('Отменить');
+
             }
         return false;
     })
