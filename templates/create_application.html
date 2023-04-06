@@ -28,15 +28,23 @@
         <div class="container-fluid p-0 ul_tech_list" >
              {% for v in list_of_vehicles %}
             <div class="mt-4 " id="{{forloop.counter}}">
-                <div class="input-group tech_driver_list " id="{{forloop.counter}}">
+                <div class="input-group tech_driver_list" id="{{forloop.counter}}">
                     <input name="io_id_app_tech" type="hidden" value="{{ v.id }}">
+                    <input id="chack{{ v.id }}" name="io_app_tech_var_chack" type="hidden" value="{{ v.var_check }}">
                     <input name="io_id_tech_driver" type="hidden" value="{{ v.technic_driver.id }}" id="io_id_tech_driver_{{forloop.counter}}">
                     <input name="io_id_tech_name" type="hidden" value="{{ v.technic_driver.technic.name.id }}" id="io_tech_name_id_{{ forloop.counter }}">
 
                     <input type="text" id="io_technic_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.technic.name }}">
                     <input type="text" id="io_driver_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.driver.driver.last_name }}">
-                    <button role="button" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
-                    <button role="button" class="btn btn-danger col-auto btn_del_io"><i class="fa-solid fa-trash"></i></button>
+                    {% if not v.var_check %}
+                    <button id="btn_edit_io{{ v.id }}" role="button" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
+                    <button role="button" class="btn btn-danger col-auto {% if post == 'admin' %} btn_del_io {% else %} btn_delete {% endif %}"><i class="fa-solid fa-trash"></i></button>
+                    {% elif v.var_check and post == 'admin' %}
+                        <button id="btn_edit_io{{ v.id }}" role="button" hidden="" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
+                        <button role="button" class="btn btn-primary col-auto btn_del_io"><i class="fa-solid fa-rotate-left"></i></button>
+                    {% elif v.var_check %}
+                        <button role="button" class="btn btn-danger col-auto btn_delete "><i class="fa-solid fa-trash"></i></button>
+                    {% endif %}
                 </div>
 
 
@@ -49,7 +57,6 @@
                     </select>
 
                     {% for d in tech_driver_list %}
-{#                        <input class="free_td_loop_{{forloop.parentloop.counter}} free_td_{{ d.0.id }}" type="hidden" value="{{ d.2 }}">#}
                     <select class="col-auto select_td_{{ d.0.id }} select_add_driver_{{forloop.parentloop.counter}}" hidden="" >
                         <option selected id_dt=""></option>
                         {% for td in d.1 %}
@@ -60,13 +67,13 @@
 
                     <button role="button" class="btn btn-success btn-sm  btn_check_new_tech" ><i class="fa-sharp fa-solid fa-check"></i></button>
                     <button role="button" class="btn btn-danger btn-sm btn_check_cancel_tech" ><i class="fa-solid fa-ban"></i></button>
+
                 </div>
 
 
-                <div class="mt-1 p-0">
-                    <textarea class="form-control app_description m-0" name="description_app_list" rows="1">{{ v.description }}</textarea>
+                <div class="mt-1 p-0 desc_area">
+                    <textarea id="desc{{ v.id }}" {% if v.var_check %}readonly{% endif %} class="form-control app_description m-0" name="description_app_list" rows="1">{{ v.description }}</textarea>
                 </div>
-
             </div>
             {% endfor %}
         </div>
@@ -85,7 +92,6 @@
             </select>
 
         {% for d in tech_driver_list %}
-{#            <input class="free_add_td_{{ d.0.id }}" type="hidden" value="{{ d.2|safe }}">#}
             <select  class="col-auto  driver_add select_td_add_{{ d.0.id }}" hidden="">
                 <option selected></option>
                 {% for td in d.1 %}
