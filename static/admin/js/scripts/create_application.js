@@ -74,8 +74,6 @@ $('#add_vehicle_btn').click(function () {
 $("#input_tech_add").change(function (){    //OK
     $('.driver_add').prop('hidden',true);
     let tech_name_id = this.value;
-    // const free_td = $('.free_add_td_'+tech_name_id).val();
-    // let free_td_val = free_td.replace('[','').replace(']','').split(', ');
 
     $('.select_td_add_'+tech_name_id).prop('hidden',false);
 
@@ -133,10 +131,33 @@ $('.btn_edit_io').click(function (e) {
 });
 
 $('.btn_del_io').click(function (e) {
-    this.parentElement.parentElement.remove();
+    const del_str = 'ОТКЛОНЕНА\n';
+    const desc_area = $(this.parentElement.parentElement.getElementsByClassName('app_description'));
+    let desc_id = desc_area[0].id.replace('desc','');
+
+    if(desc_area.text().includes('ОТКЛОНЕНА')){
+        desc_area.text(desc_area.text().replace('ОТКЛОНЕНА\n',''));
+        $('#chack'+desc_id).val('False');
+        $('#desc'+desc_id).prop('readonly',false);
+        $('#btn_edit_io'+desc_id).prop('hidden',false);
+
+    }
+    else {
+        desc_area.text(del_str+desc_area.text());
+        $('#chack'+desc_id).val('True');
+        $('#desc'+desc_id).prop('readonly',true);
+        $('#btn_edit_io'+desc_id).prop('hidden',true);
+
+    }
     return false;
 });
+
+$('.btn_delete').click(function (e) {
+    this.parentElement.parentElement.remove();
+    return false;
+})
 
 $('.app_description').each(function () {
     this.style.height = ""+(this.scrollHeight)+"px";
 });
+

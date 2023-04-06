@@ -1514,14 +1514,9 @@ def create_new_application(request, id_application):
     technic_names = Tech_name_list.filter(id__in=technic_name_id_list)
     out['technic_names'] = technic_names
 
-    # work_tech_drv_list = Tech_driver_list.values_list('technic__name_id', 'id', 'driver__driver__last_name')
-    # out['work_tech_drv_list'] = work_tech_drv_list.order_by('driver__driver__last_name')
-
     out['tech_driver_list'] = []
     for tn in technic_names:
         _td = Tech_driver_list.filter(technic__name=tn).values('id', 'driver__driver__last_name')
-        # free_drv = get_free_tech_driver_list(current_date, tn)
-        # out['tech_driver_list'].append((tn, _td, free_drv))
         out['tech_driver_list'].append((tn, _td))
 
     _materials = ApplicationMeterial.objects.filter(app_for_day=current_application)
@@ -1536,6 +1531,7 @@ def create_new_application(request, id_application):
         IO_desc_application_today = request.POST.get('app_today_desc')
         IO_desc_application_technic = request.POST.getlist('description_app_list')
         IO_desc_application_materiial = request.POST.get('desc_meterials')
+        IO_app_var_check = request.POST.getlist('io_app_tech_var_chack')
 
         if IO_desc_application_today:
             IO_desc_application_today = str(IO_desc_application_today).strip()
@@ -1577,12 +1573,12 @@ def create_new_application(request, id_application):
         for i, _id_app_tech in enumerate(IOL_id_application_technic):
             _app_technic = ApplicationTechnic.objects.get(id=_id_app_tech)
             _app_technic.technic_driver = TechnicDriver.objects.get(id=IOL_id_technic_driver[i])
+            _app_technic.var_check = IO_app_var_check[i]
 
             if IO_desc_application_technic[i] in _app_technic.description:
                 _app_technic.description = IO_desc_application_technic[i]
             else:
                 _app_technic.description = IO_desc_application_technic[i]
-                _app_technic.var_check = False
             _app_technic.save()
         # --------------------------------------------------------------------------------------------
 
