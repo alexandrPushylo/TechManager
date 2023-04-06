@@ -41,7 +41,8 @@
                     <button role="button" class="btn btn-danger col-auto {% if post == 'admin' %} btn_del_io {% else %} btn_delete {% endif %}"><i class="fa-solid fa-trash"></i></button>
                     {% elif v.var_check and post == 'admin' %}
                         <button id="btn_edit_io{{ v.id }}" role="button" hidden="" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button role="button" class="btn btn-primary col-auto btn_del_io"><i class="fa-solid fa-rotate-left"></i></button>
+                        <button id="btn_back{{ v.id }}" role="button" class="btn btn-primary col-auto btn_del_io"><i class="fa-solid fa-rotate-left"></i></button>
+                        <button id="btn_delete{{ v.id }}" role="button" hidden="" class="btn btn-danger col-auto btn_del_io"><i class="fa-solid fa-trash"></i></button>
                     {% elif v.var_check %}
                         <button role="button" class="btn btn-danger col-auto btn_delete "><i class="fa-solid fa-trash"></i></button>
                     {% endif %}
