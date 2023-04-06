@@ -140,6 +140,9 @@ $('.btn_del_io').click(function (e) {
         $('#chack'+desc_id).val('False');
         $('#desc'+desc_id).prop('readonly',false);
         $('#btn_edit_io'+desc_id).prop('hidden',false);
+        $('#btn_delete'+desc_id).prop('hidden',false);
+        $('#btn_back'+desc_id).prop('hidden',true);
+
 
     }
     else {
@@ -147,6 +150,8 @@ $('.btn_del_io').click(function (e) {
         $('#chack'+desc_id).val('True');
         $('#desc'+desc_id).prop('readonly',true);
         $('#btn_edit_io'+desc_id).prop('hidden',true);
+        $('#btn_delete'+desc_id).prop('hidden',true);
+        $('#btn_back'+desc_id).prop('hidden',false);
 
     }
     return false;
