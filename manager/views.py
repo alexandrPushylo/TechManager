@@ -646,6 +646,7 @@ def conflict_correction_view(request, day, id_applications):
             _app = ApplicationTechnic.objects.get(id=_id_app_tech)
             if request.POST.get(f"technic_driver_{_id_app_tech}"):
                 _app.technic_driver = TechnicDriver.objects.get(id=request.POST.get(f"technic_driver_{_id_app_tech}"))
+                _app.var_check = request.POST.get(f"io_app_tech_var_chack_{_id_app_tech}")
                 if request.POST.get(f"description_{_id_app_tech}"):
                     _app.description = str(request.POST.get(f"description_{_id_app_tech}")).strip()
                 else:

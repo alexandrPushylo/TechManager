@@ -32,6 +32,8 @@
             <div class="item">
         <div class="me-3 mb-4 ">
         <input type="hidden" value="{{ app.id }}" name="id_list"/>
+        <input id="chack{{ app.id }}" name="io_app_tech_var_chack_{{ app.id }}" type="hidden" value="{{ app.var_check }}">
+
         <div class="card shadow-lg border {% if app.technic_driver.technic.name.id in conflicts_list %} border-2 border-danger {% endif %}"style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
 
           <div class="card-body w-100 p-1" >
@@ -58,7 +60,7 @@
                 <div class="card-text fs-6 mt-0">
                     <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ app.technic_driver.id }}" >
                     {% for td_l in tech_driver_list %}
-                    <select class="form-control col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ app.id }}">
+                    <select class="form-control disabled col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ app.id }}">
                         {% for td in td_l.1 %}
                     <option {% if td.id in work_TD_list %} style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %}[занят]{% else %}[своб.]{% endif %}</option>
                         {% endfor %}
@@ -68,7 +70,7 @@
                     </div>
                   {% if app.description %}
                 <div class="input-groupp-0">
-                        <textarea class="form-control app_description mt-2"  id="floatingInputValue" name="description_{{ app.id }}" >{{ app.description }}</textarea>
+                        <textarea class="form-control app_description mt-2"  id="desc{{ app.id }}" name="description_{{ app.id }}" >{{ app.description }}</textarea>
                     </div>
 
                 {%endif%}
@@ -76,12 +78,9 @@
 
             <hr class="m-0 mt-1">
             <div class="btn-group d-flex justify-content-center m-0 mt-2">
-                <button role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-outline-primary btn-sm col-auto" >Вернуть</button>
-                    <button role="button" class="btn btn-outline-danger btn-sm col-auto" onclick="
-                            this.parentNode.parentNode.parentNode.remove();
-                            return false;
-                            "  >Удалить
-                    </button>
+                <button id="btn_reset{{ app.id }}" role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-outline-primary btn-sm col-auto" >Вернуть</button>
+                    <button id="btn_del{{ app.id }}" role="button" class="btn btn-outline-danger btn-sm col-auto btn_del">Удалить</button>
+                <button id="btn_del_back{{ app.id }}" hidden="" role="button" class="btn btn-outline-primary btn-sm col-auto btn_del">Отменить</button>
             </div>
           </div>
         </div>
