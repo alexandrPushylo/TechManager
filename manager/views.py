@@ -1703,6 +1703,8 @@ def signup_view(request):
 
     if request.user.is_anonymous:
         post_list = None
+    elif is_mechanic(request.user):
+        post_list = PostName.objects.filter(name_post=POST_USER['driver'])
     else:
         post_list = PostName.objects.all()
 
