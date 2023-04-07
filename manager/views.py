@@ -28,6 +28,7 @@ from manager.utilities import status_application as STATUS_AP
 from manager.utilities import status_constr_site as STATUS_CS
 from manager.utilities import variable as VAR
 from manager.utilities import text_templates as TEXT_TEMPLATES
+from manager.utilities import colors as COLOR_LIST
 # -----------------
 from manager.utilities import get_day_in_days
 # from manager.utilities import get_difference
@@ -621,10 +622,22 @@ def conflict_correction_view(request, day, id_applications):
     out["date_of_target"] = current_day
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
     out['conflicts_list'] = get_conflicts_vehicles_list(current_day, c_in=0)
-    out['priority_list'] = get_priority_list(current_day)
+    priority_list = get_priority_list(current_day)
+    out['priority_list'] = priority_list
     out['work_TD_list'] = get_work_TD_list(current_day, c_in=0)
     out['free_tech_name'] = get_free_tech_driver_list(current_day=current_day)
     out['tech_app_list'] = _Application_technic.order_by('technic_driver__driver__driver__last_name')
+
+    out['prior_color'] = {}
+    ds = _Application_technic.filter(
+        technic_driver_id__in=get_priority_list(current_day, get_td_id=True)).values_list('technic_driver_id', flat=True)
+    for pr in ds:
+        clr = rand_choice(COLOR_LIST)
+        if clr not in out['prior_color'].values():
+            out['prior_color'][pr] = clr
+        else:
+            COLOR_LIST.remove(clr)
+            out['prior_color'][pr] = rand_choice(COLOR_LIST)
 
     l_out = []
 

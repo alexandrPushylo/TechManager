@@ -100,3 +100,19 @@ def check_time(stop_time=None):
     NOW = datetime.now().time()
     if NOW < stop_time:
         return stop_time
+
+colors = [
+    '#15b03e',
+    '#5a9e6c',
+    '#85d633',
+    '#2b5403',
+    '#f0dc05',
+    '#fa9600',
+    '#fa4f00',
+    '#fa0400',
+    '#00fae1',
+    '#008efa',
+    '#001dfa',
+    '#9600fa',
+    '#fa00ed',
+]
