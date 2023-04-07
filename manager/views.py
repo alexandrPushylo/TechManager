@@ -1841,7 +1841,7 @@ def submitted_all_applications(request, day):
     return HttpResponseRedirect(f'/applications/{day}')
 
 
-def get_priority_list(current_day):
+def get_priority_list(current_day, get_td_id=False):
     """
     return ApplicationTechnic_id
     """
@@ -1857,10 +1857,16 @@ def get_priority_list(current_day):
     for _app in set(ll):
         count = ll.count(_app)
         if count > 1:
-            _l = [q[0] for q in _Application_technic.filter(
-                priority=_app[0],
-                technic_driver_id=_app[1]).exclude(var_check=True).distinct().values_list('id')]
-            l.extend(_l)
+            if get_td_id:
+                _l = [q[0] for q in _Application_technic.filter(
+                    priority=_app[0],
+                    technic_driver_id=_app[1]).exclude(var_check=True).distinct().values_list('technic_driver_id')]
+                l.extend(_l)
+            else:
+                _l = [q[0] for q in _Application_technic.filter(
+                    priority=_app[0],
+                    technic_driver_id=_app[1]).exclude(var_check=True).distinct().values_list('id')]
+                l.extend(_l)
     return l
 
 
