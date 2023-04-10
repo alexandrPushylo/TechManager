@@ -564,6 +564,7 @@ def driver_app_list_view(request, day):
 def get_id_app_from_tech_name(request, day, id_tech_name):
     if is_admin(request.user):
         current_day = convert_str_to_date(day)
+
         _technic_name = TechnicName.objects.get(id=id_tech_name)
         id_applications = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
