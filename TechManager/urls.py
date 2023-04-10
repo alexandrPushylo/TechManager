@@ -83,7 +83,7 @@ urlpatterns = [
     path('append_in_hos_tech/<int:id_drv>', append_in_spec_tech, name='append_in_spec_tech'),# TODO: del
 
 
-    path('copy_app/<int:id_application>', copy_app_view, name='copy_app'),
+    path('copy_app/<int:id_application>/<str:day>', copy_app_view, name='copy_app'),
 
     path('construction_sites/', show_construction_sites_view, name='construction_sites'),
     path('edit_construction_sites/<int:id_construction_sites>', edit_construction_sites_view, name='edit_construction_sites'),
