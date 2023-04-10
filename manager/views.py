@@ -673,6 +673,7 @@ def conflict_correction_view(request, day, id_applications):
         if out['conflicts_vehicles_list']:
             return HttpResponseRedirect(f'/conflict_resolution/{day}')
         else:
+            return HttpResponseRedirect(f'/applications/{day}')
     return render(request, 'conflict_correction.html', out)
 
 
