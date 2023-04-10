@@ -1595,11 +1595,10 @@ def create_new_application(request, id_application):
             _app_technic = ApplicationTechnic.objects.get(id=_id_app_tech)
             _app_technic.technic_driver = TechnicDriver.objects.get(id=IOL_id_technic_driver[i])
             _app_technic.var_check = IO_app_var_check[i]
-
-            if IO_desc_application_technic[i] in _app_technic.description:
-                _app_technic.description = IO_desc_application_technic[i]
+            if IO_desc_application_technic[i]:
+                _app_technic.description = str(IO_desc_application_technic[i]).strip()
             else:
-                _app_technic.description = IO_desc_application_technic[i]
+                _app_technic.description = ''
             _app_technic.save()
         # --------------------------------------------------------------------------------------------
 
