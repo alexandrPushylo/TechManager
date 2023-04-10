@@ -2177,7 +2177,7 @@ def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     _ex_td = driver_list.exclude(
-        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True))
+        user_post__id__in=DriverTabel.objects.filter(date=current_day).values_list('driver__id', flat=True))
     if current_day > TODAY:
         try:
             if _ex_td.exists():
