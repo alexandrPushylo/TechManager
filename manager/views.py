@@ -424,55 +424,55 @@ def edit_technic_view(request, id_tech=None):
     return render(request, 'edit_technic.html', out)
 
 
-def copy_app_view(request, id_application):
+def copy_app_view(request, id_application, day):
     out = {}
     _app_for_day = ApplicationToday.objects.get(id=id_application)
     current_day = _app_for_day.date
     get_prepare_data(out, request, current_day)
     _app_technic = ApplicationTechnic.objects.filter(app_for_day=_app_for_day)
-
+    _app_materials = ApplicationMeterial.objects.filter(app_for_day=_app_for_day)
     if is_admin(request.user):
         _status = STATUS_APP_submitted
     else:
         _status = STATUS_APP_saved
 
-    if current_day != get_current_day('next_day'):
-        next_app_for_day, _ = ApplicationToday.objects.get_or_create(
-            date=get_current_day('next_day'),
-            construction_site=_app_for_day.construction_site)
-        next_app_for_day.status = _status
-        next_app_for_day.save()
+    date_of_target = convert_str_to_date(day)
+    if date_of_target > TODAY:
+        new_app_today, _ = ApplicationToday.objects.get_or_create(
+            date=date_of_target,
+            construction_site=_app_for_day.construction_site,
+            status=STATUS_APP_saved,
+            description=_app_for_day.description
+        )
+        new_app_today.save()
 
-        for _apptech in _app_technic:
-            if DriverTabel.objects.filter(
-                    date=get_current_day('next_day'),
-                    status=True,
-                    driver=_apptech.technic_driver.driver.driver).count() != 0:
-                _drv_tab = DriverTabel.objects.get(
-                    date=get_current_day('next_day'),
-                    status=True,
-                    driver=_apptech.technic_driver.driver.driver)
+        for app_tech in _app_technic:
+            if app_tech.technic_driver.driver:
+                if TechnicDriver.objects.filter(date=date_of_target,
+                                                status=True,
+                                                driver__date=date_of_target,
+                                                driver__driver=app_tech.technic_driver.driver.driver).exists():
+                    td = TechnicDriver.objects.get(date=date_of_target,
+                                                   status=True,
+                                                   driver__date=date_of_target,
+                                                   driver__driver=app_tech.technic_driver.driver.driver)
+                    new_app_tech, _ = ApplicationTechnic.objects.get_or_create(
+                        technic_driver=td,
+                        app_for_day=new_app_today,
+                        description=app_tech.description,
 
-                if TechnicDriver.objects.filter(
-                        status=True,
-                        date=get_current_day('next_day'),
-                        driver=_drv_tab,
-                        technic=_apptech.technic_driver.technic).count() != 0:
-                    _technic_driver = TechnicDriver.objects.get(
-                        status=True,
-                        technic=_apptech.technic_driver.technic,
-                        date=get_current_day('next_day'),
-                        driver=_drv_tab)
-                    _td, _ = ApplicationTechnic.objects.get_or_create(
-                        app_for_day=next_app_for_day,
-                        description=_apptech.description,
-                        technic_driver=_technic_driver)
-                    _td.save()
-                else:
-                    continue
-            else:
-                continue
-    return HttpResponseRedirect(f'/applications/{current_day}')
+                    )
+                    new_app_tech.save()
+
+        for app_mater in _app_materials:
+            _app_m, _ = ApplicationMeterial.objects.get_or_create(
+                app_for_day=new_app_today,
+                description=app_mater.description,
+
+            )
+            _app_m.save()
+
+    return HttpResponseRedirect(f'/applications/{date_of_target}')
 
 
 def append_in_spec_tech(request, id_drv):
@@ -569,11 +569,11 @@ def get_id_app_from_tech_name(request, day, id_tech_name):
         id_applications = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
             technic_driver__status=True,
-            technic_driver__driver__status=True,
+            # technic_driver__driver__status=True,
             var_check=False,
             technic_driver__technic__name=_technic_name
         ).values_list('id', flat=True)
-        
+
         return conflict_correction_view(request, day, id_applications)
     return HttpResponseRedirect('/')
 
@@ -957,11 +957,9 @@ def tabel_driver_view(request, day):
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
 
-    # prepare_driver_table(day)
     _exc_post = Post.objects.filter(post_name__name_post=POST_USER['driver']).exclude(
-        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True)
+        user_post__id__in=DriverTabel.objects.filter(date=current_day).values_list('driver__id', flat=True)
     ).exists()
-
     if not DriverTabel.objects.filter(date=current_day).exists() or _exc_post:
         prepare_driver_table(day)
 
@@ -1301,6 +1299,8 @@ def show_applications_view(request, day, id_user=None):
             appMater = materials_list.filter(
                 app_for_day=appToday).values_list('description', flat=True).first()
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
+
+    out['apps_today_save'] = app_for_day.filter(status=STATUS_APP_saved)
 
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
@@ -1684,11 +1684,11 @@ def del_staff(request, id_staff):
 
     user = User.objects.get(id=id_staff)
     post = Post.objects.get(user_post=user)
-    tech_drv = TechnicDriver.objects.filter(
-        driver__driver=user,
-        date__lt=TODAY
+    driver_tab = DriverTabel.objects.filter(
+        driver=user,
+        # date__lt=TODAY
     )
-    tech_drv.delete()
+    driver_tab.delete()
     post.delete()
     user.delete()
 
@@ -2179,18 +2179,19 @@ def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     _ex_td = driver_list.exclude(
-        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True))
-
+        user_post__id__in=DriverTabel.objects.filter(date=current_day).values_list('driver__id', flat=True))
     if current_day > TODAY:
         try:
             if _ex_td.exists():
                 for dr in _ex_td:
                     DriverTabel.objects.create(driver=dr.user_post, date=current_day)
-            _driver_table = DriverTabel.objects.filter(date=TODAY)
-            for _dt in _driver_table:
-                _dt.pk = None
-                _dt.date = current_day
-            DriverTabel.objects.bulk_create(_driver_table)
+            else:
+                _driver_table = DriverTabel.objects.filter(date=TODAY)
+                for _dt in _driver_table:
+                    _dt.pk = None
+                    _dt.date = current_day
+                DriverTabel.objects.bulk_create(_driver_table)
+
         except DriverTabel.DoesNotExist:
             for drv in driver_list:
                 DriverTabel.objects.create(driver=drv, date=current_day)

@@ -33,6 +33,16 @@ $('.btn_driver_panel').click(function () {
     return false
 })
 
+$('#btn_app_copy').click(function () {
+    const select_app = $('#select_copy_app');
+    const date_copy_app = $('#date_copy_app');
+
+    if (date_copy_app.val() != ''){
+        location.href = '/copy_app/'+select_app.val()+'/'+date_copy_app.val();
+    }
+    return false;
+});
+
 $('.driver_name_link').click(function () {
     if(this.id){
         location.href = '/personal_application/'+$('.io_current_day').val()+'/'+this.id;
