@@ -564,6 +564,7 @@ def driver_app_list_view(request, day):
 def get_id_app_from_tech_name(request, day, id_tech_name):
     if is_admin(request.user):
         current_day = convert_str_to_date(day)
+
         _technic_name = TechnicName.objects.get(id=id_tech_name)
         id_applications = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
@@ -572,7 +573,7 @@ def get_id_app_from_tech_name(request, day, id_tech_name):
             var_check=False,
             technic_driver__technic__name=_technic_name
         ).values_list('id', flat=True)
-
+        
         return conflict_correction_view(request, day, id_applications)
     return HttpResponseRedirect('/')
 
@@ -670,9 +671,10 @@ def conflict_correction_view(request, day, id_applications):
                 _app.save()
             else:
                 _app.delete()
-
-        # return HttpResponseRedirect(f'/conflict_resolution/{day}')
-        return HttpResponseRedirect('')
+        if out['conflicts_vehicles_list']:
+            return HttpResponseRedirect(f'/conflict_resolution/{day}')
+        else:
+            return HttpResponseRedirect(f'/applications/{day}')
     return render(request, 'conflict_correction.html', out)
 
 
@@ -955,7 +957,12 @@ def tabel_driver_view(request, day):
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
 
-    if not DriverTabel.objects.filter(date=current_day).exists():
+    # prepare_driver_table(day)
+    _exc_post = Post.objects.filter(post_name__name_post=POST_USER['driver']).exclude(
+        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True)
+    ).exists()
+
+    if not DriverTabel.objects.filter(date=current_day).exists() or _exc_post:
         prepare_driver_table(day)
 
     if not TechnicDriver.objects.filter(date=current_day).exists():
@@ -1590,11 +1597,10 @@ def create_new_application(request, id_application):
             _app_technic = ApplicationTechnic.objects.get(id=_id_app_tech)
             _app_technic.technic_driver = TechnicDriver.objects.get(id=IOL_id_technic_driver[i])
             _app_technic.var_check = IO_app_var_check[i]
-
-            if IO_desc_application_technic[i] in _app_technic.description:
-                _app_technic.description = IO_desc_application_technic[i]
+            if IO_desc_application_technic[i]:
+                _app_technic.description = str(IO_desc_application_technic[i]).strip()
             else:
-                _app_technic.description = IO_desc_application_technic[i]
+                _app_technic.description = ''
             _app_technic.save()
         # --------------------------------------------------------------------------------------------
 
@@ -2172,9 +2178,14 @@ def prepare_work_day_table(day):
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
+    _ex_td = driver_list.exclude(
+        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True))
 
     if current_day > TODAY:
         try:
+            if _ex_td.exists():
+                for dr in _ex_td:
+                    DriverTabel.objects.create(driver=dr.user_post, date=current_day)
             _driver_table = DriverTabel.objects.filter(date=TODAY)
             for _dt in _driver_table:
                 _dt.pk = None
@@ -2183,9 +2194,16 @@ def prepare_driver_table(day):
         except DriverTabel.DoesNotExist:
             for drv in driver_list:
                 DriverTabel.objects.create(driver=drv, date=current_day)
+
+    elif current_day == TODAY:
+        if not _ex_td.exists():
+            for drv in driver_list:
+                DriverTabel.objects.create(driver=drv.user_post, date=current_day)
+        else:
+            for dr in _ex_td:
+                DriverTabel.objects.create(driver=dr.user_post, date=current_day)
     else:
-        for drv in driver_list:
-            DriverTabel.objects.create(driver=drv.user_post, date=current_day)
+        pass
 
 
 def prepare_technic_driver_table(day):

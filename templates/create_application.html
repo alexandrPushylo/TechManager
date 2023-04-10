@@ -112,10 +112,10 @@
       <div class="card-body p-0">
          <p class="card-text fs-5 m-0 ms-3 fw-bold col-auto">Список материалов</p>
          <hr class="m-0 mt-1">
-         <div >
-            {% if check_time and cw_day == nw_day or weekend_flag %}
+         <div >{# {{ cw_day }} {{ nw_day }} {{ weekend_flag }}#}
+            {% if check_time and cw_day == nw_day or weekend_flag and check_time %}
                 <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials" placeholder="Время подачи заявок на материалы ограниченно до {{ LIMIT_for_submission }}">{{ material_list_raw }}</textarea>
-            {% elif cw_day > nw_day or post == 'employee_supply' and cw_day > lw_day  %}
+            {% elif cw_day > nw_day and not weekend_flag or post == 'employee_supply' and cw_day > lw_day  %}
                 <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials" >{{ material_list_raw }}</textarea>
             {% else %}
                 <textarea readonly class="form-control app_description mx-auto" name="desc_meterials" placeholder="Время подачи заявок на материалы закончилось">{{ material_list_raw }}</textarea>
