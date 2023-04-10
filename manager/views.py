@@ -569,11 +569,11 @@ def get_id_app_from_tech_name(request, day, id_tech_name):
         id_applications = ApplicationTechnic.objects.filter(
             app_for_day__date=current_day,
             technic_driver__status=True,
-            technic_driver__driver__status=True,
+            # technic_driver__driver__status=True,
             var_check=False,
             technic_driver__technic__name=_technic_name
         ).values_list('id', flat=True)
-        
+
         return conflict_correction_view(request, day, id_applications)
     return HttpResponseRedirect('/')
 
