@@ -2490,7 +2490,7 @@ def check_table(day):
         prepare_application_today(day)
         print('workday')
     elif _today.date < TODAY:
-        app = ApplicationToday.objects.filter(date__lt=date, status=STATUS_APP_absent)
+        app = ApplicationToday.objects.filter(date__lt=date).exclude(status=STATUS_APP_send)
         if app.exists():
             app.delete()
         _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=date)
