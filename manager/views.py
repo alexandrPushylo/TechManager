@@ -572,7 +572,7 @@ def get_id_app_from_tech_name(request, day, id_tech_name):
             var_check=False,
             technic_driver__technic__name=_technic_name
         ).values_list('id', flat=True)
-
+        
         return conflict_correction_view(request, day, id_applications)
     return HttpResponseRedirect('/')
 
@@ -670,9 +670,9 @@ def conflict_correction_view(request, day, id_applications):
                 _app.save()
             else:
                 _app.delete()
-
-        # return HttpResponseRedirect(f'/conflict_resolution/{day}')
-        return HttpResponseRedirect('')
+        if out['conflicts_vehicles_list']:
+            return HttpResponseRedirect(f'/conflict_resolution/{day}')
+        else:
     return render(request, 'conflict_correction.html', out)
 
 

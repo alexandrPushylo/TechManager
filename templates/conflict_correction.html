@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container-fluid mx-auto "  >
-  <form method="post" id="conf_corr_form" enctype="multipart/form-data">{% csrf_token %}
+  <form  method="post" id="conf_corr_form" enctype="multipart/form-data">{% csrf_token %}
 
 
 {# -----------------------------------------------------------------------------------------------------------#}
@@ -40,7 +40,11 @@
           <div class="row ps-2">
               <input {% for id, clr in prior_color.items %}{% if id == app.technic_driver.id %} style="border-width: 3px; border-color: {{ clr }}" {% endif %}{% endfor %} type="number" min="1" id="priority_{{ app.id }}" name="priority_{{ app.id }}" class="form-control w-25 ms-1 fs-3" value="{{ app.priority }}" />
             <div class="col pt-3">
+            {% if app.technic_driver.driver.driver.last_name %}
                 <h6 {% for id, clr in prior_color.items %}{% if id == app.technic_driver.id %} style="color: {{ clr }}" {% endif %}{% endfor %} class="card-title  fw-bold text-center ">{{ app.technic_driver.driver.driver.last_name }} ({{ app.technic_driver.technic.name.name }})</h6>
+            {% else %}
+                <h6 class="card-title fw-bold text-center bg-danger">Вадитель не назначен ({{ app.technic_driver.technic.name.name }})</h6>
+            {% endif %}
                 <h6 class="card-title text-center" >{{ app.app_for_day.construction_site.address }} ({{ app.app_for_day.construction_site.foreman.last_name }})</h6>
             </div>
           </div>
@@ -200,7 +204,11 @@
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
 {#    <a href="{{ referer }}" class="btn btn-outline-primary active  col-auto " aria-current="page"> Отмена</a>#}
-    <a href="{% url 'conflict_resolution' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page"> Назад</a>
+    {% if conflicts_vehicles_list %}
+    <a href="{% url 'conflict_resolution' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page">Назад</a>
+    {% else %}
+    <a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page">Назад</a>
+    {% endif %}
   <input form="conf_corr_form" class="btn btn-success  col-auto m-1" type="submit" value="Сохранить">
 </div>
 {% endblock %}
