@@ -955,7 +955,12 @@ def tabel_driver_view(request, day):
     current_day = convert_str_to_date(day)
     get_prepare_data(out, request, current_day)
 
-    if not DriverTabel.objects.filter(date=current_day).exists():
+    # prepare_driver_table(day)
+    _exc_post = Post.objects.filter(post_name__name_post=POST_USER['driver']).exclude(
+        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True)
+    ).exists()
+
+    if not DriverTabel.objects.filter(date=current_day).exists() or _exc_post:
         prepare_driver_table(day)
 
     if not TechnicDriver.objects.filter(date=current_day).exists():
@@ -2183,9 +2188,16 @@ def prepare_driver_table(day):
         except DriverTabel.DoesNotExist:
             for drv in driver_list:
                 DriverTabel.objects.create(driver=drv, date=current_day)
+
+    elif current_day == TODAY:
+        if not _ex_td.exists():
+            for drv in driver_list:
+                DriverTabel.objects.create(driver=drv.user_post, date=current_day)
+        else:
+            for dr in _ex_td:
+                DriverTabel.objects.create(driver=dr.user_post, date=current_day)
     else:
-        for drv in driver_list:
-            DriverTabel.objects.create(driver=drv.user_post, date=current_day)
+        pass
 
 
 def prepare_technic_driver_table(day):
