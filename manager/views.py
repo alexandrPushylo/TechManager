@@ -1989,6 +1989,7 @@ def get_count_app_for_driver(current_day):
         status=True,
         driver__status=True).values_list('id')]
     _app = [_[0] for _ in ApplicationTechnic.objects.filter(
+        Q(var_check=False),
         Q(app_for_day__date=current_day),
         Q(app_for_day__status=STATUS_APP_approved) |
         Q(app_for_day__status=STATUS_APP_submitted) |
