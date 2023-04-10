@@ -2176,9 +2176,14 @@ def prepare_work_day_table(day):
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
+    _ex_td = driver_list.exclude(
+        user_post__id__in=DriverTabel.objects.filter(date=TODAY).values_list('driver__id', flat=True))
 
     if current_day > TODAY:
         try:
+            if _ex_td.exists():
+                for dr in _ex_td:
+                    DriverTabel.objects.create(driver=dr.user_post, date=current_day)
             _driver_table = DriverTabel.objects.filter(date=TODAY)
             for _dt in _driver_table:
                 _dt.pk = None
