@@ -490,7 +490,6 @@ def append_in_spec_tech(request, id_drv):
     if not status:
         return HttpResponseRedirect(f'/applications/{date}')
 
-
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address=TEXT_TEMPLATES['constr_site_spec_name'],
         foreman=None)
@@ -609,7 +608,6 @@ def conflict_correction_view(request, day, id_applications):
         'technic_driver__technic__name_id',
         'technic_driver__technic__name__name').distinct()
 
-
     for tn in tech_name_list:
         all_t = technic_driver_table.filter(technic__name__id=tn[0])
         work_t = all_t.filter(status=True)
@@ -618,7 +616,6 @@ def conflict_correction_view(request, day, id_applications):
         free_td_id = get_free_tech_driver_list(current_day=current_day, technic_name=tn[0])
         free_td = technic_driver_table.filter(id__in=free_td_id).values_list('driver__driver__last_name', 'driver__driver__first_name')
         out['tech_inf'] = (tn[1], all_c, work_c, all_c - work_c, free_td)
-
 
     out["date_of_target"] = current_day
     out['conflicts_vehicles_list'] = get_conflicts_vehicles_list(current_day, c_in=1)
