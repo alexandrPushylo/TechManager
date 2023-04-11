@@ -133,7 +133,7 @@
                 {% if tense %}
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
 
-                <a ondblclick="location.href = '/clear_app/{{ a.app_today.id }}'; return false;" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
+                <a ondblclick="location.href = '/clear_app/{{ a.app_today.id }}'; return false;" class="btn btn-outline-danger  m-1" aria-current="page" title="Двойной клик для удаления"><i class="fa-solid fa-trash"></i></a>
 
                 {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
