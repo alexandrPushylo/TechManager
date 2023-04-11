@@ -27,7 +27,7 @@
         <div class=" position-fixed start-50 top-0 translate-middle-x  " style="z-index: 100; margin-top: 15px; z-index: 1000;">
             {% block indicator %}
                 {% if user.is_authenticated %}
-                <a href="{% url 'start_page' %}"  class="btn btn-sm btn-primary  " aria-current="page">На главную страницу</a>
+                <a href="{% url 'start_page' %}"  class="btn btn-primary  " aria-current="page">На главную</a>
                 {% endif %}
             {% endblock %}
         </div>
