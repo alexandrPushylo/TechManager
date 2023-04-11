@@ -938,10 +938,10 @@ def edit_staff_view(request, id_staff):
 
         selected_user.save()
 
-        if not get_current_post(selected_user):
+        if is_admin(request.user) or is_mechanic(request.user):
+            return HttpResponseRedirect('/show_staff/')
+        else:
             return HttpResponseRedirect('/')
-
-        return HttpResponseRedirect('/show_staff/')
     return render(request, 'edit_staff.html', out)
 
 # STAFF-----------------------------------------------STAFF-------------------------------------------------------------
