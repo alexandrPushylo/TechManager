@@ -671,7 +671,7 @@ def conflict_correction_view(request, day, id_applications):
                 _app.save()
             else:
                 _app.delete()
-        if out['conflicts_vehicles_list']:
+        if get_conflicts_vehicles_list(current_day, c_in=0):
             return HttpResponseRedirect(f'/conflict_resolution/{day}')
         else:
             return HttpResponseRedirect(f'/applications/{day}')
