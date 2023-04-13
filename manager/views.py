@@ -1200,7 +1200,7 @@ def show_applications_view(request, day, id_user=None):
         driver_table_list = DriverTabel.objects.filter(date=current_day)
         technic_driver_table = TechnicDriver.objects.filter(date=current_day)
         var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
-
+#   --------------------------------------------------------------------------------------------------------------------
         if var_sort_driver_panel and var_sort_driver_panel.value:
             dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
         else:
@@ -1231,6 +1231,7 @@ def show_applications_view(request, day, id_user=None):
                     l_out.append((_drv, count, attach_drv, tech_drv))
 
         out["DRV_LIST"] = l_out
+#   --------------------------------------------------------------------------------------------------------------------
         out["priority_list"] = get_priority_list(current_day)
 
         if request.POST.get('panel'):
