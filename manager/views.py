@@ -1050,10 +1050,10 @@ def Technic_Driver_view(request, day):
     if DriverTabel.objects.filter(date=current_day, status=True).count() == 0:
         prepare_driver_table(day)
 
-    if TechnicDriver.objects.filter(date=current_day).count() == 0:
+    if not TechnicDriver.objects.filter(date=current_day).exists():
         prepare_technic_driver_table(day)
     else:
-        technic_driver_list = TechnicDriver.objects.filter(date=current_day)
+        technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
 
         for _td in technic_driver_list:
             if not _td.driver:
@@ -1069,8 +1069,24 @@ def Technic_Driver_view(request, day):
                     _td.save()
 
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
+    technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)#######TODO: , technic__isnull=False
+    exclude_drv = DriverTabel.objects.filter(date=current_day, status=True).exclude(
+        driver__in=list(TechnicDriver.objects.filter(
+            date=current_day).exclude(technic=None).values_list('driver__driver', flat=True)))
+    if exclude_drv.exists():
+        for exc_drv in exclude_drv:
+            _td, _ = TechnicDriver.objects.get_or_create(
+                date=current_day,
+                driver=exc_drv,
+                technic=None
+            )
+            _td.status = False
+            _td.save()
+        TechnicDriver.objects.filter(date=current_day, technic__isnull=True).exclude(driver__in=exclude_drv).delete()
+    else:
+        TechnicDriver.objects.filter(date=current_day, technic__isnull=True).exclude(driver__in=exclude_drv).delete()
+
     out['work_driver_list'] = work_driver_list.order_by('driver__last_name')
-    technic_driver_list = TechnicDriver.objects.filter(date=current_day)
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
 
     if request.POST.getlist('tech_drv_id'):
