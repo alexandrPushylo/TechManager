@@ -1222,6 +1222,7 @@ def show_applications_view(request, day, id_user=None):
             except:
                 out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
         else:
+            out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
         out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
         try:
