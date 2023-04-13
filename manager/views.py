@@ -2435,10 +2435,14 @@ def send_message_for_admin(current_day, messages=False, id_app_today=None):
     _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
     if id_app_today:
         _app = ApplicationToday.objects.get(id=id_app_today)
-        if send_flag:
-            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена повторно"
+        if _app.construction_site.foreman is not None:
+            foreman = f'({_app.construction_site.foreman.last_name})'
         else:
-            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена"
+            foreman = ''
+        if send_flag:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} {foreman} отправлена повторно"
+        else:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} {foreman} отправлена"
 
     if messages:
         mess = messages
