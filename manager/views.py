@@ -1213,40 +1213,18 @@ def show_applications_view(request, day, id_user=None):
         if _Application_today.filter(status=STATUS_APP_approved).exists():
             out['send_app_list'] = True
 
-        driver_table_list = DriverTabel.objects.filter(date=current_day)
         technic_driver_table = TechnicDriver.objects.filter(date=current_day)
         var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
 #   --------------------------------------------------------------------------------------------------------------------
         if var_sort_driver_panel and var_sort_driver_panel.value:
-            dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
+            try:
+                out["DRV_LIST"] = technic_driver_table.order_by(f'{var_sort_driver_panel.value}')
+            except:
+                out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
         else:
-            dr_tab_l_ord = driver_table_list.order_by('driver__last_name')
+        out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
-        l_out = []
         try:
-            for _drv in dr_tab_l_ord:
-                app = _Application_technic.filter(technic_driver__driver=_drv)
-                tech_drv = technic_driver_table.filter(driver=_drv)
-                if not tech_drv:
-                    tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver)
-                attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-                count = app.count()
-
-                if not _drv in [_[0] for _ in l_out]:
-                    l_out.append((_drv, count, attach_drv, tech_drv))
-        except:
-            for _drv in driver_table_list.order_by('driver__last_name'):
-                app = _Application_technic.filter(technic_driver__driver=_drv)
-                tech_drv = technic_driver_table.filter(driver=_drv)
-                if not tech_drv:
-                    tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
-                attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-                count = app.count()
-
-                if not _drv in [_[0] for _ in l_out]:
-                    l_out.append((_drv, count, attach_drv, tech_drv))
-
-        out["DRV_LIST"] = l_out
 #   --------------------------------------------------------------------------------------------------------------------
         out["priority_list"] = get_priority_list(current_day)
 
