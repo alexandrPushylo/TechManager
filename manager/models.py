@@ -78,7 +78,7 @@ class DriverTabel(models.Model):
 
 
 class TechnicDriver(models.Model):
-    technic = models.ForeignKey(Technic, on_delete=models.CASCADE, verbose_name='Транспортное средство')
+    technic = models.ForeignKey(Technic, on_delete=models.SET_NULL, null=True, verbose_name='Транспортное средство')
     driver = models.ForeignKey(DriverTabel, on_delete=models.SET_NULL, null=True, verbose_name="Водитель техники")
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.BooleanField(default=True, verbose_name="Статус техники")
