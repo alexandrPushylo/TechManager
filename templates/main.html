@@ -301,9 +301,12 @@
                                 {% endif %}
                             {% endfor %}
                         {% else %}
+                            {% if attach_drv %}
                             {% for tech in attach_drv %}
                                 <div class="lh-sm text-danger text-truncate">{{ tech.0 }}</div>
                             {% endfor %}
+                            {% else %}  ----
+                                {% endif %}
                         {% endif %}
 
 
