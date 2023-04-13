@@ -1996,7 +1996,7 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
     return out
 
 
-def get_count_app_for_driver(current_day):
+def get_count_app_for_driver(current_day, just_list=False):
     out = []
     _tech_drv = [_[0] for _ in TechnicDriver.objects.filter(
         date=current_day,
@@ -2010,9 +2010,14 @@ def get_count_app_for_driver(current_day):
         Q(app_for_day__status=STATUS_APP_send)
     ).values_list('technic_driver_id')]
 
-    for _td in set(_tech_drv):
-        _count = _app.count(_td)
-        out.append((_td, _count))
+    if just_list:
+        for _td in set(_tech_drv):
+            if _app.count(_td) > 0:
+                out.append(_td)
+    else:
+        for _td in set(_tech_drv):
+            _count = _app.count(_td)
+            out.append((_td, _count))
     return out
 
 
