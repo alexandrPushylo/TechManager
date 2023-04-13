@@ -582,7 +582,7 @@ def conflict_correction_view(request, day, id_applications):
     get_prepare_data(out, request, current_day)
 
     driver_table_list = DriverTabel.objects.filter(date=current_day)
-    technic_driver_table = TechnicDriver.objects.filter(date=current_day)
+    technic_driver_table = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
     _Application_technic = ApplicationTechnic.objects.filter(id__in=id_application_list)
     _Tech_driver_list = technic_driver_table.filter(
         status=True,
@@ -607,7 +607,8 @@ def conflict_correction_view(request, day, id_applications):
         all_c = all_t.count()
         work_c = work_t.count()
         free_td_id = get_free_tech_driver_list(current_day=current_day, technic_name=tn[0])
-        free_td = technic_driver_table.filter(id__in=free_td_id).values_list('driver__driver__last_name', 'driver__driver__first_name')
+        free_td = technic_driver_table.filter(id__in=free_td_id).values_list(
+            'driver__driver__last_name', 'driver__driver__first_name', 'id')
         out['tech_inf'] = (tn[1], all_c, work_c, all_c - work_c, free_td)
 
     out["date_of_target"] = current_day
@@ -630,20 +631,26 @@ def conflict_correction_view(request, day, id_applications):
             COLOR_LIST.remove(clr)
             out['prior_color'][pr] = rand_choice(COLOR_LIST)
 
-    l_out = []
+    var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
+    technic_driver_table = TechnicDriver.objects.filter(date=current_day)
+    #   --------------------------------------------------------------------------------------------------------------------
+    if var_sort_driver_panel and var_sort_driver_panel.value:
+        try:
+            out["DRV_LIST"] = technic_driver_table.order_by(f'{var_sort_driver_panel.value}')
+        except:
+            out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
+    else:
+        out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
+    out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
-    for _drv in driver_table_list.order_by('driver__last_name'):
-        app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
-        tech_drv = technic_driver_table.filter(driver=_drv)
-        if not tech_drv:
-            tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
-        attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-        count = app.count()
+    if request.POST.get('panel'):
+        _flag = request.POST.get('panel')
+        _flag = str(_flag).capitalize()
+        set_var('hidden_panel', value=request.user.id, flag=_flag, user=request.user)
 
-        if not _drv in [_[0] for _ in l_out]:
-            l_out.append((_drv, count, attach_drv, tech_drv))
+    out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
-    out["DRV_LIST"] = l_out
+    #   --------------------------------------------------------------------------------------------------------------------
 
     if request.method == 'POST':
         app_technic_id_list = request.POST.getlist('id_list')
