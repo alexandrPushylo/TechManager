@@ -2225,20 +2225,21 @@ def prepare_driver_table(day):
 def prepare_technic_driver_table(day):
     current_day = convert_str_to_date(day)
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
-    tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY)
+    tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY, technic__isnull=False)
 
     if current_day > TODAY:
-        for _tech in Technic.objects.all():
-            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__last_name', 'status')
-            driver = _drv[0][0]
-            status = _drv[0][1]
 
-            c_drv = work_driver_list.filter(driver__last_name=driver)
+        for _tech in Technic.objects.all():
+            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver', 'status')[0]
+            driver = _drv[0]
+            status = _drv[1]
+
+            c_drv = work_driver_list.filter(driver=driver)
 
             if c_drv.exists():
                 TechnicDriver.objects.create(
                     technic=_tech,
-                    driver=DriverTabel.objects.get(date=current_day, driver__last_name=driver),
+                    driver=work_driver_list.get(date=current_day, driver=driver),
                     date=current_day,
                     status=status)
             else:
