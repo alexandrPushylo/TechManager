@@ -106,9 +106,9 @@
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
                             {% if not  v.technic_driver.driver.status %}
-                                text-warning">(Водитель не назначен){{ v.technic_driver.driver.driver }}
+                                text-warning">(Водитель не назначен){{ v.technic_driver.driver.driver.last_name }}
                             {% else %}
-                    "> ({{ v.technic_driver.driver.driver }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 and not v.var_check %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
+                    "> ({{ v.technic_driver.driver.driver.last_name }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 and not v.var_check %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
                             {% endif %}
                 </div>
                     </div>

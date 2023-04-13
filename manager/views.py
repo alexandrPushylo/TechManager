@@ -1225,7 +1225,6 @@ def show_applications_view(request, day, id_user=None):
             out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
         out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
-        try:
 #   --------------------------------------------------------------------------------------------------------------------
         out["priority_list"] = get_priority_list(current_day)
 
@@ -2232,6 +2231,7 @@ def prepare_technic_driver_table(day):
                     driver=None,
                     date=current_day,
                     status=status)
+
     else:
         for tech in Technic.objects.all():
             TechnicDriver.objects.create(technic=tech, date=TODAY, status=True)
