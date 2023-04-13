@@ -2355,7 +2355,10 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
             if _a.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{_a.priority})\n"
             else:
-                mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address} ({_a.app_for_day.construction_site.foreman}):\n"
+                if _a.app_for_day.construction_site.foreman is not None:
+                    mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address} ({_a.app_for_day.construction_site.foreman}):\n"
+                else:
+                    mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address}:\n"
 
             mss += f"{_a.description}\n\n"
             send_message(_a.technic_driver.driver.driver.id, mss)
@@ -2377,12 +2380,14 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
             if s.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{s.priority})\n"
             else:
-                mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
+                if s.app_for_day.construction_site.foreman is not None:
+                    mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
+                else:
+                    mss += f"\t{s.priority}) {s.app_for_day.construction_site.address}\n"
 
             mss += f"{s.description}\n\n"
         if messages:
             mss = messages
-        print(mss)
         send_message(drv.driver.id, mss)
 
 
