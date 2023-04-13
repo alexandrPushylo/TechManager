@@ -475,11 +475,10 @@ def copy_app_view(request, id_application, day):
     return HttpResponseRedirect(f'/applications/{date_of_target}')
 
 
-def append_in_spec_tech(request, id_drv):
-    _driver_table = DriverTabel.objects.get(id=id_drv)
-    status = _driver_table.status
-    date = _driver_table.date
-    driver = _driver_table.driver
+def append_in_spec_tech(request, id_td):
+
+    technic_driver = TechnicDriver.objects.get(id=id_td)
+    current_day = technic_driver.date
 
     var_message, _ = Variable.objects.get_or_create(name='DEF_MESS_FOR_SPEC')
     if not var_message.value:
@@ -487,8 +486,8 @@ def append_in_spec_tech(request, id_drv):
     else:
         message = var_message.value
 
-    if not status:
-        return HttpResponseRedirect(f'/applications/{date}')
+    if technic_driver.driver is None or not technic_driver.driver.status:
+        return HttpResponseRedirect(f'/applications/{current_day}')
 
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address=TEXT_TEMPLATES['constr_site_spec_name'],
@@ -498,15 +497,9 @@ def append_in_spec_tech(request, id_drv):
 
     app_for_day, _ = ApplicationToday.objects.get_or_create(
         construction_site=constr_site,
-        date=date)
+        date=current_day)
     app_for_day.status = STATUS_APP_submitted
     app_for_day.save()
-
-    technic_driver = TechnicDriver.objects.filter(
-        driver=_driver_table,
-        date=date,
-        driver__status=True
-    ).first()
 
     ApplicationTechnic.objects.get_or_create(
         app_for_day=app_for_day,
@@ -514,7 +507,7 @@ def append_in_spec_tech(request, id_drv):
         description=message
     )
 
-    return HttpResponseRedirect(f"/applications/{date}")
+    return HttpResponseRedirect(f"/applications/{current_day}")
 
 
 def foreman_app_list_view(request, day):
