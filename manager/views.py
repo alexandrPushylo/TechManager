@@ -540,10 +540,9 @@ def copy_app_view(request, id_application, day):
     if date_of_target > TODAY:
         new_app_today, _ = ApplicationToday.objects.get_or_create(
             date=date_of_target,
-            construction_site=_app_for_day.construction_site,
-            status=STATUS_APP_saved,
-            description=_app_for_day.description
-        )
+            construction_site=_app_for_day.construction_site)
+        new_app_today.status = STATUS_APP_saved
+        new_app_today.description = _app_for_day.description
         new_app_today.save()
 
         for app_tech in _app_technic:
