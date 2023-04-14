@@ -76,10 +76,12 @@
         {% endif %}
 
         <hr>
+        {% if user.username == 'admin' %}
+            <li><a class="dropdown-item" href="#">...</a></li>
+        <hr>
+        {% endif %}
 
         <li><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></li>
-        {% if user.username == 'admin' %}
-            <li><a class="dropdown-item" href="{% url 'supply_app' cw_day %}">TEST</a></li>
-        {% endif %}
+
     </ul>
 </div>
