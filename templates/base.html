@@ -48,9 +48,10 @@
 {% endblock %}
 </div>
 
-{% if post == 'admin' %}<p class="position-relative" style="font-size: small; color: black">{{ LOG_DB }}</p>{% endif %}
+
 
 <div id="block_bottom_panel" class="container-fluid position-fixed  bottom-0 " style="width: 100vw; height: max-content;background-color: rgba(52,58,64,0.89); z-index: 100;">
+{% if post == 'admin' %}<p class="position-absolute" style="font-size: small; color: black">{{ LOG_DB }}</p>{% endif %}
 
 {#    <nav class="navbar fixed-bottom " style="min-height: 40px; background-color: rgba(52,58,64,0.89);">#}
 {#        <div class="container-fluid position-relative">#}
