@@ -44,6 +44,8 @@ from manager.utilities import get_id_chat
 from manager.utilities import BOT
 # ----------------
 
+AUTO_CLEAR_DB = True
+
 # ----------PREPARE--------------
 
 # STATUS application_today------------------------------------------------------------------
@@ -57,7 +59,105 @@ STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS
 STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
 
+def test_bot(request, id_user):
+    tel_bot = TeleBot.objects.get(user_bot=id_user)
+    id_chat = tel_bot.id_chat
+    BOT.send_message(id_chat, 'test message')
 
+    return HttpResponseRedirect(f'/connect_bot_view/{id_user}')
+
+
+def send_message(id_user, message):
+    if TeleBot.objects.filter(user_bot=id_user).exists():
+        chat_id = TeleBot.objects.get(user_bot=id_user)
+
+        if chat_id and chat_id.id_chat:
+            BOT.send_message(chat_id.id_chat, message)
+
+
+def send_debug_messages(messages='Test'):
+    admin_id_list = User.objects.filter(is_superuser=True)
+    mess = f"{TODAY}\n{messages}"
+    for _id in admin_id_list:
+        send_message(_id, mess)
+
+
+def clean_db(_flag_delete=False, send_mess=True):
+    var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
+    if var_date_clean.date is None:
+        return "date_of_last_clean_db is not exists"
+    if (TODAY - timedelta(days=2)) > var_date_clean.date:
+        # var_comm_date = get_var(var=VAR['LIMIT_for_apps'])
+        var_comm_date = Variable.objects.get_or_create(name=VAR['LIMIT_for_apps'])[0]
+        if var_comm_date.value is None:
+            comm_date = TODAY - timedelta(days=60)
+        else:
+            comm_date = TODAY - timedelta(days=var_comm_date.value)
+        mess = {}
+        application_today = ApplicationToday.objects.filter(date__lt=comm_date)
+        application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
+        application_material = ApplicationMeterial.objects.filter(app_for_day__in=application_today)
+        technic_driver = TechnicDriver.objects.filter(date__lt=comm_date)
+        table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
+        work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date)
+
+        if technic_driver.exists():
+            mess['technic_driver'] = technic_driver.count()
+            if _flag_delete:
+                technic_driver.delete()
+
+        if table_drivers.exists():
+            mess['table_drivers'] = table_drivers.count()
+            if _flag_delete:
+                table_drivers.delete()
+
+        if work_day_table.exists():
+            mess['work_day_table'] = work_day_table.count()
+            if _flag_delete and False: # TODO: del work_day
+                work_day_table.delete()
+
+        if application_material.exists():
+            mess['application_material'] = application_material.count()
+            if _flag_delete:
+                application_material.delete()
+
+        if application_technic.exists():
+            mess['application_technic'] = application_technic.count()
+            if _flag_delete:
+                application_technic.delete()
+
+        if application_today.exists():
+            mess['application_today'] = application_today.count()
+            if _flag_delete:
+                application_today.delete()
+
+        app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
+        if app.exists():
+            mess['app'] = app.count()
+            if _flag_delete:
+                app.delete()
+        _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
+        if _var.exists():
+            mess['sent_var'] = _var.count()
+            if _flag_delete:
+                _var.delete()
+
+        var_date_clean.date = TODAY
+        var_date_clean.time = NOW
+        var_date_clean.value = application_today.count()
+        var_date_clean.flag = True
+        var_date_clean.save()
+
+        if send_mess:
+            send_debug_messages(mess)
+
+        return f"status:CLR, time:{NOW.isoformat('minutes')}, date:{TODAY}"
+    else:
+        return f"status:CONT, t:{var_date_clean.time.isoformat('minutes')}, d:{var_date_clean.date}"
+
+    return f"status:BRK, time:{NOW}, date:{TODAY}"
+
+LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB)
 
 # ------FUNCTION VIEW----------------------
 
@@ -2096,6 +2196,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['tense'] = current_day >= TODAY
     out['referer'] = request.headers.get('Referer')
     out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day('next_day').weekday() == 5 and current_day.weekday() == 0
+    out['LOG_DB'] = LOG_DB
 
 
     return out
@@ -2313,22 +2414,6 @@ def connect_bot_view(request, id_user):
     return render(request, 'bot_connect.html', out)
 
 
-def test_bot(request, id_user):
-    tel_bot = TeleBot.objects.get(user_bot=id_user)
-    id_chat = tel_bot.id_chat
-    BOT.send_message(id_chat, 'test message')
-
-    return HttpResponseRedirect(f'/connect_bot_view/{id_user}')
-
-
-def send_message(id_user, message):
-    if TeleBot.objects.filter(user_bot=id_user).exists():
-        chat_id = TeleBot.objects.get(user_bot=id_user)
-
-        if chat_id and chat_id.id_chat:
-            BOT.send_message(chat_id.id_chat, message)
-
-
 def send_task_for_drv(current_day, messages=None, id_app_today=None):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
@@ -2504,25 +2589,12 @@ def check_table(day):
         prepare_application_today(day)
         print('workday')
     elif _today.date < TODAY:
-        app = ApplicationToday.objects.filter(date__lt=date).exclude(status=STATUS_APP_send)
-        if app.exists():
-            app.delete()
-        _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=date)
-        if _var.exists():
-            _var.delete()
+        pass
 
     else:
         print('weekend')
         return False
     return True
-
-
-def send_debug_messages(messages='Test'):
-    admin_id_list = User.objects.filter(is_superuser=True)
-    mess = f"{TODAY}\n{messages}"
-
-    for _id in admin_id_list:
-        send_message(_id, mess)
 
 
 def find_view(request, day):
@@ -2612,3 +2684,4 @@ def change_workday(request, day):
     except WorkDayTabel.DoesNotExist:
         print('this day DoesNotExist')
     return HttpResponseRedirect(f'/applications/{day}')
+
