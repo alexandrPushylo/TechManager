@@ -1204,7 +1204,6 @@ def show_applications_view(request, day, id_user=None):
                 Q(status=STATUS_APP_send)
               ))
 
-        # out['conflicts_technic_name'] = get_conflicts_vehicles_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
 
         if _Application_today.filter(status=STATUS_APP_submitted).exists():
@@ -2178,7 +2177,7 @@ def prepare_driver_table(day):
 
     if not WorkDayTabel.objects.get(date=current_day).status:
         return None
-    
+
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     _ex_td = driver_list.exclude(
         user_post__id__in=DriverTabel.objects.filter(date=current_day).values_list('driver__id', flat=True))
