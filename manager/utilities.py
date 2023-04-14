@@ -27,6 +27,8 @@ variable = {
     'font_color_main_page': 'style_font_color',
     'FILTER_APP_TODAY': 'FILTER_APP_TODAY',
     'LIMIT_for_submission': 'time_limit_for_submission',
+    'LIMIT_for_apps': 'day_limit_before_del_apps',
+    'last_clean_db': 'date_of_last_clean_db',
 }
 text_templates = {
     'dismiss': 'ОТКЛОНЕНА\r\n',
