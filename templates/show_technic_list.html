@@ -19,11 +19,11 @@
 
     <tr id="{{ tech.id }}" class="technic_row">
       <th scope="row">{{ forloop.counter }}</th>
-      <td>{{ tech.name }}</td>
+      <td>{{ tech.name.name }}</td>
       <td>{{ tech.tech_type }}</td>
       <td>{{ tech.id_information }}</td>
       <td>{{ tech.description }}</td>
-      <td>{{ tech.attached_driver }}</td>
+      <td>{{ tech.attached_driver.last_name }}</td>
     </tr>
     {% endfor %}
   </tbody>
