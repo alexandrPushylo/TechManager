@@ -95,58 +95,6 @@
     </div>
 
 {#-----------------------------------------------------------------------------------------------------------  #}
-
-
-{#    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">#}
-{#      <div class="card-body p-0">#}
-{#      <p class="card-text mt-1 text-center">#}
-{#            <b class="fs-5">{{ WEEKDAY }},</b> <b class="fs-5">{{ date_of_target }}</b>#}
-{#            <hr>#}
-{#        </p>#}
-{#        <ul class="container-fluid" id="vehicle_list">#}
-{#            {% for v in tech_app_list %}#}
-{#                <input type="hidden" value="{{ v.id }}" name="id_list"/>#}
-{#                <div class="row mb-4 border border-1 border-primary rounded p-1">#}
-{##}
-{#                 <div class="input-group">#}
-{#                    <input type="hidden"   value="{{ v.id }}" name="id_app_tech"/>#}
-{#                    <input id="io_vehicle_{{ forloop.counter }}" type="hidden"   value="{{ v.technic_driver.technic.name.id }}"/>#}
-{##}
-{#                     <select class="form-control col-4 input_tech" id="select_tech_name_{{ forloop.counter }}">#}
-{#                        {% for tn in technic_name_list %}#}
-{#                    <option {% if tn.id not in free_tech_name %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} {% if tn.id not in free_tech_name %}[занят]{% endif %}</option>#}
-{#                         {% endfor %}#}
-{#                    </select>#}
-{##}
-{#                    <input  id="io_driver_{{ forloop.counter }}" type="hidden"  value="{{ v.technic_driver.id }}" >#}
-{##}
-{#                     {% for td_l in tech_driver_list %}#}
-{#                    <select class="form-control col-4 input_driver select_tech_drv_{{ forloop.parentloop.counter }}" disabled hidden="" id="select_tech_drv_{{ td_l.0.id }}" name="technic_driver_{{ v.id }}">#}
-{#                        {% for td in td_l.1 %}#}
-{#                    <option {% if td.id in work_TD_list %} style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %}[занят]{% else %}[своб.]{% endif %}</option>#}
-{#                        {% endfor %}#}
-{#                    </select>#}
-{#                    {% endfor %}#}
-{##}
-{#                    <button role="button" id="btn_reset_{{ forloop.counter }}" class="btn btn-primary btn-sm col-auto" >Вернуть</button>#}
-{#                    <button role="button" class="btn btn-danger btn-sm col-auto" onclick="#}
-{#                            this.parentNode.parentNode.remove();#}
-{#                            return false;#}
-{#                            "  >X#}
-{#                    </button>#}
-{##}
-{#                </div>#}
-{#                      <div class="input-group form-floating p-0">#}
-{#                        <span class="input-group-text mt-2">#}
-{#                        <input type="number" id="priority_{{ v.id }}" name="priority_{{ v.id }}" class="  col-auto  " value="{{ v.priority }}" style="max-width: 50px; margin-left: -5px;"/></span>#}
-{#                        <textarea class="form-control app_description mt-2" aria-label="With textarea" id="floatingInputValue" name="description_{{ v.id }}" rows="1">{{ v.description }}</textarea>#}
-{#                        <label for="floatingInputValue" class="fw-bold " style="color: black; margin-left: 100px; margin-top: 0px">{{ v.app_for_day.construction_site.address }} ({{ v.app_for_day.construction_site.foreman.last_name }})</label>#}
-{#                    </div>#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        </ul>#}
-{#      </div>#}
-{#    </div>#}
   </form>
 </div>
 
@@ -197,7 +145,7 @@
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
 {#    <a href="{{ referer }}" class="btn btn-outline-primary active  col-auto " aria-current="page"> Отмена</a>#}
-    {% if conflicts_vehicles_list %}
+    {% if conflicts_list %}
     <a href="{% url 'conflict_resolution' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page">Назад</a>
     {% else %}
     <a href="{% url 'application_list' cw_day  %}" class="btn btn-outline-primary active  col-auto ms-5" aria-current="page">Назад</a>
