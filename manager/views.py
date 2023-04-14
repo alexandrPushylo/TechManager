@@ -143,7 +143,7 @@ def clean_db(_flag_delete=False, send_mess=True):
                 _var.delete()
 
         var_date_clean.date = TODAY
-        var_date_clean.time = NOW
+        var_date_clean.time = NOW.isoformat('minutes')
         var_date_clean.value = application_today.count()
         var_date_clean.flag = True
         var_date_clean.save()
@@ -2212,7 +2212,6 @@ def success_application(request, id_application):
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
     _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
-
 
     if is_admin(request.user):
         _status = current_application.status
