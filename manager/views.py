@@ -2175,6 +2175,10 @@ def prepare_work_day_table(day):
 
 def prepare_driver_table(day):
     current_day = convert_str_to_date(day)
+
+    if not WorkDayTabel.objects.get(date=current_day).status:
+        return None
+    
     driver_list = Post.objects.filter(post_name__name_post=POST_USER['driver'])
     _ex_td = driver_list.exclude(
         user_post__id__in=DriverTabel.objects.filter(date=current_day).values_list('driver__id', flat=True))
@@ -2209,6 +2213,9 @@ def prepare_technic_driver_table(day):
     current_day = convert_str_to_date(day)
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY, technic__isnull=False)
+
+    if not WorkDayTabel.objects.get(date=current_day).status:
+        return None
 
     if current_day > TODAY:
 
