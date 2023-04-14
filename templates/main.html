@@ -106,9 +106,9 @@
                             {% if v.id in priority_list %}
                             text-primary{% endif %}
                             {% if not  v.technic_driver.driver.status %}
-                                text-warning">(Водитель не назначен){{ v.technic_driver.driver.driver }}
+                                text-warning">(Водитель не назначен){{ v.technic_driver.driver.driver.last_name }}
                             {% else %}
-                    "> ({{ v.technic_driver.driver.driver }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 and not v.var_check %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
+                    "> ({{ v.technic_driver.driver.driver.last_name }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 and not v.var_check %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
                             {% endif %}
                 </div>
                     </div>
@@ -279,37 +279,27 @@
     <div class="driver_panel  col-auto   position-fixed end-0 translate-middle-y top-50 mt-4" style="height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
         <div class="card-body overflow-auto " style="height: 90%;" >
 
-            {% for drv, count, attach_drv, tech_drv in DRV_LIST %}
+            {% for TD in DRV_LIST %}
             <ol class="list-group" >
                 <li class="list-group-item d-flex justify-content-between align-items-start" >
-                <div class="div_td" {% if cw_day >= lw_day %} onclick="location.href = '/append_in_spec_tech/'+this.id;" {% endif %}  style="margin-left: -5px; margin-right: -10px;" id="{{ drv.id }}">
+                <div class="div_td" {% if cw_day >= lw_day %} onclick="location.href = '/append_in_spec_tech/'+this.id;" {% endif %}  style="margin-left: -5px; margin-right: -10px;" id="{{ TD.id }}">
                   <div class="fw-bold small
-                    {% if not drv.status %} text-danger
-                    {% elif count == 0 %}
-                    {% elif not count == 0 %} text-success
+                    {% if not TD.driver.status %} text-danger
+                    {% elif TD.id in work_drv %} text-success
                     {% endif %}
-                    ">{{drv.driver.last_name}}</div>
-                    <div class=" small ">
-
-                        {% if tech_drv %}
-                            {% for tech in tech_drv %}
-                                {% if tech.status %}
-                                    {% if not count == 0 %}<div class="lh-sm text-success text-truncate">{{ tech.technic.name.name }}</div>
-                                    {% else %}<div class="lh-sm text-truncate">{{ tech.technic.name.name }}</div>
+                    ">{% if TD.driver %}{{TD.driver.driver.last_name}}
+                    {% else %}{{ TD.technic.attached_driver.last_name }}
+                  {% endif %}
+                  </div>
+                    <div class="small">
+                        {% if TD.technic %}
+                                {% if TD.status %}
+                                    {% if TD.id in work_drv %}<div class="lh-sm text-success text-truncate">{{ TD.technic.name.name }}</div>
+                                    {% else %}<div class="lh-sm text-truncate">{{ TD.technic.name.name }}</div>
                                     {% endif %}
-                                {% else %} <div class="lh-sm text-danger text-truncate">{{ tech.technic.name.name }}</div>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            {% if attach_drv %}
-                            {% for tech in attach_drv %}
-                                <div class="lh-sm text-danger text-truncate">{{ tech.0 }}</div>
-                            {% endfor %}
-                            {% else %}  ----
+                                {% else %} <div class="lh-sm text-danger text-truncate">{{ TD.technic.name.name }}</div>
                                 {% endif %}
                         {% endif %}
-
-
                     </div>
                 </div>
                 <span class="badge bg-primary rounded-pill"></span>

@@ -475,11 +475,10 @@ def copy_app_view(request, id_application, day):
     return HttpResponseRedirect(f'/applications/{date_of_target}')
 
 
-def append_in_spec_tech(request, id_drv):
-    _driver_table = DriverTabel.objects.get(id=id_drv)
-    status = _driver_table.status
-    date = _driver_table.date
-    driver = _driver_table.driver
+def append_in_spec_tech(request, id_td):
+
+    technic_driver = TechnicDriver.objects.get(id=id_td)
+    current_day = technic_driver.date
 
     var_message, _ = Variable.objects.get_or_create(name='DEF_MESS_FOR_SPEC')
     if not var_message.value:
@@ -487,8 +486,8 @@ def append_in_spec_tech(request, id_drv):
     else:
         message = var_message.value
 
-    if not status:
-        return HttpResponseRedirect(f'/applications/{date}')
+    if technic_driver.driver is None or not technic_driver.driver.status:
+        return HttpResponseRedirect(f'/applications/{current_day}')
 
     constr_site, _ = ConstructionSite.objects.get_or_create(
         address=TEXT_TEMPLATES['constr_site_spec_name'],
@@ -498,15 +497,9 @@ def append_in_spec_tech(request, id_drv):
 
     app_for_day, _ = ApplicationToday.objects.get_or_create(
         construction_site=constr_site,
-        date=date)
+        date=current_day)
     app_for_day.status = STATUS_APP_submitted
     app_for_day.save()
-
-    technic_driver = TechnicDriver.objects.filter(
-        driver=_driver_table,
-        date=date,
-        driver__status=True
-    ).first()
 
     ApplicationTechnic.objects.get_or_create(
         app_for_day=app_for_day,
@@ -514,7 +507,7 @@ def append_in_spec_tech(request, id_drv):
         description=message
     )
 
-    return HttpResponseRedirect(f"/applications/{date}")
+    return HttpResponseRedirect(f"/applications/{current_day}")
 
 
 def foreman_app_list_view(request, day):
@@ -589,7 +582,7 @@ def conflict_correction_view(request, day, id_applications):
     get_prepare_data(out, request, current_day)
 
     driver_table_list = DriverTabel.objects.filter(date=current_day)
-    technic_driver_table = TechnicDriver.objects.filter(date=current_day)
+    technic_driver_table = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
     _Application_technic = ApplicationTechnic.objects.filter(id__in=id_application_list)
     _Tech_driver_list = technic_driver_table.filter(
         status=True,
@@ -614,7 +607,8 @@ def conflict_correction_view(request, day, id_applications):
         all_c = all_t.count()
         work_c = work_t.count()
         free_td_id = get_free_tech_driver_list(current_day=current_day, technic_name=tn[0])
-        free_td = technic_driver_table.filter(id__in=free_td_id).values_list('driver__driver__last_name', 'driver__driver__first_name')
+        free_td = technic_driver_table.filter(id__in=free_td_id).values_list(
+            'driver__driver__last_name', 'driver__driver__first_name', 'id')
         out['tech_inf'] = (tn[1], all_c, work_c, all_c - work_c, free_td)
 
     out["date_of_target"] = current_day
@@ -637,20 +631,26 @@ def conflict_correction_view(request, day, id_applications):
             COLOR_LIST.remove(clr)
             out['prior_color'][pr] = rand_choice(COLOR_LIST)
 
-    l_out = []
+    var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
+    technic_driver_table = TechnicDriver.objects.filter(date=current_day)
+    #   --------------------------------------------------------------------------------------------------------------------
+    if var_sort_driver_panel and var_sort_driver_panel.value:
+        try:
+            out["DRV_LIST"] = technic_driver_table.order_by(f'{var_sort_driver_panel.value}')
+        except:
+            out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
+    else:
+        out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
+    out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
-    for _drv in driver_table_list.order_by('driver__last_name'):
-        app = ApplicationTechnic.objects.filter(technic_driver__driver=_drv)
-        tech_drv = technic_driver_table.filter(driver=_drv)
-        if not tech_drv:
-            tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
-        attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-        count = app.count()
+    if request.POST.get('panel'):
+        _flag = request.POST.get('panel')
+        _flag = str(_flag).capitalize()
+        set_var('hidden_panel', value=request.user.id, flag=_flag, user=request.user)
 
-        if not _drv in [_[0] for _ in l_out]:
-            l_out.append((_drv, count, attach_drv, tech_drv))
+    out['var_drv_panel'] = get_var('hidden_panel', user=request.user)
 
-    out["DRV_LIST"] = l_out
+    #   --------------------------------------------------------------------------------------------------------------------
 
     if request.method == 'POST':
         app_technic_id_list = request.POST.getlist('id_list')
@@ -1050,10 +1050,10 @@ def Technic_Driver_view(request, day):
     if DriverTabel.objects.filter(date=current_day, status=True).count() == 0:
         prepare_driver_table(day)
 
-    if TechnicDriver.objects.filter(date=current_day).count() == 0:
+    if not TechnicDriver.objects.filter(date=current_day).exists():
         prepare_technic_driver_table(day)
     else:
-        technic_driver_list = TechnicDriver.objects.filter(date=current_day)
+        technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
 
         for _td in technic_driver_list:
             if not _td.driver:
@@ -1069,8 +1069,24 @@ def Technic_Driver_view(request, day):
                     _td.save()
 
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
+    technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)#######TODO: , technic__isnull=False
+    exclude_drv = DriverTabel.objects.filter(date=current_day, status=True).exclude(
+        driver__in=list(TechnicDriver.objects.filter(
+            date=current_day).exclude(technic=None).values_list('driver__driver', flat=True)))
+    if exclude_drv.exists():
+        for exc_drv in exclude_drv:
+            _td, _ = TechnicDriver.objects.get_or_create(
+                date=current_day,
+                driver=exc_drv,
+                technic=None
+            )
+            _td.status = False
+            _td.save()
+        TechnicDriver.objects.filter(date=current_day, technic__isnull=True).exclude(driver__in=exclude_drv).delete()
+    else:
+        TechnicDriver.objects.filter(date=current_day, technic__isnull=True).exclude(driver__in=exclude_drv).delete()
+
     out['work_driver_list'] = work_driver_list.order_by('driver__last_name')
-    technic_driver_list = TechnicDriver.objects.filter(date=current_day)
     out['technic_driver_list'] = technic_driver_list.order_by('technic__name__name')
 
     if request.POST.getlist('tech_drv_id'):
@@ -1197,40 +1213,18 @@ def show_applications_view(request, day, id_user=None):
         if _Application_today.filter(status=STATUS_APP_approved).exists():
             out['send_app_list'] = True
 
-        driver_table_list = DriverTabel.objects.filter(date=current_day)
         technic_driver_table = TechnicDriver.objects.filter(date=current_day)
         var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
 #   --------------------------------------------------------------------------------------------------------------------
         if var_sort_driver_panel and var_sort_driver_panel.value:
-            dr_tab_l_ord = driver_table_list.order_by(f'{var_sort_driver_panel.value}')
+            try:
+                out["DRV_LIST"] = technic_driver_table.order_by(f'{var_sort_driver_panel.value}')
+            except:
+                out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
         else:
-            dr_tab_l_ord = driver_table_list.order_by('driver__last_name')
+            out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
+        out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
-        l_out = []
-        try:
-            for _drv in dr_tab_l_ord:
-                app = _Application_technic.filter(technic_driver__driver=_drv)
-                tech_drv = technic_driver_table.filter(driver=_drv)
-                if not tech_drv:
-                    tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver)
-                attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-                count = app.count()
-
-                if not _drv in [_[0] for _ in l_out]:
-                    l_out.append((_drv, count, attach_drv, tech_drv))
-        except:
-            for _drv in driver_table_list.order_by('driver__last_name'):
-                app = _Application_technic.filter(technic_driver__driver=_drv)
-                tech_drv = technic_driver_table.filter(driver=_drv)
-                if not tech_drv:
-                    tech_drv = technic_driver_table.filter(technic__attached_driver=_drv.driver.id)
-                attach_drv = Technic.objects.filter(attached_driver=_drv.driver).values_list('name__name')
-                count = app.count()
-
-                if not _drv in [_[0] for _ in l_out]:
-                    l_out.append((_drv, count, attach_drv, tech_drv))
-
-        out["DRV_LIST"] = l_out
 #   --------------------------------------------------------------------------------------------------------------------
         out["priority_list"] = get_priority_list(current_day)
 
@@ -1980,11 +1974,11 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
     return out
 
 
-def get_count_app_for_driver(current_day):
+def get_count_app_for_driver(current_day, just_list=False):
     out = []
     _tech_drv = [_[0] for _ in TechnicDriver.objects.filter(
         date=current_day,
-        status=True,
+        # status=True,  #TODO:del
         driver__status=True).values_list('id')]
     _app = [_[0] for _ in ApplicationTechnic.objects.filter(
         Q(var_check=False),
@@ -1994,9 +1988,14 @@ def get_count_app_for_driver(current_day):
         Q(app_for_day__status=STATUS_APP_send)
     ).values_list('technic_driver_id')]
 
-    for _td in set(_tech_drv):
-        _count = _app.count(_td)
-        out.append((_td, _count))
+    if just_list:
+        for _td in set(_tech_drv):
+            if _app.count(_td) > 0:
+                out.append(_td)
+    else:
+        for _td in set(_tech_drv):
+            _count = _app.count(_td)
+            out.append((_td, _count))
     return out
 
 
@@ -2209,20 +2208,21 @@ def prepare_driver_table(day):
 def prepare_technic_driver_table(day):
     current_day = convert_str_to_date(day)
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
-    tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY)
+    tech_drv_list_today = TechnicDriver.objects.filter(date=TODAY, technic__isnull=False)
 
     if current_day > TODAY:
-        for _tech in Technic.objects.all():
-            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver__last_name', 'status')
-            driver = _drv[0][0]
-            status = _drv[0][1]
 
-            c_drv = work_driver_list.filter(driver__last_name=driver)
+        for _tech in Technic.objects.all():
+            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver', 'status')[0]
+            driver = _drv[0]
+            status = _drv[1]
+
+            c_drv = work_driver_list.filter(driver=driver)
 
             if c_drv.exists():
                 TechnicDriver.objects.create(
                     technic=_tech,
-                    driver=DriverTabel.objects.get(date=current_day, driver__last_name=driver),
+                    driver=work_driver_list.get(date=current_day, driver=driver),
                     date=current_day,
                     status=status)
             else:
@@ -2231,6 +2231,7 @@ def prepare_technic_driver_table(day):
                     driver=None,
                     date=current_day,
                     status=status)
+
     else:
         for tech in Technic.objects.all():
             TechnicDriver.objects.create(technic=tech, date=TODAY, status=True)
@@ -2338,7 +2339,10 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
             if _a.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{_a.priority})\n"
             else:
-                mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address} ({_a.app_for_day.construction_site.foreman}):\n"
+                if _a.app_for_day.construction_site.foreman is not None:
+                    mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address} ({_a.app_for_day.construction_site.foreman}):\n"
+                else:
+                    mss += f"\t{_a.priority}) {_a.app_for_day.construction_site.address}:\n"
 
             mss += f"{_a.description}\n\n"
             send_message(_a.technic_driver.driver.driver.id, mss)
@@ -2360,12 +2364,14 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
             if s.app_for_day.construction_site.address == TEXT_TEMPLATES['constr_site_supply_name']:
                 mss += f"\t{s.priority})\n"
             else:
-                mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
+                if s.app_for_day.construction_site.foreman is not None:
+                    mss += f"\t{s.priority}) {s.app_for_day.construction_site.address} ({s.app_for_day.construction_site.foreman})\n"
+                else:
+                    mss += f"\t{s.priority}) {s.app_for_day.construction_site.address}\n"
 
             mss += f"{s.description}\n\n"
         if messages:
             mss = messages
-        print(mss)
         send_message(drv.driver.id, mss)
 
 
@@ -2413,10 +2419,14 @@ def send_message_for_admin(current_day, messages=False, id_app_today=None):
     _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
     if id_app_today:
         _app = ApplicationToday.objects.get(id=id_app_today)
-        if send_flag:
-            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена повторно"
+        if _app.construction_site.foreman is not None:
+            foreman = f'({_app.construction_site.foreman.last_name})'
         else:
-            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} ({_app.construction_site.foreman.last_name}) отправлена"
+            foreman = ''
+        if send_flag:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} {foreman} отправлена повторно"
+        else:
+            messages = f"Заявка на:\n{_day}\nобъект: {_app.construction_site.address} {foreman} отправлена"
 
     if messages:
         mess = messages
