@@ -153,7 +153,7 @@ def clean_db(_flag_delete=False, send_mess=True):
 
         return f"status:CLR, time:{NOW.isoformat('minutes')}, date:{TODAY}"
     else:
-        return f"status:CONT, t:{var_date_clean.time.isoformat('minutes')}, d:{var_date_clean.date}"
+        return f"status:CONT, t:{var_date_clean.time.isoformat('minutes')}, d:{var_date_clean.date}, t_check:{NOW.isoformat('minutes')} "
 
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
