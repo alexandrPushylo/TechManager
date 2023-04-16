@@ -92,7 +92,7 @@ def clean_db(_flag_delete=False, send_mess=True):
         if var_comm_date.value is None:
             comm_date = TODAY - timedelta(days=60)
         else:
-            comm_date = TODAY - timedelta(days=var_comm_date.value)
+            comm_date = TODAY - timedelta(days=int(var_comm_date.value))
         mess = {}
         application_today = ApplicationToday.objects.filter(date__lt=comm_date)
         application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
