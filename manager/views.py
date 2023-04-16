@@ -192,6 +192,7 @@ def notice_submitt(request, current_day):
 def print_material_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
     current_application = ApplicationToday.objects.filter(
         Q(date=current_day),
         Q(status=STATUS_APP_submitted) |

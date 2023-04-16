@@ -16,22 +16,25 @@
         {% load static %}
     <body>
 
-            <div class="container container-fluid mx-auto" id="PRINT">
-    <div class=" " >
-        <div class="">
+            <div class="container-fluid p-0 mx-auto" id="PRINT">
+
+
         {% for a in materials_list %}
-        <div class="col-auto mb-3">
-          <div class="mt-1" >
-            <div class="fw-bold text-center" style="font-size: {{ font_size }}pt;">{{a.app_for_day__construction_site__address}} ({{ a.app_for_day__construction_site__foreman__last_name }})</div>
+        <div class="mb-3">
+          <div class="input-group form-floating container-fluid position-relative" >
+
+
             {% if a.description  %}
                 <input type="hidden" name="materials_id" value="{{ a.id }}">
-              <textarea class="form-control app_description overflow-hidden" style="font-size: {{ font_size }}pt;height: content-box" name="materials_description">{{ a.description }}</textarea>
+              <textarea class="form-control app_description overflow-hidden" style="font-size: {{ font_size }}pt; height: max-content" name="materials_description">{{ a.description }}</textarea>
+              <label class="fw-bold text-nowrap start-50 translate-middle-x m-0 p-0" style="font-size: {{ font_size }}pt; color: black">{{a.app_for_day__construction_site__address}} ({{ a.app_for_day__construction_site__foreman__last_name }})&emsp;&emsp;{{ WEEKDAY }}, {{ DAY }}</label>
           {% endif %}
+
           </div>
         </div>
         {% endfor %}
-    </div>
-    </div>
+
+
 </div>
 
         <script src="{% static "admin/js/scripts/jquery-3.6.3.min.js" %}"></script>
