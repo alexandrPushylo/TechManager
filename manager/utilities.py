@@ -122,7 +122,7 @@ colors = [
 
 def create_backup_db():
     name_db = 'db.sqlite3'
-    path_backup_db = f"..{os.sep}..{os.sep}..{os.sep}temp_backup"
+    path_backup_db = f"..{os.sep}temp_backup"
 
     if not os.path.exists(path_backup_db):
         os.makedirs(path_backup_db)

@@ -62,6 +62,11 @@ STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS
 STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
 
+def db(request):
+    create_backup_db()
+
+    return HttpResponseRedirect('/')
+
 def test_bot(request, id_user):
     tel_bot = TeleBot.objects.get(user_bot=id_user)
     id_chat = tel_bot.id_chat
