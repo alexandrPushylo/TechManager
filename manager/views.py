@@ -50,6 +50,7 @@ from manager.utilities import create_backup_db
 from manager.utilities import get_list_db_backup
 from manager.utilities import clear_db_backup
 from manager.utilities import restore_db_backup
+from manager.utilities import delete_db_backup
 # ----------------
 
 AUTO_CLEAR_DB = True
@@ -2255,6 +2256,8 @@ def success_application(request, id_application):
     """изменение статуса заявки"""
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
+    if is_admin(request.user):
+        create_backup_db()
 
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = convert_str_to_date(current_application.date)
