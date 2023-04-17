@@ -11,6 +11,7 @@
             </li>
             <hr>
             <ul class="small">База данных
+                <li><a class="dropdown-item" href="{% url 'list_backup' %}">Резервные копии</a></li>
                 <li><a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
                 <li><a class="dropdown-item fw-bolder" href="{% url 'show_staff' %}">Персонал</a></li>
             </ul>
@@ -77,7 +78,7 @@
 
         <hr>
         {% if user.username == 'admin' %}
-            <li><a class="dropdown-item" href="{% url 'create_backup' %}">...</a></li>
+            <li><a class="dropdown-item" href="#">...</a></li>
         <hr>
         {% endif %}
 
