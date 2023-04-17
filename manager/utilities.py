@@ -17,6 +17,8 @@ dict_Staff = {'admin': 'Администратор', 'foreman': 'Прораб', 
 status_application = {'absent': 'Отсутствует', 'saved': 'Сохранена', 'submitted': 'Подана', 'approved': 'Одобрена', 'send': 'Отправлена'}
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 PLATFORM = sys.platform
+name_db = 'db.sqlite3'
+path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
 
 variable = {
     'sent_app': 'STATUS_sended_app',
@@ -131,8 +133,6 @@ colors = [
 
 
 def create_backup_db():
-    name_db = 'db.sqlite3'
-    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
     target = f'{path_backup_db}{os.sep}{date.today()}_{datetime.now().time().strftime("%H-%M-%S")}.sqlite3'
 
     if not os.path.exists(path_backup_db):
@@ -144,7 +144,8 @@ def create_backup_db():
 
 
 def get_list_db_backup():
-    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    if not os.path.exists(path_backup_db):
+        os.makedirs(path_backup_db)
     file_list = os.listdir(path_backup_db)
     out = []
     for iv in file_list:
@@ -156,8 +157,8 @@ def get_list_db_backup():
 
 
 def restore_db_backup(backup, undo=False):
-    name_db = 'db.sqlite3'
-    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    if not os.path.exists(path_backup_db):
+        os.makedirs(path_backup_db)
     file_list = os.listdir(path_backup_db)
     for iv in file_list:
         if iv == backup:
@@ -173,7 +174,8 @@ def restore_db_backup(backup, undo=False):
 
 
 def delete_db_backup(backup):
-    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    if not os.path.exists(path_backup_db):
+        os.makedirs(path_backup_db)
     file_list = os.listdir(path_backup_db)
     for iv in file_list:
         if iv == backup:
@@ -182,7 +184,8 @@ def delete_db_backup(backup):
 
 
 def clear_db_backup():
-    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    if not os.path.exists(path_backup_db):
+        os.makedirs(path_backup_db)
     file_list = os.listdir(path_backup_db)
 
     for iv in file_list:
