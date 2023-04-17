@@ -63,8 +63,10 @@ STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS
 STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
 
-def db(request):
+
+def create_db_backup(request):
     create_backup_db()
+    return HttpResponseRedirect(request.headers.get('Referer'))
 
     return HttpResponseRedirect('/')
 
@@ -1228,7 +1230,8 @@ def Technic_Driver_view(request, day):
 def clear_application_view(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
-
+    if is_admin(request.user):
+        create_backup_db()
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
     current_day = convert_str_to_date(current_application.date)
@@ -1647,6 +1650,8 @@ def create_new_application(request, id_application):
         out['material_list_raw'] = _materials.values_list('description', flat=True).first()
 
     if request.method == "POST":
+        if is_admin(request.user):
+            create_backup_db()
         IOL_id_application_technic = request.POST.getlist('io_id_app_tech')
         IOL_id_technic_name = request.POST.getlist('io_id_tech_name')
         IOL_id_technic_driver = request.POST.getlist('io_id_tech_driver')
@@ -1910,6 +1915,7 @@ def approv_all_applications(request, day):
         return HttpResponseRedirect('/')
 
     if is_admin(request.user):
+        create_backup_db()
         current_day = convert_str_to_date(day)
         current_applications = ApplicationToday.objects.filter(
             status=STATUS_APP_submitted, date=current_day)
