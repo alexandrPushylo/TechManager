@@ -52,9 +52,11 @@ from manager.utilities import clear_db_backup
 from manager.utilities import restore_db_backup
 from manager.utilities import delete_db_backup
 # ----------------
+from TechManager.settings import AUTO_CREATE_BACKUP_DB
+# ----------------
 
 AUTO_CLEAR_DB = True
-AUTO_CREATE_BACKUP_DB = False
+# AUTO_CREATE_BACKUP_DB = False
 
 # ----------PREPARE--------------
 
