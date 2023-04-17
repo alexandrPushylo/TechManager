@@ -49,6 +49,7 @@ from manager.utilities import is_backup_time
 from manager.utilities import create_backup_db
 from manager.utilities import get_list_db_backup
 from manager.utilities import clear_db_backup
+from manager.utilities import restore_db_backup
 # ----------------
 
 AUTO_CLEAR_DB = True
@@ -71,7 +72,23 @@ def create_db_backup(request):
     create_backup_db()
     return HttpResponseRedirect(request.headers.get('Referer'))
 
+
+def undo_change_db(request):
+    list_backup = get_list_db_backup()
+    backups = sorted(list_backup)  # reversed(list_backup)
+    if backups:
+        last_backup = backups.pop()
+        curr_backup = str(last_backup).replace(' ', '_').replace(':', '-') + '.sqlite3'
+        restore_db_backup(curr_backup, undo=True)
+
     return HttpResponseRedirect('/')
+
+
+def restore_db(request, date_img):
+    curr_backup = date_img.replace(' ', '_').replace(':', '-')+'.sqlite3'
+    restore_db_backup(curr_backup)
+    return HttpResponseRedirect('/list_backup/')
+
 
 def show_backup_list_view(request):
     out = {}
