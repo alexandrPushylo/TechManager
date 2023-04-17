@@ -42,6 +42,9 @@ from manager.utilities import NOW
 from manager.utilities import get_json
 from manager.utilities import get_id_chat
 from manager.utilities import BOT
+
+# ----------------
+from manager.utilities import create_backup_db
 # ----------------
 
 AUTO_CLEAR_DB = True

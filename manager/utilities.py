@@ -1,4 +1,5 @@
 import time
+import os
 from datetime import date, timedelta, datetime
 from random import choice
 import telebot
@@ -118,3 +119,10 @@ colors = [
     '#9600fa',
     '#fa00ed',
 ]
+
+def create_backup_db():
+    name_db = 'db.sqlite3'
+    path_backup_db = f"..{os.sep}..{os.sep}..{os.sep}temp_backup"
+
+    if not os.path.exists(path_backup_db):
+        os.makedirs(path_backup_db)
