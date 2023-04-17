@@ -44,7 +44,10 @@ from manager.utilities import get_id_chat
 from manager.utilities import BOT
 
 # ----------------
+from manager.utilities import is_backup_time
+
 from manager.utilities import create_backup_db
+from manager.utilities import get_list_db_backup
 from manager.utilities import clear_db_backup
 # ----------------
 
@@ -69,6 +72,16 @@ def create_db_backup(request):
     return HttpResponseRedirect(request.headers.get('Referer'))
 
     return HttpResponseRedirect('/')
+
+def show_backup_list_view(request):
+    out = {}
+    get_prepare_data(out, request)
+    list_backup = get_list_db_backup()
+    out['list_backup'] = sorted(list_backup, reverse=True)#reversed(list_backup)
+    # clear_db_backup()
+
+    return render(request, 'db_supply.html', out)
+
 
 def test_bot(request, id_user):
     tel_bot = TeleBot.objects.get(user_bot=id_user)
@@ -1364,6 +1377,8 @@ def show_applications_view(request, day, id_user=None):
             'technic_driver__driver__driver__last_name',
             'technic_driver__technic__name__name'
         ).distinct().order_by('technic_driver__driver__driver__last_name')
+
+        out['backups_list'] = get_list_db_backup()
 
     elif is_foreman(current_user):
         app_for_day = _Application_today.filter(construction_site__foreman=current_user)
