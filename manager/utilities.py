@@ -1,5 +1,5 @@
 import time
-import os
+import os, shutil, sys
 from datetime import date, timedelta, datetime
 from random import choice
 import telebot
@@ -16,6 +16,7 @@ TOMORROW = TODAY + ONE_DAY
 dict_Staff = {'admin': 'Администратор', 'foreman': 'Прораб', 'master': 'Мастер', 'driver': 'Водитель', 'mechanic': 'Механик', 'employee_supply': 'Снабжение'}
 status_application = {'absent': 'Отсутствует', 'saved': 'Сохранена', 'submitted': 'Подана', 'approved': 'Одобрена', 'send': 'Отправлена'}
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
+PLATFORM = sys.platform
 
 variable = {
     'sent_app': 'STATUS_sended_app',
@@ -104,6 +105,14 @@ def check_time(stop_time=None):
     if NOW < stop_time:
         return stop_time
 
+def is_backup_time():
+    start = datetime.now().time().replace(hour=15, minute=00)
+    stop = datetime.now().time().replace(hour=18, minute=00)
+    if start < NOW < stop:
+        return True
+    else:
+        return False
+
 colors = [
     '#15b03e',
     '#5a9e6c',
@@ -120,9 +129,65 @@ colors = [
     '#fa00ed',
 ]
 
+
 def create_backup_db():
     name_db = 'db.sqlite3'
     path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    target = f'{path_backup_db}{os.sep}{date.today()}_{datetime.now().time().strftime("%H-%M-%S")}.sqlite3'
 
     if not os.path.exists(path_backup_db):
         os.makedirs(path_backup_db)
+    if PLATFORM == 'win32':
+        os.popen(f"copy {name_db} {target}")
+    else:
+        os.popen(f"cp {name_db} {target}")
+
+
+def get_list_db_backup():
+    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    file_list = os.listdir(path_backup_db)
+    out = []
+    for iv in file_list:
+        str_date = iv.replace('.sqlite3', '')
+        _date = datetime.strptime(str_date, '%Y-%m-%d_%H-%M-%S')
+        out.append(_date)
+
+    return out
+
+
+def restore_db_backup(backup, undo=False):
+    name_db = 'db.sqlite3'
+    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    file_list = os.listdir(path_backup_db)
+    for iv in file_list:
+        if iv == backup:
+            target = f"{path_backup_db}{os.sep}{iv}"
+            if undo:
+                shutil.move(f"{target}", f"{name_db}")
+            else:
+                if PLATFORM == 'win32':
+                    os.popen(f"copy {target} {name_db}")
+                else:
+                    os.popen(f"cp {target} {name_db}")
+
+
+
+def delete_db_backup(backup):
+    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    file_list = os.listdir(path_backup_db)
+    for iv in file_list:
+        if iv == backup:
+            target = f"{path_backup_db}{os.sep}{iv}"
+            os.remove(f"{target}")
+
+
+def clear_db_backup():
+    path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
+    file_list = os.listdir(path_backup_db)
+
+    for iv in file_list:
+        str_date = iv.replace('.sqlite3', '')
+        _date = datetime.strptime(str_date, '%Y-%m-%d_%H-%M-%S')
+        if _date < datetime.now():# - timedelta(seconds=1):
+            os.remove(f"{path_backup_db}{os.sep}{iv}")
+
