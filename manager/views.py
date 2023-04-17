@@ -44,7 +44,13 @@ from manager.utilities import get_id_chat
 from manager.utilities import BOT
 
 # ----------------
+from manager.utilities import is_backup_time
+
 from manager.utilities import create_backup_db
+from manager.utilities import get_list_db_backup
+from manager.utilities import clear_db_backup
+from manager.utilities import restore_db_backup
+from manager.utilities import delete_db_backup
 # ----------------
 
 AUTO_CLEAR_DB = True
@@ -62,10 +68,38 @@ STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS
 STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
 
-def db(request):
+
+def create_db_backup(request):
     create_backup_db()
+    return HttpResponseRedirect(request.headers.get('Referer'))
+
+
+def undo_change_db(request):
+    list_backup = get_list_db_backup()
+    backups = sorted(list_backup)  # reversed(list_backup)
+    if backups:
+        last_backup = backups.pop()
+        curr_backup = str(last_backup).replace(' ', '_').replace(':', '-') + '.sqlite3'
+        restore_db_backup(curr_backup, undo=True)
 
     return HttpResponseRedirect('/')
+
+
+def restore_db(request, date_img):
+    curr_backup = date_img.replace(' ', '_').replace(':', '-')+'.sqlite3'
+    restore_db_backup(curr_backup)
+    return HttpResponseRedirect('/list_backup/')
+
+
+def show_backup_list_view(request):
+    out = {}
+    get_prepare_data(out, request)
+    list_backup = get_list_db_backup()
+    out['list_backup'] = sorted(list_backup, reverse=True)#reversed(list_backup)
+    # clear_db_backup()
+
+    return render(request, 'db_supply.html', out)
+
 
 def test_bot(request, id_user):
     tel_bot = TeleBot.objects.get(user_bot=id_user)
@@ -1227,7 +1261,8 @@ def Technic_Driver_view(request, day):
 def clear_application_view(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
-
+    if is_admin(request.user):
+        create_backup_db()
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
     current_day = convert_str_to_date(current_application.date)
@@ -1360,6 +1395,8 @@ def show_applications_view(request, day, id_user=None):
             'technic_driver__driver__driver__last_name',
             'technic_driver__technic__name__name'
         ).distinct().order_by('technic_driver__driver__driver__last_name')
+
+        out['backups_list'] = get_list_db_backup()
 
     elif is_foreman(current_user):
         app_for_day = _Application_today.filter(construction_site__foreman=current_user)
@@ -1646,6 +1683,8 @@ def create_new_application(request, id_application):
         out['material_list_raw'] = _materials.values_list('description', flat=True).first()
 
     if request.method == "POST":
+        if is_admin(request.user):
+            create_backup_db()
         IOL_id_application_technic = request.POST.getlist('io_id_app_tech')
         IOL_id_technic_name = request.POST.getlist('io_id_tech_name')
         IOL_id_technic_driver = request.POST.getlist('io_id_tech_driver')
@@ -1899,6 +1938,8 @@ def send_all_applications(request, day):
         _var.value = TODAY
         _var.save()
 
+        clear_db_backup()
+
     return HttpResponseRedirect(f'/applications/{day}')
 
 
@@ -1907,6 +1948,7 @@ def approv_all_applications(request, day):
         return HttpResponseRedirect('/')
 
     if is_admin(request.user):
+        create_backup_db()
         current_day = convert_str_to_date(day)
         current_applications = ApplicationToday.objects.filter(
             status=STATUS_APP_submitted, date=current_day)
@@ -2214,6 +2256,8 @@ def success_application(request, id_application):
     """изменение статуса заявки"""
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
+    if is_admin(request.user):
+        create_backup_db()
 
     current_application = ApplicationToday.objects.get(id=id_application)
     current_day = convert_str_to_date(current_application.date)
