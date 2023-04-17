@@ -54,6 +54,7 @@ from manager.utilities import delete_db_backup
 # ----------------
 
 AUTO_CLEAR_DB = True
+AUTO_CREATE_BACKUP_DB = False
 
 # ----------PREPARE--------------
 
@@ -1261,7 +1262,7 @@ def Technic_Driver_view(request, day):
 def clear_application_view(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
-    if is_admin(request.user):
+    if AUTO_CREATE_BACKUP_DB and is_admin(request.user):
         create_backup_db()
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
@@ -1683,7 +1684,7 @@ def create_new_application(request, id_application):
         out['material_list_raw'] = _materials.values_list('description', flat=True).first()
 
     if request.method == "POST":
-        if is_admin(request.user):
+        if AUTO_CREATE_BACKUP_DB and is_admin(request.user):
             create_backup_db()
         IOL_id_application_technic = request.POST.getlist('io_id_app_tech')
         IOL_id_technic_name = request.POST.getlist('io_id_tech_name')
@@ -1947,7 +1948,7 @@ def approv_all_applications(request, day):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
-    if is_admin(request.user):
+    if AUTO_CREATE_BACKUP_DB and is_admin(request.user):
         create_backup_db()
         current_day = convert_str_to_date(day)
         current_applications = ApplicationToday.objects.filter(
@@ -2256,7 +2257,7 @@ def success_application(request, id_application):
     """изменение статуса заявки"""
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
-    if is_admin(request.user):
+    if AUTO_CREATE_BACKUP_DB and is_admin(request.user):
         create_backup_db()
 
     current_application = ApplicationToday.objects.get(id=id_application)
