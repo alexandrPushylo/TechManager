@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container  m-3 mx-auto">
+      <div><div class="fw-bold fs-4">Резервные копии</div><hr>
+{#    <form method="post" id="db_supply_form" enctype="multipart/form-data">{% csrf_token %}#}
+      {% if list_backup %}
+        <table class="table w-auto mx-auto table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+{#      <th scope="col">Дата</th>#}
+      <th scope="col">Время</th>
+      <th scope="col"></th>
+      <th scope="col" hidden>id</th>
+
+    </tr>
+  </thead>
+  <tbody>{% for backup in list_backup %}
+
+    <tr id="row_{{ forloop.counter }}" class="setting_row" >
+      <th scope="row">{{ forloop.counter }}</th>
+{#      <td>{{ backup.date }}</td>#}
+      <td>{{ backup.ctime }}</td>
+
+      <td><a href="{% url 'restore_db' backup %}" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
+      <td hidden><input name="setting_id" type="hidden" value="{{ setting.id }}"></td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+          {% else %}
+          <p>Резервные копии отсутствуют</p>
+        {% endif %}
+</table>
+
+{#    </form>#}
+
+      </div>
+      </div>
+    </div>
+
+
+</div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/setting_page.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+<div class="input-group d-flex justify-content-center align-items-center">
+  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
+    <a href="{% url 'create_backup'  %}" class="btn btn-warning  col-auto m-1" aria-current="page">Создать резервную копию</a>
+{#  <input form="setting_form" class="btn btn-success  col-auto " type="submit" value="Сохранить">#}
+</div>
+{% endblock %}
