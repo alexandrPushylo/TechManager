@@ -42,6 +42,9 @@ from manager.utilities import NOW
 from manager.utilities import get_json
 from manager.utilities import get_id_chat
 from manager.utilities import BOT
+
+# ----------------
+from manager.utilities import create_backup_db
 # ----------------
 
 AUTO_CLEAR_DB = True
@@ -58,6 +61,11 @@ STATUS_APP_send = ApplicationStatus.objects.get_or_create(status=STATUS_AP['send
 STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['closed'])[0]
 STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
 # ------------------------------------------------------------------------------------------
+
+def db(request):
+    create_backup_db()
+
+    return HttpResponseRedirect('/')
 
 def test_bot(request, id_user):
     tel_bot = TeleBot.objects.get(user_bot=id_user)

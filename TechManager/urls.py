@@ -74,6 +74,8 @@ from manager.views import notice_submitt
 from manager.views import find_view
 from manager.views import change_workday
 
+from manager.views import db
+
 
 urlpatterns = [
     path('', show_start_page, name='start_page'),
@@ -83,6 +85,8 @@ urlpatterns = [
 
 
     path('copy_app/<int:id_application>/<str:day>', copy_app_view, name='copy_app'),
+    path('create_backup_db/', db, name='create_backup'),
+
 
     path('construction_sites/', show_construction_sites_view, name='construction_sites'),
     path('edit_construction_sites/<int:id_construction_sites>', edit_construction_sites_view, name='edit_construction_sites'),
