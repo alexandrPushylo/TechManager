@@ -45,6 +45,7 @@ from manager.utilities import BOT
 
 # ----------------
 from manager.utilities import create_backup_db
+from manager.utilities import clear_db_backup
 # ----------------
 
 AUTO_CLEAR_DB = True
@@ -1898,6 +1899,8 @@ def send_all_applications(request, day):
         _var.flag = True
         _var.value = TODAY
         _var.save()
+
+        clear_db_backup()
 
     return HttpResponseRedirect(f'/applications/{day}')
 
