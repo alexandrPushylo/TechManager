@@ -385,16 +385,16 @@
 
 {% block bottom_panel %}
 
-<div class=" d-flex  align-items-center">
+<div class="d-flex  align-items-center">
     {% if post == 'admin' %}
-    <a href="{% url 'undo_change_db' %}"  class="btn {% if backups_list %} btn-warning {% else %}  {% endif %} start-0 me-2" aria-current="page" title="Отменить изменения"><i class="fa-solid fa-rotate-left"></i></a>
-    <a href="{% url 'create_backup' %}"  class="btn btn-outline-info" aria-current="page" title="Создать резервную копию"><i class="fa-regular fa-floppy-disk"></i></a>
+    <a href="{% url 'undo_change_db' %}"  class="btn position-absolute {% if backups_list %} btn-warning {% else %}  {% endif %} start-0 ms-2" aria-current="page" title="Отменить изменения"><i class="fa-solid fa-rotate-left"></i></a>
+{#    <a href="{% url 'create_backup' %}"  class="btn btn-outline-info" aria-current="page" title="Создать резервную копию"><i class="fa-regular fa-floppy-disk"></i></a>#}
 
-        {% endif %}
+    {% endif %}
 
-    <a href="{% url 'show_today_applications' cw_day  %}"  class="btn position-absolute translate-middle-x start-50 btn-outline-secondary active" aria-current="page">Все заявки</a>
+    <a href="{% url 'show_today_applications' cw_day  %}"  class="btn position-relative translate-middle-x start-50 btn-outline-secondary active" aria-current="page">Все заявки</a>
 
-    {% if post == 'admin' %}
+{#    {% if post == 'admin' %}#}
 {#    <div class="btn-group dropup position-absolute ms-3 start-0">#}
 {#      <button type="button" class="btn btn-sm btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">#}
 {#        <i class="fa-solid fa-ellipsis"></i>#}
@@ -405,7 +405,7 @@
 {#          {% endif %}#}
 {#      </ul>#}
 {#    </div>#}
-    {% endif %}
+{#    {% endif %}#}
 
 
 
