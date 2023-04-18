@@ -9,9 +9,9 @@
                 <a class="dropdown-item" href="/edit_staff/{{ user.id }}">Профиль</a>
                 <a class="btn" href="{% url 'settings_page' %}"><i class="fas fa-cogs"></i></a>
             </li>
+            <li><a class="dropdown-item small m-0" href="{% url 'list_backup' %}">Резервные копии</a></li>
             <hr>
             <ul class="small">База данных
-                <li><a class="dropdown-item" href="{% url 'list_backup' %}">Резервные копии</a></li>
                 <li><a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
                 <li><a class="dropdown-item fw-bolder" href="{% url 'show_staff' %}">Персонал</a></li>
             </ul>
