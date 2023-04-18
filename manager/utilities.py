@@ -195,8 +195,7 @@ def clear_db_backup():
             os.remove(f"{path_backup_db}{os.sep}{iv}")
 
 
-
-def back24H(param:str='list', backup=None):
+def back24H(param: str='list', backup=None):
     name_db = 'db.sqlite3'
     path_backup24_db = f"..{os.sep}..{os.sep}backup"
     if not os.path.exists(path_backup24_db):
@@ -209,9 +208,10 @@ def back24H(param:str='list', backup=None):
         if param == 'list':
             out.append(_date)
         elif param == 'restore' and backup is not None:
-            target = f"{path_backup24_db}{os.sep}{iv}"
-            if PLATFORM == 'win32':
-                os.popen(f"copy {target} {name_db}")
-            else:
-                os.popen(f"cp {target} {name_db}")
+            if backup == iv:
+                target = f"{path_backup24_db}{os.sep}{iv}"
+                if PLATFORM == 'win32':
+                    os.popen(f"copy {target} {name_db}")
+                else:
+                    os.popen(f"cp {target} {name_db}")
     return out
