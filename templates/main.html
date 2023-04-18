@@ -331,6 +331,7 @@
         <a  class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange">Замена водителя </a>
 
           {% endif %}
+        <a href="{% url 'create_backup' %}"  class="dropdown-item" aria-current="page" title="Создать резервную копию">Создать резервную копию</a>
 
           {% else %}
           <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#copyModal">Копировать заявку</a>
