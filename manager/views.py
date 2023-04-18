@@ -85,7 +85,7 @@ def undo_change_db(request):
         curr_backup = str(last_backup).replace(' ', '_').replace(':', '-') + '.sqlite3'
         restore_db_backup(curr_backup, undo=True)
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.headers.get('Referer'))
 
 
 def restore_db(request, date_img):
