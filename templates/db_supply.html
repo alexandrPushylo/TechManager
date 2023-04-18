@@ -64,8 +64,8 @@
 
 {% block bottom_panel %}
 <div class="input-group d-flex justify-content-center align-items-center">
-  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
-    <a href="{% url 'create_backup'  %}" class="btn btn-warning  col-auto m-1" aria-current="page">Создать резервную копию</a>
-<a ondblclick="location.href = '/clear_db_backup/'; return false;" class="btn btn-outline-danger  col-auto m-1" aria-current="page">Отчистить все</a>
+  <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-0" aria-current="page">Назад</a>
+    <a href="{% url 'create_backup'  %}" class="btn btn-warning  col-auto m-0" aria-current="page">Создать резервную копию</a>
+<a ondblclick="location.href = '/clear_db_backup/'; return false;" class="btn btn-outline-danger  col-auto m-0" aria-current="page">Отчистить все</a>
 </div>
 {% endblock %}
