@@ -4,24 +4,22 @@
 
 <div class="container  m-3 mx-auto">
       <div><div class="fw-bold fs-4">Резервные копии</div><hr>
-{#    <form method="post" id="db_supply_form" enctype="multipart/form-data">{% csrf_token %}#}
-      {% if list_backup %}
+
         <table class="table w-auto mx-auto table-bordered">
   <thead>
     <tr>
       <th scope="col">#</th>
-{#      <th scope="col">Дата</th>#}
       <th scope="col">Время</th>
       <th scope="col"></th>
       <th scope="col" hidden>id</th>
 
     </tr>
   </thead>
+        {% if list_backup %}
   <tbody>{% for backup in list_backup %}
 
     <tr id="row_{{ forloop.counter }}" class="setting_row" >
       <th scope="row">{{ forloop.counter }}</th>
-{#      <td>{{ backup.date }}</td>#}
       <td>{{ backup.ctime }}</td>
 
       <td><a href="{% url 'restore_db' backup %}" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
@@ -30,12 +28,26 @@
     </tr>
     {% endfor %}
   </tbody>
-          {% else %}
-          <p>Резервные копии отсутствуют</p>
-        {% endif %}
+            {% endif %}
+
+{% if list_backup24 %}
+  <tbody class="border border-3 border-info">{% for backup in list_backup24 %}
+
+    <tr id="row_{{ forloop.counter }}" class="setting_row" >
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{ backup.date }} {{ backup.time }}</td>
+
+      <td><a href="{% url 'restore24_db' backup %}" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
+      <td hidden><input name="setting_id" type="hidden" value="{{ setting.id }}"></td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+{% endif %}
 </table>
 
-{#    </form>#}
+
+
 
       </div>
       </div>

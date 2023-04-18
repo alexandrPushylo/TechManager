@@ -194,3 +194,24 @@ def clear_db_backup():
         if _date < datetime.now():# - timedelta(seconds=1):
             os.remove(f"{path_backup_db}{os.sep}{iv}")
 
+
+
+def back24H(param:str='list', backup=None):
+    name_db = 'db.sqlite3'
+    path_backup24_db = f"..{os.sep}..{os.sep}backup"
+    if not os.path.exists(path_backup24_db):
+        os.makedirs(path_backup24_db)
+    file_list = os.listdir(path_backup24_db)
+    out = []
+    for iv in file_list:
+        str_date = iv.replace('.sqlite3', '')
+        _date = datetime.strptime(str_date, '%Y-%m-%d_%H-%M')
+        if param == 'list':
+            out.append(_date)
+        elif param == 'restore' and backup is not None:
+            target = f"{path_backup24_db}{os.sep}{iv}"
+            if PLATFORM == 'win32':
+                os.popen(f"copy {target} {name_db}")
+            else:
+                os.popen(f"cp {target} {name_db}")
+    return out

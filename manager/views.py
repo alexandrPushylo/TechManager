@@ -51,6 +51,7 @@ from manager.utilities import get_list_db_backup
 from manager.utilities import clear_db_backup
 from manager.utilities import restore_db_backup
 from manager.utilities import delete_db_backup
+from manager.utilities import back24H
 # ----------------
 from TechManager.settings import AUTO_CREATE_BACKUP_DB
 # ----------------
@@ -101,12 +102,20 @@ def restore_db(request, date_img):
     return HttpResponseRedirect('/list_backup/')
 
 
+def restore24_db(request, date_img):
+    curr_backup = date_img.replace(' ', '_').replace(':', '-')+'.sqlite3'
+    back24H(param='restore', backup=curr_backup)
+    return HttpResponseRedirect('/list_backup/')
+
+
 def show_backup_list_view(request):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
     out = {}
     get_prepare_data(out, request)
     list_backup = get_list_db_backup()
     out['list_backup'] = sorted(list_backup, reverse=True)#reversed(list_backup)
-    # clear_db_backup()
+    out['list_backup24'] = sorted(back24H(param='list'), reverse=True)
 
     return render(request, 'db_supply.html', out)
 
