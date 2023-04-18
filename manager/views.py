@@ -72,6 +72,13 @@ STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS
 # ------------------------------------------------------------------------------------------
 
 
+def clear_db(request):
+    if not is_admin(request.user):
+        return HttpResponseRedirect('/')
+    clear_db_backup()
+    return HttpResponseRedirect(request.headers.get('Referer'))
+
+
 def create_db_backup(request):
     create_backup_db()
     return HttpResponseRedirect(request.headers.get('Referer'))
