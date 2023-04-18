@@ -198,7 +198,10 @@ def clean_db(_flag_delete=False, send_mess=True):
 
         return f"status:CLR, time:{NOW.isoformat('minutes')}, date:{TODAY}"
     else:
-        return f"status:CONT, t:{var_date_clean.time.isoformat('minutes')}, d:{var_date_clean.date}, t_check:{NOW.isoformat('minutes')} "
+        return f"status:CONT, t:{var_date_clean.time.isoformat('minutes')}, " \
+               f"d:{var_date_clean.date}, " \
+               f"t_check:{NOW.isoformat('minutes')}, a_back:{AUTO_CREATE_BACKUP_DB}, " \
+               f"c_back:{len(get_list_db_backup())} "
 
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
