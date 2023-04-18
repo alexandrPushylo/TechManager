@@ -22,7 +22,7 @@
       <th scope="row">{{ forloop.counter }}</th>
       <td>{{ backup.ctime }}</td>
 
-      <td><a href="{% url 'restore_db' backup %}" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
+      <td><a ondblclick="location.href = '/restore_db/{{ backup.isoformat }}'; return false;" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
       <td hidden><input name="setting_id" type="hidden" value="{{ setting.id }}"></td>
 
     </tr>
@@ -37,7 +37,7 @@
       <th scope="row">{{ forloop.counter }}</th>
       <td>{{ backup.date }} {{ backup.time }}</td>
 
-      <td><a href="{% url 'restore24_db' backup %}" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
+      <td><a ondblclick="location.href = '/restore24_db/{{ backup.isoformat }}'; return false;" class="btn btn-outline-success btn-sm col-auto m-1" aria-current="page">Востановить</a></td>
       <td hidden><input name="setting_id" type="hidden" value="{{ setting.id }}"></td>
 
     </tr>

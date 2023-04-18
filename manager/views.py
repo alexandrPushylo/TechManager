@@ -97,13 +97,13 @@ def undo_change_db(request):
 
 
 def restore_db(request, date_img):
-    curr_backup = date_img.replace(' ', '_').replace(':', '-')+'.sqlite3'
+    curr_backup = date_img.replace('T', '_').replace(':', '-')+'.sqlite3'
     restore_db_backup(curr_backup)
     return HttpResponseRedirect('/list_backup/')
 
 
 def restore24_db(request, date_img):
-    curr_backup = date_img.replace(' ', '_').replace(':', '-')+'.sqlite3'
+    curr_backup = date_img[:-3].replace('T', '_').replace(':', '-')+'.sqlite3'
     back24H(param='restore', backup=curr_backup)
     return HttpResponseRedirect('/list_backup/')
 
