@@ -78,6 +78,7 @@ from manager.views import show_backup_list_view
 from manager.views import restore_db
 from manager.views import create_db_backup
 from manager.views import undo_change_db
+from manager.views import clear_db
 
 
 urlpatterns = [
@@ -92,6 +93,7 @@ urlpatterns = [
     path('restore_db/<str:date_img>', restore_db, name='restore_db'),
     path('create_backup/', create_db_backup, name='create_backup'),
     path('undo_change/', undo_change_db, name='undo_change_db'),
+    path('clear_db_backup/', clear_db, name='clear_db_backup'),
 
 
     path('construction_sites/', show_construction_sites_view, name='construction_sites'),
