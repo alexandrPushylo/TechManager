@@ -318,12 +318,12 @@
 
 {% block tab %}
 
-<a href="{% url 'find' cw_day %}" id="btn_find" style="margin-top: 6rem;" class="btn btn-primary position-fixed" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
+<a href="{% url 'find' cw_day %}" id="btn_find" style="margin-top: 6rem; margin-left: -0.4rem;" class="btn btn-outline-primary position-fixed" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
 
 
-    <div class="btn-group dropend position-fixed " style="margin-top: 8.5rem;">
-      <button type="button" class="btn btn-sm btn-primary  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-solid fa-ellipsis"></i>
+    <div class="btn-group dropend position-fixed" style="margin-top: 11rem; margin-left: -1.8rem;">
+      <button type="button" class="btn btn-outline-primary  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
+{#        <i class="fa-solid fa-ellipsis"></i>#}Опции
       </button>
       <ul class="dropdown-menu">
       {% if post == 'admin' %}
