@@ -1219,6 +1219,15 @@ def Technic_Driver_view(request, day):
     else:
         technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
 
+        if current_day >= TODAY and technic_driver_list.count() != Technic.objects.all().count():
+            tech_exc = Technic.objects.filter().exclude(id__in=technic_driver_list.values_list('technic__id', flat=True))
+            for _tech in tech_exc:
+                TechnicDriver.objects.create(
+                    date=current_day,
+                    technic=_tech,
+                    status=True
+                )
+
         for _td in technic_driver_list:
             if not _td.driver:
                 _attach_drv = _td.technic.attached_driver
@@ -1233,7 +1242,7 @@ def Technic_Driver_view(request, day):
                     _td.save()
 
     work_driver_list = DriverTabel.objects.filter(date=current_day, status=True)
-    technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)#######TODO: , technic__isnull=False
+    technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
     exclude_drv = DriverTabel.objects.filter(date=current_day, status=True).exclude(
         driver__in=list(TechnicDriver.objects.filter(
             date=current_day).exclude(technic=None).values_list('driver__driver', flat=True)))
@@ -1662,7 +1671,7 @@ def create_new_application(request, id_application):
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
 
-    check_table(current_date)
+    flag = check_table(current_date)
     get_prepare_data(out, request, current_day=current_date)
 
     var_submit_mat_app = get_var(VAR['LIMIT_for_submission'])
@@ -1683,6 +1692,7 @@ def create_new_application(request, id_application):
     out['free_tech_name'] = get_free_tech_driver_list(current_day=current_date)
 
     Tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True, driver__status=True)
+    print(Tech_driver_list.count())
     Tech_name_list = TechnicName.objects.all().order_by('name')
 
     work_tech_name_list = Tech_driver_list.values_list('id', flat=True).distinct()
@@ -2393,9 +2403,13 @@ def prepare_technic_driver_table(day):
     if current_day > TODAY:
 
         for _tech in Technic.objects.all():
-            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver', 'status')[0]
-            driver = _drv[0]
-            status = _drv[1]
+            _drv = tech_drv_list_today.filter(technic=_tech).values_list('driver__driver', 'status').first()
+            if _drv is not None:
+                driver = _drv[0]
+                status = _drv[1]
+            else:
+                driver = _tech.attached_driver
+                status = False
 
             c_drv = work_driver_list.filter(driver=driver)
 
@@ -2410,7 +2424,8 @@ def prepare_technic_driver_table(day):
                     technic=_tech,
                     driver=None,
                     date=current_day,
-                    status=status)
+                    status=status
+                )
 
     else:
         for tech in Technic.objects.all():
@@ -2647,7 +2662,6 @@ def setting_view(request):
 
 def check_table(day):
     date = convert_str_to_date(day)
-
     if not WorkDayTabel.objects.filter(date=date).exists():
         prepare_work_day_table(day)
 
@@ -2658,6 +2672,18 @@ def check_table(day):
 
         if not TechnicDriver.objects.filter(date=date).exists():
             prepare_technic_driver_table(day)
+
+        technic_driver_list = TechnicDriver.objects.filter(date=date, technic__isnull=False)
+        if technic_driver_list.count() != Technic.objects.all().count():
+            tech_exc = Technic.objects.filter().exclude(
+                id__in=technic_driver_list.values_list('technic__id', flat=True))
+            for _tech in tech_exc:
+                TechnicDriver.objects.create(
+                    date=date,
+                    technic=_tech,
+                    status=True
+                )
+
 
         prepare_application_today(day)
         print('workday')
