@@ -1918,7 +1918,8 @@ def signup_view(request):
             else:
                 foreman = None
 
-            _count_post = Post.objects.all().count()+1
+            # _count_post = Post.objects.all().count()+1
+            _count_post = max(Post.objects.values_list('id', flat=True))+1
             Post.objects.create(
                 id=_count_post,
                 user_post=new_user,
