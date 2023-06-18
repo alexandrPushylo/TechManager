@@ -132,9 +132,12 @@
                 <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-info  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
                 {% if tense %}
                 <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
+                {% if a.app_today.status.status  == 'Отправлена' and post == 'foreman' %}
+                {% elif a.app_today.status.status  == 'Отправлена' and post == 'master'%}
 
-                <a ondblclick="location.href = '/clear_app/{{ a.app_today.id }}'; return false;" class="btn btn-outline-danger  m-1" aria-current="page" title="Двойной клик для удаления"><i class="fa-solid fa-trash"></i></a>
-
+                {% else %}
+                    <a ondblclick="location.href = '/clear_app/{{ a.app_today.id }}'; return false;" class="btn btn-outline-danger  m-1" aria-current="page" title="Двойной клик для удаления"><i class="fa-solid fa-trash"></i></a>
+                {% endif %}
                 {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
                 <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
 {#                <a id="success_application_{{ a.app_today.id }}" class="btn_T btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
