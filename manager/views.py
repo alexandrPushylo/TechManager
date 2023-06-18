@@ -1467,7 +1467,8 @@ def show_applications_view(request, day, id_user=None):
                 app_for_day=appToday).values_list('description', flat=True).first()
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
 
-    out['apps_today_save'] = app_for_day.filter(status=STATUS_APP_saved)
+    # out['apps_today_save'] = app_for_day.filter(status=STATUS_APP_saved)
+    out['apps_today_save'] = app_for_day.exclude(status=STATUS_APP_absent)
 
 
     out['count_app_list'] = get_count_app_for_driver(current_day)
@@ -1692,7 +1693,7 @@ def create_new_application(request, id_application):
     out['free_tech_name'] = get_free_tech_driver_list(current_day=current_date)
 
     Tech_driver_list = TechnicDriver.objects.filter(date=current_date, status=True, driver__status=True)
-    print(Tech_driver_list.count())
+    # print(Tech_driver_list.count())
     Tech_name_list = TechnicName.objects.all().order_by('name')
 
     work_tech_name_list = Tech_driver_list.values_list('id', flat=True).distinct()
