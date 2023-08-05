@@ -18,7 +18,7 @@ from django.urls import path, re_path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from manager.views import signin_view, signup_view, logout_view, show_applications_view
+from manager.views import signin_view, signup_view, logout_view, show_applications_view, restore_pwd_view
 from manager.views import create_new_application
 from manager.views import show_start_page
 
@@ -123,6 +123,9 @@ urlpatterns = [
     path('signin/', signin_view, name="sign_in"),
     path('signup/', signup_view, name="sign_up"),
     path('logout', logout_view, name="logout"),
+    path('res_pwd/', restore_pwd_view, name="restore_pwd"),
+    path('res_pwd/<int:id_user>', restore_pwd_view, name="restore_pwd"),
+
 
     path('find/<str:day>', find_view, name='find'),
     path('change_workday/<str:day>', change_workday, name='change_workday'),
