@@ -2786,3 +2786,49 @@ def change_workday(request, day):
         print('this day DoesNotExist')
     return HttpResponseRedirect(f'/applications/{day}')
 
+
+def restore_pwd_view(request, id_user=None):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/')
+
+    out = {
+        'TODAY': TODAY,
+        'WEEKDAY_TODAY': WEEKDAY[TODAY.weekday()],
+    }
+
+    if id_user:
+        out['id_user'] = id_user
+        cur_user = User.objects.get(id=id_user)
+        cur_user.set_password('1234')
+        cur_user.save()
+
+    personals = Post.objects.filter().exclude(post_name=PostName.objects.get(name_post=POST_USER['admin']))
+
+    if request.method == 'POST':
+        found_user = request.POST['last_name']
+        found_user = str(found_user).strip(' ')
+
+        if found_user:
+            fu = personals.filter(
+                user_post__last_name__icontains=found_user
+            ).values_list(
+                'user_post__last_name', 'user_post__first_name', 'post_name__name_post', 'user_post__id').order_by(
+                'user_post__last_name')
+            if not fu.exists():
+                fu = personals.filter(
+                    user_post__last_name__icontains=found_user.capitalize()
+                ).values_list(
+                    'user_post__last_name', 'user_post__first_name', 'post_name__name_post', 'user_post__id').order_by(
+                    'user_post__last_name')
+                if not fu.exists():
+                    out['message_status'] = True
+                    out['message'] = 'Данный пользователь не найден!'
+
+        else:
+            fu = ''
+            out['message_status'] = True
+            out['message'] = 'Данный пользователь не найден!'
+        out['fu'] = fu
+
+    return render(request, 'restore_pwd.html', out)
+
