@@ -5,13 +5,13 @@
 <section class="container mt-5" style="width: 300px">
     <form  method="post">{% csrf_token %}
         <div >
-            <label for="exampleInputEmail1" class="form-label">Имя пользователя</label>
-            <input type="text" class="form-control" name="username">
+            <label for="exampleInputEmail1" class="form-label">Логин (Фамилия)</label>
+            <input type="text" class="form-control" name="username" placeholder="напр: Петров">
 
         </div>
         <div>
-            <label for="exampleInputPassword1" class="form-label">Пороль</label>
-            <input type="password" class="form-control" name="password">
+            <label for="exampleInputPassword1" class="form-label">Пароль</label>
+            <input type="password" class="form-control" name="password" placeholder="1234">
         </div>
         <br>
         <button type="submit" class="btn btn-primary">Вход</button>
