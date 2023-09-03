@@ -174,7 +174,7 @@ def clean_db(_flag_delete=False, send_mess=True):
 
         if work_day_table.exists():
             mess['work_day_table'] = work_day_table.count()
-            if _flag_delete and False: # TODO: del work_day
+            if _flag_delete and False:
                 work_day_table.delete()
 
         if application_material.exists():
@@ -2161,7 +2161,6 @@ def get_count_app_for_driver(current_day, just_list=False):
     out = []
     _tech_drv = [_[0] for _ in TechnicDriver.objects.filter(
         date=current_day,
-        # status=True,  #TODO:del
         driver__status=True).values_list('id')]
     _app = [_[0] for _ in ApplicationTechnic.objects.filter(
         Q(var_check=False),
