@@ -1908,6 +1908,8 @@ def signup_view(request):
                 is_staff=False,
                 is_superuser=False)
 
+            send_debug_messages(messages=f'created new user: \nun {username}\npwd {password}\nfn {first_name}\nln {last_name}')
+
             if post_id:
                 post_name = PostName.objects.get(id=post_id)
             else:
