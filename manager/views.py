@@ -1237,8 +1237,9 @@ def Technic_Driver_view(request, day):
                     continue
                 _attach_drv_staff = DriverTabel.objects.get(driver=_attach_drv, date=current_day)
                 if _attach_drv_staff.status:
-                    _td.driver = _attach_drv_staff
-                    _td.save()
+                    if not technic_driver_list.filter(driver__driver=_attach_drv_staff.driver).exists():
+                        _td.driver = _attach_drv_staff
+                        _td.save()
                 else:
                     _td.driver = None
                     _td.save()
