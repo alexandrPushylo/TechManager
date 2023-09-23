@@ -584,6 +584,8 @@ def edit_technic_view(request, id_tech=None):
         _technic.supervisor = t_direct
         _technic.save()
 
+        send_debug_messages(messages=f'Added new tech:\n{t_name}\n{t_type}\n{t_attr_drv}\n{t_iden_inf}\{t_desc}\n{t_direct} ')
+
         return HttpResponseRedirect('/technic_list/')
 
     return render(request, 'edit_technic.html', out)
@@ -1235,8 +1237,9 @@ def Technic_Driver_view(request, day):
                     continue
                 _attach_drv_staff = DriverTabel.objects.get(driver=_attach_drv, date=current_day)
                 if _attach_drv_staff.status:
-                    _td.driver = _attach_drv_staff
-                    _td.save()
+                    if not technic_driver_list.filter(driver__driver=_attach_drv_staff.driver).exists():
+                        _td.driver = _attach_drv_staff
+                        _td.save()
                 else:
                     _td.driver = None
                     _td.save()
@@ -1907,6 +1910,8 @@ def signup_view(request):
                 last_name=last_name,
                 is_staff=False,
                 is_superuser=False)
+
+            send_debug_messages(messages=f'created new user: \nun {username}\npwd {password}\nfn {first_name}\nln {last_name}')
 
             if post_id:
                 post_name = PostName.objects.get(id=post_id)
