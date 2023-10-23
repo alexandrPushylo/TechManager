@@ -1988,13 +1988,13 @@ def approv_all_applications(request, day):
 
     if AUTO_CREATE_BACKUP_DB and is_admin(request.user):
         create_backup_db()
-        current_day = convert_str_to_date(day)
-        current_applications = ApplicationToday.objects.filter(
-            status=STATUS_APP_submitted, date=current_day)
+    current_day = convert_str_to_date(day)
+    current_applications = ApplicationToday.objects.filter(
+        status=STATUS_APP_submitted, date=current_day)
 
-        for app in current_applications:
-            app.status = STATUS_APP_approved
-            app.save()
+    for app in current_applications:
+        app.status = STATUS_APP_approved
+        app.save()
 
     return HttpResponseRedirect(f'/applications/{day}')
 
