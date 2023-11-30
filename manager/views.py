@@ -2301,7 +2301,7 @@ def success_application(request, id_application):
     current_day = convert_str_to_date(current_application.date)
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+  #  _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
 
     if is_admin(request.user):
         _status = current_application.status
