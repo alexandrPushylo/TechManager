@@ -584,7 +584,7 @@ def edit_technic_view(request, id_tech=None):
         _technic.supervisor = t_direct
         _technic.save()
 
-        send_debug_messages(messages=f'Added new tech:\n{t_name}\n{t_type}\n{t_attr_drv}\n{t_iden_inf}\{t_desc}\n{t_direct} ')
+        send_debug_messages(messages=f'Added new tech:\n{t_name}\n{t_type}\n{t_attr_drv}\n{t_iden_inf}\n{t_desc}\n{t_direct} ')
 
         return HttpResponseRedirect('/technic_list/')
 
