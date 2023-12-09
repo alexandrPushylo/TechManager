@@ -20,15 +20,11 @@
             <a href="{% url 'restore_pwd' p.3 %}" class="btn btn-outline-primary">{{ p.0 }} {{ p.1 }}  {% if p.2 != None %}[{{ p.2 }}]{% endif %}</a>
             <br>
             {% endfor %}
-{#        {% else %}#}
-{#            Данный пользователь не найден!#}
         {% endif %}
-
     {% if id_user %}
         <script>
-
-            alert('Ваш пароль был сброшен на стандартный: 1234 ');
-            location.href = "{% url 'sign_in' %}";
+            alert('{{ id_user_mess }}');
+            location.href = "{% url 'sign_in' %}"
         </script>
     {% endif %}
 
