@@ -2792,6 +2792,12 @@ def change_workday(request, day):
 
 
 def restore_pwd_view(request, id_user=None):
+
+    MESSAGES = (
+        'Данный пользователь является администратором, чтобы сбросить пароль обратитесь к другому администратору',
+        'Ваш пароль был сброшен на стандартный: 1234 '
+    )
+
     if request.user.is_authenticated:
         return HttpResponseRedirect('/')
 
@@ -2803,11 +2809,17 @@ def restore_pwd_view(request, id_user=None):
     if id_user:
         out['id_user'] = id_user
         cur_user = User.objects.get(id=id_user)
-        cur_user.set_password('1234')
-        cur_user.save()
+        cur_post = Post.objects.get(user_post=cur_user)
 
-    personals = Post.objects.filter().exclude(post_name=PostName.objects.get(name_post=POST_USER['admin']))
+        if cur_post.post_name is not None and cur_post.post_name.name_post == POST_USER['admin']:
+            out['id_user_mess'] = MESSAGES[0]
+        else:
+            cur_user.set_password('1234')
+            cur_user.save()
+            send_debug_messages(f"Chande password:\n\t{cur_user.last_name}")
+            out['id_user_mess'] = MESSAGES[1]
 
+    personals = Post.objects.filter()#.exclude(post_name=PostName.objects.get(name_post=POST_USER['admin']))
     if request.method == 'POST':
         found_user = request.POST['last_name']
         found_user = str(found_user).strip(' ')
