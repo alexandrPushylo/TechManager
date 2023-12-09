@@ -30,10 +30,10 @@
             <br>
             <b class="fs-5">{{ current_user.last_name }} {{ current_user.first_name }}</b>
             <hr>
-        </p>
+        </p>    
 
         <ul class="container-fluid" >
-            {% for v in applications %}
+            {% for v in applications %}{% ifchanged %}<b class="fs-5" >{{ v.technic_driver.technic.name }}</b>{% endifchanged %}
                 <div class=" pb-1" id="vehicle_list">
                     <label  class= "fw-bold start-50">{{ v.priority }}) {% if v.app_for_day.construction_site.address and not v.app_for_day.construction_site.address == 'Снабжение'  %}{{ v.app_for_day.construction_site.address }}{% endif %} {% if v.app_for_day.construction_site.foreman %}({{ v.app_for_day.construction_site.foreman }}){% endif %}</label>
                     <textarea class="app_description form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ v.description }}</textarea>
