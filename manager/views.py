@@ -2327,18 +2327,41 @@ def success_application(request, id_application):
     return HttpResponseRedirect(f'/applications/{current_day}')
 
 
-def get_current_day(selected_day: str):
+def __get_current_day(selected_day: str):   #TODO: for del
     """получить (следующий, текущий, прошлый) рабочий день """
     if selected_day == 'next_day':
         for n in range(1, 14):
-            _day = WorkDayTabel.objects.get(date=TODAY+timedelta(n))
-            if _day.status:
-                return _day.date
+            try:
+                _day = WorkDayTabel.objects.get(date=TODAY+timedelta(n))
+                if _day.status:
+                    return _day.date
+            except WorkDayTabel.DoesNotExist:
+                prepare_work_day_table(TODAY+timedelta(n))
+
+            # if _day.status:
+            #     return _day.date
     elif selected_day == 'last_day':
         for n in range(14):
             _day = WorkDayTabel.objects.get(date=TODAY - timedelta(n))
             if _day.status:
                 return _day.date
+    else:
+        return selected_day
+
+
+def get_current_day(selected_day: str):
+    """Получить (следующий, текущий, прошлый) рабочий день """
+    if selected_day == 'next_day':
+        _day = WorkDayTabel.objects.filter(date__gt=TODAY, status=True).first()
+        if _day:
+            return _day.date
+        else:
+            prepare_work_day_table(TODAY)
+
+    elif selected_day == 'last_day':
+        _day = WorkDayTabel.objects.filter(date__lte=TODAY, status=True).last()
+        if _day:
+            return _day.date
     else:
         return selected_day
 
