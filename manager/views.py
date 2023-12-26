@@ -25,6 +25,7 @@ from archive.models import ApplicationTechnic as aApplicationTechnic
 from archive.models import ApplicationToDay as aApplicationToDay
 
 from archive.models import Technic as aTechnic
+from archive.models import ConstructionSite as aConstructionSite
 # ==================================
 
 # from manager.forms import CreateNewApplicationForm
@@ -194,7 +195,21 @@ def make_backup_technics(id_technic=None, action='add'):
                 'bd_status': _status
             }
         )
-        
+def make_backup_construction_site(id_constr_site=None, action='add'):
+    if id_constr_site is None:
+        constr_sites = ConstructionSite.objects.all()
+    else:
+        constr_sites = ConstructionSite.objects.filter(pk=id_constr_site)
+    _status = True if action == 'del' else False
+    for constr_site in constr_sites:
+        aConstructionSite.objects.using(ARCHIVE_DB).update_or_create(
+            id_C_S=constr_site.pk, defaults={
+                'address': constr_site.address,
+                'foreman_i': constr_site.foreman.pk if constr_site.foreman is not None else None,
+                'bd_status': _status
+            }
+        )
+
 
 
 
@@ -1055,6 +1070,7 @@ def edit_construction_sites_view(request, id_construction_sites):
         construction_sites.address = request.POST['construction_site_address']
         construction_sites.foreman = User.objects.get(id=request.POST['foreman'])
         construction_sites.save()
+        make_backup_construction_site(id_constr_site=construction_sites.pk, action='edit')
         return HttpResponseRedirect('/construction_sites/')
 
     return render(request, 'edit_construction_site.html', out)
@@ -1062,7 +1078,8 @@ def edit_construction_sites_view(request, id_construction_sites):
 
 def delete_construction_sites_view(request, id_construction_sites):
     construction_sites = ConstructionSite.objects.get(id=id_construction_sites)
-    construction_sites.delete()
+    make_backup_construction_site(id_constr_site=id_construction_sites, action='del')
+    construction_sites.delete()  # TODO: Fix del
     return HttpResponseRedirect('/construction_sites/')
 
 
@@ -1120,6 +1137,7 @@ def add_construction_sites_view(request):
 
         construction_sites.status = STATUS_CS_opened
         construction_sites.save()
+        make_backup_construction_site(id_constr_site=construction_sites.pk, action='add')
 
         return HttpResponseRedirect('/construction_sites/')
     return render(request, 'edit_construction_site.html', out)
