@@ -2074,7 +2074,7 @@ def get_priority_list(current_day, get_td_id=False):
 def get_work_TD_list(current_day, c_in=1, F_saved=False):
     out = []
 
-    if F_saved: #if ApplicationTechnic have status = 'saved'
+    if F_saved: #if ApplicationTechnic has status = 'saved'
         tech_app_status = ApplicationTechnic.objects.filter(
             Q(app_for_day__status=STATUS_APP_send) |
             Q(app_for_day__status=STATUS_APP_submitted) |
@@ -2286,12 +2286,11 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day('next_day').weekday() == 5 and current_day.weekday() == 0
     out['LOG_DB'] = LOG_DB
 
-
     return out
 
 
 def success_application(request, id_application):
-    """изменение статуса заявки"""
+    """Изменение статуса заявки"""
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
     if AUTO_CREATE_BACKUP_DB and is_admin(request.user):
@@ -2321,14 +2320,13 @@ def success_application(request, id_application):
             mess = f'Подана заявка требующая рассмотрение!'
             send_message_for_admin(current_day, mess)
 
-
     current_application.save()
 
     return HttpResponseRedirect(f'/applications/{current_day}')
 
 
 def __get_current_day(selected_day: str):   #TODO: for del
-    """получить (следующий, текущий, прошлый) рабочий день """
+    """Получить (следующий, текущий, прошлый) рабочий день """
     if selected_day == 'next_day':
         for n in range(1, 14):
             try:
