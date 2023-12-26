@@ -26,6 +26,7 @@ from archive.models import ApplicationToDay as aApplicationToDay
 
 from archive.models import Technic as aTechnic
 from archive.models import ConstructionSite as aConstructionSite
+from archive.models import User as aUser
 # ==================================
 
 # from manager.forms import CreateNewApplicationForm
@@ -195,6 +196,8 @@ def make_backup_technics(id_technic=None, action='add'):
                 'bd_status': _status
             }
         )
+
+
 def make_backup_construction_site(id_constr_site=None, action='add'):
     if id_constr_site is None:
         constr_sites = ConstructionSite.objects.all()
@@ -211,7 +214,24 @@ def make_backup_construction_site(id_constr_site=None, action='add'):
         )
 
 
-
+def make_backup_staff(id_staff=None, action='add'):
+    if id_staff is None:
+        staff = Post.objects.all()
+    else:
+        staff = Post.objects.filter(user_post_id=id_staff)
+    _status = True if action == 'del' else False
+    for employee in staff:
+        aUser.objects.using(ARCHIVE_DB).update_or_create(
+            id_U=employee.user_post.pk, defaults={
+                'username': employee.user_post.username,
+                'first_name': employee.user_post.first_name,
+                'last_name': employee.user_post.last_name,
+                'post': employee.post_name.name_post if employee.post_name is not None else None,
+                'date_joined': employee.user_post.date_joined,
+                'telephone': employee.telephone,
+                'bd_status': _status
+            }
+        )
 
 
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
@@ -1240,6 +1260,8 @@ def edit_staff_view(request, id_staff):
 
         selected_user.save()
 
+        make_backup_staff(id_staff=selected_user.pk, action='edit')
+
         if is_admin(request.user) or is_mechanic(request.user):
             return HttpResponseRedirect('/show_staff/')
         else:
@@ -2004,6 +2026,7 @@ def del_staff(request, id_staff):
         driver=user,
         # date__lt=TODAY
     )
+    make_backup_staff(id_staff=id_staff, action='del')
     driver_tab.delete()
     post.delete()
     user.delete()
@@ -2074,6 +2097,7 @@ def signup_view(request):
                 post_name=post_name,
                 telephone=telephone,
                 supervisor=foreman)
+            make_backup_staff(id_staff=new_user.pk, action='add')
 
             if request.user.is_anonymous:
                 login(request, new_user)
