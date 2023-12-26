@@ -160,6 +160,26 @@ def testA(request):
     make_backup_technics()
 
     return HttpResponse(mess)
+
+
+def make_backup_technics(id_technic=None, action='add'):
+    if id_technic is None:
+        technics = Technic.objects.all()
+    else:
+        technics = Technic.objects.filter(pk=id_technic)
+    _status = True if action == 'del' else False
+    for _technic in technics:
+        aTechnic.objects.using(ARCHIVE_DB).update_or_create(
+            id_T=_technic.id, defaults={
+                'name': _technic.name.name,
+                'id_information': _technic.id_information,
+                'tech_type': _technic.tech_type.name,
+                'description': _technic.description,
+                'attached_driver_i': _technic.attached_driver.pk if _technic.attached_driver is not None else None,
+                'supervisor_i': _technic.supervisor.pk,
+                'bd_status': _status
+            }
+        )
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
         return "date_of_last_clean_db is not exists"
@@ -524,6 +544,7 @@ def supply_app_view(request, day):
 def del_technic(request, id_tech):
     if is_admin(request.user) or is_mechanic(request.user):
         _technic = Technic.objects.get(id=id_tech)
+        make_backup_technics(id_technic=id_tech, action='del')
         _technic.delete()
 
     return HttpResponseRedirect('/technic_list/')
@@ -599,8 +620,9 @@ def edit_technic_view(request, id_tech=None):
         _technic.id_information = t_iden_inf
         _technic.supervisor = t_direct
         _technic.save()
-
-        send_debug_messages(messages=f'Added new tech:\n{t_name}\n{t_type}\n{t_attr_drv}\n{t_iden_inf}\n{t_desc}\n{t_direct} ')
+        make_backup_technics(id_technic=_technic.pk, action='edit')
+        send_debug_messages(
+            messages=f'Added new tech:\n{t_name}\n{t_type}\n{t_attr_drv}\n{t_iden_inf}\n{t_desc}\n{t_direct} ')
 
         return HttpResponseRedirect('/technic_list/')
 
