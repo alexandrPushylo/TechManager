@@ -173,7 +173,10 @@ def testA(request):
     # apm.save(using=DB)
 
     # mess = apm
-    make_backup_technics()
+
+    # make_backup_technics()
+    # make_backup_construction_site()
+    # make_backup_staff()
 
     return HttpResponse(mess)
 
