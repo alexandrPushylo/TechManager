@@ -81,6 +81,8 @@ from manager.views import create_db_backup
 from manager.views import undo_change_db
 from manager.views import clear_db
 
+from manager.views import testA
+
 
 urlpatterns = [
     path('', show_start_page, name='start_page'),
@@ -166,6 +168,7 @@ urlpatterns = [
     path('connect_bot_view/<int:id_user>', connect_bot_view, name='connect_bot'),
     path('test_bot/<int:id_user>', test_bot, name='test_bot'),
     path('notice_submitt/<str:current_day>', notice_submitt, name='notice_submitt'),
+    path('archive/', testA, name='archive')
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

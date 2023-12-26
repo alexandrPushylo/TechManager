@@ -144,7 +144,22 @@ def send_debug_messages(messages='Test'):
         send_message(_id, mess)
 
 
-def clean_db(_flag_delete=False, send_mess=True):
+def testA(request):
+    DB = 'archive'
+    mess = 'OK'
+
+    # apm = ApplicationMeterialArchive.objects.using(DB).create(
+    #     id_A_M=1,
+    #     date=TODAY,
+    #     app_for_day_i=2,
+    #     description='dsfsdfsdfsd'
+    # )
+    # apm.save(using=DB)
+
+    # mess = apm
+    make_backup_technics()
+
+    return HttpResponse(mess)
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
         return "date_of_last_clean_db is not exists"
