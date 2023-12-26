@@ -18,6 +18,7 @@ status_application = {'absent': 'Отсутствует', 'saved': 'Сохран
 status_constr_site = {'closed': 'Закрыт', 'opened': 'Открыт'}
 PLATFORM = sys.platform
 name_db = 'db.sqlite3'
+archive_db = 'archive'
 path_backup_db = f"..{os.sep}..{os.sep}temp_backup"
 
 variable = {
