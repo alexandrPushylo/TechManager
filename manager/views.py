@@ -66,6 +66,7 @@ from manager.utilities import delete_db_backup
 from manager.utilities import back24H
 # ----------------
 from TechManager.settings import AUTO_CREATE_BACKUP_DB
+
 # ----------------
 
 AUTO_CLEAR_DB = True
@@ -82,6 +83,8 @@ STATUS_APP_send = ApplicationStatus.objects.get_or_create(status=STATUS_AP['send
 # STATUS construction_site------------------------------------------------------------------
 STATUS_CS_closed = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['closed'])[0]
 STATUS_CS_opened = ConstructionSiteStatus.objects.get_or_create(status=STATUS_CS['opened'])[0]
+
+
 # ------------------------------------------------------------------------------------------
 
 
@@ -109,13 +112,13 @@ def undo_change_db(request):
 
 
 def restore_db(request, date_img):
-    curr_backup = date_img.replace('T', '_').replace(':', '-')+'.sqlite3'
+    curr_backup = date_img.replace('T', '_').replace(':', '-') + '.sqlite3'
     restore_db_backup(curr_backup)
     return HttpResponseRedirect('/list_backup/')
 
 
 def restore24_db(request, date_img):
-    curr_backup = date_img[:-3].replace('T', '_').replace(':', '-')+'.sqlite3'
+    curr_backup = date_img[:-3].replace('T', '_').replace(':', '-') + '.sqlite3'
     back24H(param='restore', backup=curr_backup)
     return HttpResponseRedirect('/list_backup/')
 
@@ -126,7 +129,7 @@ def show_backup_list_view(request):
     out = {}
     get_prepare_data(out, request)
     list_backup = get_list_db_backup()
-    out['list_backup'] = sorted(list_backup, reverse=True)#reversed(list_backup)
+    out['list_backup'] = sorted(list_backup, reverse=True)  # reversed(list_backup)
     out['list_backup24'] = sorted(back24H(param='list'), reverse=True)
 
     return render(request, 'db_supply.html', out)
@@ -191,6 +194,11 @@ def make_backup_technics(id_technic=None, action='add'):
                 'bd_status': _status
             }
         )
+        
+
+
+
+
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -520,6 +528,7 @@ def cancel_supply_app(request, id_app):
 
     return HttpResponseRedirect('/')
 
+
 def move_supply_app(request, day, id_app):
     current_day = convert_str_to_date(day)
     app_for_day = ApplicationToday.objects.get(
@@ -754,7 +763,6 @@ def copy_app_view(request, id_application, day):
 
 
 def append_in_spec_tech(request, id_td):
-
     technic_driver = TechnicDriver.objects.get(id=id_td)
     current_day = technic_driver.date
 
@@ -900,7 +908,8 @@ def conflict_correction_view(request, day, id_applications):
 
     out['prior_color'] = {}
     ds = _Application_technic.filter(
-        technic_driver_id__in=get_priority_list(current_day, get_td_id=True)).values_list('technic_driver_id', flat=True)
+        technic_driver_id__in=get_priority_list(current_day, get_td_id=True)).values_list('technic_driver_id',
+                                                                                          flat=True)
     for pr in ds:
         clr = rand_choice(COLOR_LIST)
         if clr not in out['prior_color'].values():
@@ -963,7 +972,6 @@ def conflict_resolution_view(request, day):
     conflict_list = get_conflicts_vehicles_list(current_day)
     out['conflicts_list'] = conflict_list
     out['work_TD_list'] = get_work_TD_list(current_day)
-
 
     today_technic_applications_list = []
     for v in conflict_list:
@@ -1116,6 +1124,7 @@ def add_construction_sites_view(request):
         return HttpResponseRedirect('/construction_sites/')
     return render(request, 'edit_construction_site.html', out)
 
+
 ##-------------------------------------------------CONSTRURTION SITE--------------------------------------------------
 
 # STAFF-------------------------------------------------------------------------------------STAFF--------------------
@@ -1140,7 +1149,7 @@ def show_staff_view(request):
         else:
             _post = None
         try:
-            _tel = Post.objects.get(user_post=_user).telephone#get_current_post(_user)
+            _tel = Post.objects.get(user_post=_user).telephone  # get_current_post(_user)
         except:
             _tel = ''
         _user_post.append((_user, _post, _tel))
@@ -1219,6 +1228,7 @@ def edit_staff_view(request, id_staff):
             return HttpResponseRedirect('/')
     return render(request, 'edit_staff.html', out)
 
+
 # STAFF-----------------------------------------------STAFF-------------------------------------------------------------
 
 # TABEL----------------------------------------------------------------------------------------TABEL--------------------
@@ -1242,7 +1252,6 @@ def tabel_driver_view(request, day):
         prepare_technic_driver_table(day)
     else:
         technic_driver_list = TechnicDriver.objects.filter(date=current_day)
-
 
     driver_today_tabel = DriverTabel.objects.filter(date=current_day)
     out['driver_list'] = driver_today_tabel.order_by('driver__last_name')
@@ -1274,7 +1283,7 @@ def tabel_workday_view(request, ch_week):
 
     out = {}
     if ch_week == 'nextweek':
-        _day = TODAY+timedelta(7)
+        _day = TODAY + timedelta(7)
         out['week_title'] = 'Следующая неделя'
         out['ch_week'] = ch_week
     else:
@@ -1334,7 +1343,8 @@ def Technic_Driver_view(request, day):
         technic_driver_list = TechnicDriver.objects.filter(date=current_day, technic__isnull=False)
 
         if current_day >= TODAY and technic_driver_list.count() != Technic.objects.all().count():
-            tech_exc = Technic.objects.filter().exclude(id__in=technic_driver_list.values_list('technic__id', flat=True))
+            tech_exc = Technic.objects.filter().exclude(
+                id__in=technic_driver_list.values_list('technic__id', flat=True))
             for _tech in tech_exc:
                 TechnicDriver.objects.create(
                     date=current_day,
@@ -1401,7 +1411,8 @@ def Technic_Driver_view(request, day):
     else:
         return render(request, 'technic_driver.html', out)
 
-#-----------------------------------------------------TABEL-------------------------------------------------------------
+
+# -----------------------------------------------------TABEL-------------------------------------------------------------
 
 
 def clear_application_view(request, id_application):
@@ -1430,6 +1441,7 @@ def clear_application_view(request, id_application):
     current_application.save()
 
     return HttpResponseRedirect(f'/applications/{current_day}')
+
 
 # ===============================================================================================
 def show_applications_view(request, day, id_user=None):
@@ -1489,8 +1501,8 @@ def show_applications_view(request, day, id_user=None):
     if is_admin(current_user):
         app_for_day = _Application_today.filter(
             Q(Q(status=STATUS_APP_submitted) |
-                Q(status=STATUS_APP_approved) |
-                Q(status=STATUS_APP_send)
+              Q(status=STATUS_APP_approved) |
+              Q(status=STATUS_APP_send)
               ))
 
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
@@ -1503,7 +1515,7 @@ def show_applications_view(request, day, id_user=None):
 
         technic_driver_table = TechnicDriver.objects.filter(date=current_day)
         var_sort_driver_panel = get_var(VAR['sort_drv_panel'], user=request.user)
-#   --------------------------------------------------------------------------------------------------------------------
+        #   --------------------------------------------------------------------------------------------------------------------
         if var_sort_driver_panel and var_sort_driver_panel.value:
             try:
                 out["DRV_LIST"] = technic_driver_table.order_by(f'{var_sort_driver_panel.value}')
@@ -1513,7 +1525,7 @@ def show_applications_view(request, day, id_user=None):
             out["DRV_LIST"] = technic_driver_table.order_by('driver__driver__last_name')
         out['work_drv'] = get_count_app_for_driver(current_day, just_list=True)
 
-#   --------------------------------------------------------------------------------------------------------------------
+        #   --------------------------------------------------------------------------------------------------------------------
         out["priority_list"] = get_priority_list(current_day)
 
         if request.POST.get('panel'):
@@ -1585,13 +1597,13 @@ def show_applications_view(request, day, id_user=None):
     # out['apps_today_save'] = app_for_day.filter(status=STATUS_APP_saved)
     out['apps_today_save'] = app_for_day.exclude(status=STATUS_APP_absent)
 
-
     out['count_app_list'] = get_count_app_for_driver(current_day)
 
     if id_user:
         return render(request, "extend/admin_application_foreman.html", out)
     else:
         return render(request, "main.html", out)
+
 
 # ===============================================================================================
 def show_application_for_driver(request, day, id_user):
@@ -1649,7 +1661,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
 
     _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
     if not _FILTER:
-        _FILTER = ['all', 'all']    # foreman, constr_site
+        _FILTER = ['all', 'all']  # foreman, constr_site
     else:
         _FILTER = _FILTER.split(',')
 
@@ -2023,7 +2035,8 @@ def signup_view(request):
                 is_staff=False,
                 is_superuser=False)
 
-            send_debug_messages(messages=f'created new user: \nun {username}\npwd {password}\nfn {first_name}\nln {last_name}')
+            send_debug_messages(
+                messages=f'created new user: \nun {username}\npwd {password}\nfn {first_name}\nln {last_name}')
 
             if post_id:
                 post_name = PostName.objects.get(id=post_id)
@@ -2036,7 +2049,7 @@ def signup_view(request):
                 foreman = None
 
             # _count_post = Post.objects.all().count()+1
-            _count_post = max(Post.objects.values_list('id', flat=True))+1
+            _count_post = max(Post.objects.values_list('id', flat=True)) + 1
             Post.objects.create(
                 id=_count_post,
                 user_post=new_user,
@@ -2186,7 +2199,7 @@ def get_priority_list(current_day, get_td_id=False):
 def get_work_TD_list(current_day, c_in=1, F_saved=False):
     out = []
 
-    if F_saved: #if ApplicationTechnic has status = 'saved'
+    if F_saved:  # if ApplicationTechnic has status = 'saved'
         tech_app_status = ApplicationTechnic.objects.filter(
             Q(app_for_day__status=STATUS_APP_send) |
             Q(app_for_day__status=STATUS_APP_submitted) |
@@ -2258,13 +2271,13 @@ def get_conflicts_vehicles_list(current_day, all_app=False, lack=False, c_in=0):
         Q(app_for_day__status=STATUS_APP_send) |
         Q(app_for_day__status=STATUS_APP_submitted) |
         Q(app_for_day__status=STATUS_APP_approved)
-        )
+    )
 
     list_of_work_tech = list(app_list_submit_approv.filter(priority=1).values_list(
         'technic_driver__technic__name_id', flat=True))
 
     for i in set(list_of_work_tech):
-        if list_of_work_tech.count(i)+c_in > count_technics[i]:
+        if list_of_work_tech.count(i) + c_in > count_technics[i]:
             if lack:
                 _c = list_of_work_tech.count(i) - count_technics[i]
                 _name = TechnicName.objects.get(id=i).name
@@ -2389,13 +2402,14 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['cw_day'] = str(get_current_day(get_CH_day(current_day)))
     out['lw_day'] = str(get_current_day('last_day'))
     out["WEEKDAY_TODAY"] = WEEKDAY[TODAY.weekday()]
-    out['TODAY'] = f'{TODAY.day} {MONTH[TODAY.month-1]}'
-    out["DAY"] = f'{current_day.day} {MONTH[current_day.month-1]}'
+    out['TODAY'] = f'{TODAY.day} {MONTH[TODAY.month - 1]}'
+    out["DAY"] = f'{current_day.day} {MONTH[current_day.month - 1]}'
     out["WEEKDAY"] = WEEKDAY[current_day.weekday()]
     out["post"] = get_current_post(request.user)
     out['tense'] = current_day >= TODAY
     out['referer'] = request.headers.get('Referer')
-    out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day('next_day').weekday() == 5 and current_day.weekday() == 0
+    out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day(
+        'next_day').weekday() == 5 and current_day.weekday() == 0
     out['LOG_DB'] = LOG_DB
 
     return out
@@ -2412,7 +2426,7 @@ def success_application(request, id_application):
     current_day = convert_str_to_date(current_application.date)
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-  #  _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
+    #  _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.numerator]}"
 
     if is_admin(request.user):
         _status = current_application.status
@@ -2437,16 +2451,16 @@ def success_application(request, id_application):
     return HttpResponseRedirect(f'/applications/{current_day}')
 
 
-def __get_current_day(selected_day: str):   #TODO: for del
+def __get_current_day(selected_day: str):  # TODO: for del
     """Получить (следующий, текущий, прошлый) рабочий день """
     if selected_day == 'next_day':
         for n in range(1, 14):
             try:
-                _day = WorkDayTabel.objects.get(date=TODAY+timedelta(n))
+                _day = WorkDayTabel.objects.get(date=TODAY + timedelta(n))
                 if _day.status:
                     return _day.date
             except WorkDayTabel.DoesNotExist:
-                prepare_work_day_table(TODAY+timedelta(n))
+                prepare_work_day_table(TODAY + timedelta(n))
 
             # if _day.status:
             #     return _day.date
@@ -2645,7 +2659,7 @@ def send_task_for_drv(current_day, messages=None, id_app_today=None):
     out = []
     _driver_list = DriverTabel.objects.filter(date=current_day, status=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real - 1]}"
 
     if id_app_today:
         _App = ApplicationTechnic.objects.filter(app_for_day_id=id_app_today)
@@ -2706,7 +2720,7 @@ def send_status_app_for_foreman(current_day, messages=None, id_app_today=None):
         _app = ApplicationToday.objects.filter(date=current_day, status=STATUS_APP_send)
 
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real - 1]}"
 
     for _id in id_foreman_list:
         _a = _app.filter(construction_site__foreman=_id.user_post)
@@ -2734,7 +2748,7 @@ def send_message_for_admin(current_day, messages=False, id_app_today=None):
     admin_id_list = Post.objects.filter(
         post_name__name_post=POST_USER['admin']).values_list('user_post_id', flat=True)
     send_flag = Variable.objects.filter(name=VAR['sent_app'], date=current_day, flag=True).exists()
-    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real-1]}"
+    _day = f"{WEEKDAY[current_day.weekday()]}, {current_day.day} {MONTH[current_day.month.real - 1]}"
     if id_app_today:
         _app = ApplicationToday.objects.get(id=id_app_today)
         if _app.construction_site.foreman is not None:
@@ -2823,7 +2837,6 @@ def check_table(day):
                     status=True
                 )
 
-
         prepare_application_today(day)
         print('workday')
     elif _today.date < TODAY:
@@ -2881,8 +2894,7 @@ def find_view(request, day):
         out['drivers'] = driver.filter(
             Q(driver__last_name__icontains=str_find) |
             Q(driver__last_name__icontains=str(str_find).capitalize())
-            )
-
+        )
 
         app_tech = application_technic.filter(
             Q(technic_driver__technic__name__name__icontains=str_find) |
@@ -2925,7 +2937,6 @@ def change_workday(request, day):
 
 
 def restore_pwd_view(request, id_user=None):
-
     MESSAGES = (
         'Данный пользователь является администратором, чтобы сбросить пароль обратитесь к другому администратору',
         'Ваш пароль был сброшен на стандартный: 1234 '
@@ -2952,7 +2963,7 @@ def restore_pwd_view(request, id_user=None):
             send_debug_messages(f"Chande password:\n\t{cur_user.last_name}")
             out['id_user_mess'] = MESSAGES[1]
 
-    personals = Post.objects.filter()#.exclude(post_name=PostName.objects.get(name_post=POST_USER['admin']))
+    personals = Post.objects.filter()  # .exclude(post_name=PostName.objects.get(name_post=POST_USER['admin']))
     if request.method == 'POST':
         found_user = request.POST['last_name']
         found_user = str(found_user).strip(' ')
@@ -2980,4 +2991,3 @@ def restore_pwd_view(request, id_user=None):
         out['fu'] = fu
 
     return render(request, 'restore_pwd.html', out)
-
