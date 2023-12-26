@@ -22,7 +22,7 @@ class User(models.Model):
 class ConstructionSite(models.Model):
     id_C_S = models.IntegerField(null=False, blank=False, verbose_name="id объекта")
     address = models.CharField(max_length=512, verbose_name="Адрес", null=True, blank=True)
-    foreman_i = models.IntegerField(null=False, blank=False, verbose_name="id прораба")
+    foreman_i = models.IntegerField(null=True, blank=True, verbose_name="id прораба")
     bd_status = models.BooleanField(null=False, default=False, verbose_name="Удален из базы данных")
     def __str__(self): return f"{self.address} | Удален: {self.bd_status}"
 
