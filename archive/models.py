@@ -37,9 +37,9 @@ class Technic(models.Model):
     id_information = models.CharField(max_length=256, null=False, blank=False, verbose_name="Идентификационная информация")
     tech_type = models.CharField(max_length=256, null=False, blank=False, verbose_name='Тип техники')
     description = models.TextField(max_length=1024, null=True, blank=True, verbose_name="Описание")
-    attached_driver_i = models.IntegerField(null=False, blank=False, verbose_name='id Прикрепленного водителя')
+    attached_driver_i = models.IntegerField(null=True, blank=True, verbose_name='id Прикрепленного водителя')
     supervisor_i = models.IntegerField(null=False, blank=False, verbose_name='id Руководителя')
-    bd_status = models.BooleanField(null=False, default=True, verbose_name="Удален из базы данных")
+    bd_status = models.BooleanField(null=False, default=False, verbose_name="Удален из базы данных")
     def __str__(self): return f"{self.name} [{self.id_information}] - {self.description} | Удален: {self.bd_status}"
 
     class Meta:
@@ -76,7 +76,7 @@ class TTechnicDriver(models.Model):
     driver_i = models.IntegerField(null=False, blank=False, verbose_name="id водителя техники")
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.BooleanField(default=True, verbose_name="Статус техники")
-    def __str__(self): return f"{self.date} [{self.status}]"
+    def __str__(self): return f"{self.technic_i} - {self.date} [{self.status}]"
 
     class Meta:
         verbose_name = 'Отметка техники'
