@@ -237,6 +237,18 @@ def make_backup_staff(id_staff=None, action='add'):
         )
 
 
+def make_backup_technic_table(technic_driver_list: list = None):
+    if technic_driver_list is None:
+        technic_driver_list = TechnicDriver.objects.filter(date__lte=TODAY-timedelta(days=1))
+    for _td in technic_driver_list:
+        if _td.technic is not None and _td.driver is not None:
+            aTTechnicDriver.objects.using(ARCHIVE_DB).get_or_create(
+                id_T_D=_td.pk,
+                technic_i=_td.technic.pk if _td.technic is not None else None,
+                driver_i=_td.driver.driver.pk,
+                date=_td.date,
+                status=_td.status
+            )
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -260,15 +272,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if technic_driver.exists():
             mess['technic_driver'] = technic_driver.count()
             if _flag_backup:
-                for _td in technic_driver:
-                    if _td.technic is not None and _td.driver is not None:
-                        aTTechnicDriver.objects.using(ARCHIVE_DB).get_or_create(
-                            id_T_D=_td.pk,
-                            technic_i=_td.technic.pk if _td.technic is not None else None,
-                            driver_i=_td.driver.driver.pk,
-                            date=_td.date,
-                            status=_td.status
-                        )
+                make_backup_technic_table(technic_driver_list=technic_driver)
             if _flag_delete:
                 technic_driver.delete()
 
