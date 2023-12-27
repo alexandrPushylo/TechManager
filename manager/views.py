@@ -249,6 +249,19 @@ def make_backup_technic_table(technic_driver_list: list = None):
                 date=_td.date,
                 status=_td.status
             )
+def make_backup_driver_table(driver_list: list = None):
+    if driver_list is None:
+        driver_list = DriverTabel.objects.filter(date__lte=TODAY-timedelta(days=1))
+    for _td in driver_list:
+        if _td.driver is not None:
+            aTDriver.objects.using(ARCHIVE_DB).get_or_create(
+                id_D=_td.pk,
+                driver_i=_td.driver.pk,
+                status=_td.status,
+                date=_td.date
+            )
+
+
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -280,14 +293,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if table_drivers.exists():
             mess['table_drivers'] = table_drivers.count()
             if _flag_backup:
-                for _td in table_drivers:
-                    if _td.driver is not None:
-                        aTDriver.objects.using(ARCHIVE_DB).get_or_create(
-                            id_D=_td.pk,
-                            driver_i=_td.driver.pk,
-                            status=_td.status,
-                            date=_td.date
-                        )
+                make_backup_driver_table(driver_list=table_drivers)
             if _flag_delete:
                 table_drivers.delete()
 
