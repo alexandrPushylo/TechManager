@@ -8,8 +8,8 @@
         <table class="table w-auto mx-auto table-bordered">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">Время</th>
+      <th scope="col"> </th>
+      <th scope="col">Время создания</th>
       <th scope="col"></th>
       <th scope="col" hidden>id</th>
 
@@ -45,11 +45,54 @@
   </tbody>
 {% endif %}
 </table>
-
-
-
-
       </div>
+    <div class="mt-5">
+        <table class="table w-auto mx-auto table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Название таблицы</th>
+      <th scope="col">Колл-во объектов в базе</th>
+
+    </tr>
+  </thead>
+        
+  <tbody class="border border-3">
+
+    <tr>
+      <td>{{ app_materials_count.0 }}</td><td>{{ app_materials_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ app_to_day_count.0 }}</td><td>{{ app_to_day_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ app_technic_count.0 }}</td><td>{{ app_technic_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ staff_count.0 }}</td><td>{{ staff_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ construction_site_count.0 }}</td><td>{{ construction_site_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ t_drivers_count.0 }}</td><td>{{ t_drivers_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ t_work_day_count.0 }}</td><td>{{ t_work_day_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ t_technic_count.0 }}</td><td>{{ t_technic_count.1 }}</td>
+    </tr>
+  <tr>
+      <td>{{ technic_count.0 }}</td><td>{{ technic_count.1 }}</td>
+    </tr>  
+  <tr >
+      <td colspan="2"  style="text-align: center" ><a href="#" class="btn btn-warning">Выполнить архивацию данных</a></td>
+    </tr>
+  </tbody>
+</table>
+    </div>  
+    
+    
       </div>
     </div>
 
@@ -66,6 +109,6 @@
 <div class="input-group d-flex justify-content-center align-items-center">
   <a href="{% url 'start_page'  %}" class="btn btn-outline-primary active  col-auto m-0" aria-current="page">Назад</a>
     <a href="{% url 'create_backup'  %}" class="btn btn-warning  col-auto m-0" aria-current="page">Создать резервную копию</a>
-<a ondblclick="location.href = '/clear_db_backup/'; return false;" class="btn btn-outline-danger  col-auto m-0" aria-current="page">Отчистить все</a>
+{#<a ondblclick="location.href = '/clear_db_backup/'; return false;" class="btn btn-outline-danger  col-auto m-0" aria-current="page">Отчистить все</a>#}
 </div>
 {% endblock %}
