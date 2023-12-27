@@ -326,6 +326,16 @@ def make_backup_app_technics(app_technics_list: list = None):
             description=_at.description,
             priority=_at.priority
         )
+def make_backup_app_to_day(app_to_day_list: list = None):
+    if app_to_day_list is None:
+        app_to_day_list = ApplicationToday.objects.filter(date__lte=TODAY-timedelta(days=1))
+    for _at in app_to_day_list:
+        aApplicationToDay.objects.using(ARCHIVE_DB).get_or_create(
+            id_A_T_D=_at.pk,
+            date=_at.date,
+            construction_site_i=_at.construction_site.pk,
+            description=_at.description
+        )
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -389,13 +399,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if application_today.exists():
             mess['application_today'] = application_today.count()
             if _flag_backup:
-                for _at in application_today:
-                    aApplicationToDay.objects.using(ARCHIVE_DB).get_or_create(
-                        id_A_T_D=_at.pk,
-                        date=_at.date,
-                        construction_site_i=_at.construction_site.pk,
-                        description=_at.description
-                    )
+                make_backup_app_to_day(app_to_day_list=application_today)
             if _flag_delete:
                 application_today.delete()
 
