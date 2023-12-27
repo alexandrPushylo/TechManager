@@ -130,6 +130,7 @@ def show_backup_list_view(request):
         return HttpResponseRedirect('/')
     out = {}
     get_prepare_data(out, request)
+
     list_backup = get_list_db_backup()
     out['list_backup'] = sorted(list_backup, reverse=True)  # reversed(list_backup)
     out['list_backup24'] = sorted(back24H(param='list'), reverse=True)[0:6]
@@ -195,21 +196,10 @@ def testA(request):
     DB = 'archive'
     mess = 'OK'
 
-    # apm = ApplicationMeterialArchive.objects.using(DB).create(
-    #     id_A_M=1,
-    #     date=TODAY,
-    #     app_for_day_i=2,
-    #     description='dsfsdfsdfsd'
-    # )
-    # apm.save(using=DB)
-
-    # mess = apm
-
-    # make_backup_technics()
-    # make_backup_construction_site()
-    # make_backup_staff()
 
     return HttpResponse(mess)
+
+
 def make_full_archive(request):
     make_backup_app_materials()
     make_backup_app_to_day()
@@ -222,6 +212,7 @@ def make_full_archive(request):
     make_backup_technics()
     # return HttpResponse('OK')
     return HttpResponseRedirect('/list_backup/')
+
 
 
 def make_backup_technics(id_technic=None, action='add'):
@@ -292,6 +283,8 @@ def make_backup_technic_table(technic_driver_list: list = None):
                 date=_td.date,
                 status=_td.status
             )
+
+
 def make_backup_driver_table(driver_list: list = None):
     if driver_list is None:
         driver_list = DriverTabel.objects.filter(date__lte=TODAY-timedelta(days=1))
@@ -326,6 +319,8 @@ def make_backup_app_materials(app_materials_list: list = None):
             app_for_day_i=_am.app_for_day.pk,
             description=_am.description
         )
+
+
 def make_backup_app_technics(app_technics_list: list = None):
     if app_technics_list is None:
         app_technics_list = ApplicationTechnic.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
@@ -338,6 +333,8 @@ def make_backup_app_technics(app_technics_list: list = None):
             description=_at.description,
             priority=_at.priority
         )
+
+
 def make_backup_app_to_day(app_to_day_list: list = None):
     if app_to_day_list is None:
         app_to_day_list = ApplicationToday.objects.filter(date__lte=TODAY-timedelta(days=1))
@@ -348,6 +345,8 @@ def make_backup_app_to_day(app_to_day_list: list = None):
             construction_site_i=_at.construction_site.pk,
             description=_at.description
         )
+
+
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
