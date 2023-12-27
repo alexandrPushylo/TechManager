@@ -293,6 +293,17 @@ def make_backup_driver_table(driver_list: list = None):
             )
 
 
+def make_backup_work_day_table(work_day_list: list = None):
+    if work_day_list is None:
+        work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY-timedelta(days=1))
+    for _wd in work_day_list:
+        aTWorkDay.objects.using(ARCHIVE_DB).get_or_create(
+            id_W_D=_wd.pk,
+            date=_wd.date,
+            status=_wd.status
+        )
+
+
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -332,12 +343,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if work_day_table.exists():
             mess['work_day_table'] = work_day_table.count()
             if _flag_backup:
-                for _wd in work_day_table:
-                    aTWorkDay.objects.using(ARCHIVE_DB).get_or_create(
-                        id_W_D=_wd.pk,
-                        date=_wd.date,
-                        status=_wd.status
-                    )
+                make_backup_work_day_table(work_day_list=work_day_table)
             if _flag_delete and False:
                 work_day_table.delete()
 
