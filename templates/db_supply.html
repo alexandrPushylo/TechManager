@@ -86,7 +86,11 @@
       <td>{{ technic_count.0 }}</td><td>{{ technic_count.1 }}</td>
     </tr>  
   <tr >
-      <td colspan="2"  style="text-align: center" ><a href="#" class="btn btn-warning">Выполнить архивацию данных</a></td>
+      <td colspan="2"  style="text-align: center" >
+          <a href="{% url 'make_archive' %}" class="btn btn-warning">Выполнить архивацию данных</a>
+          <br>
+          <p class="m-0 fs-6">Это может занять несколько минут</p>
+      </td>
     </tr>
   </tbody>
 </table>

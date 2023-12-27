@@ -81,6 +81,8 @@ from manager.views import create_db_backup
 from manager.views import undo_change_db
 from manager.views import clear_db
 
+from manager.views import make_full_archive
+
 from manager.views import testA
 
 
@@ -98,6 +100,8 @@ urlpatterns = [
     path('create_backup/', create_db_backup, name='create_backup'),
     path('undo_change/', undo_change_db, name='undo_change_db'),
     path('clear_db_backup/', clear_db, name='clear_db_backup'),
+    path('make_archive/', make_full_archive, name='make_archive'),
+
 
 
     path('construction_sites/', show_construction_sites_view, name='construction_sites'),

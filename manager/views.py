@@ -304,6 +304,16 @@ def make_backup_work_day_table(work_day_list: list = None):
         )
 
 
+def make_backup_app_materials(app_materials_list: list = None):
+    if app_materials_list is None:
+        app_materials_list = ApplicationMeterial.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
+    for _am in app_materials_list:
+        aTApplicationMeterial.objects.using(ARCHIVE_DB).get_or_create(
+            id_A_M=_am.pk,
+            date=_am.app_for_day.date,
+            app_for_day_i=_am.app_for_day.pk,
+            description=_am.description
+        )
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -351,13 +361,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if application_material.exists():
             mess['application_material'] = application_material.count()
             if _flag_backup:
-                for _am in application_material:
-                    aTApplicationMeterial.objects.using(ARCHIVE_DB).get_or_create(
-                        id_A_M=_am.pk,
-                        date=_am.app_for_day.date,
-                        app_for_day_i=_am.app_for_day.pk,
-                        description=_am.description
-                    )
+                make_backup_app_materials(app_materials_list=application_material)
             if _flag_delete:
                 application_material.delete()
 
