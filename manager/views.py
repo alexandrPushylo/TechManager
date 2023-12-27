@@ -314,6 +314,18 @@ def make_backup_app_materials(app_materials_list: list = None):
             app_for_day_i=_am.app_for_day.pk,
             description=_am.description
         )
+def make_backup_app_technics(app_technics_list: list = None):
+    if app_technics_list is None:
+        app_technics_list = ApplicationTechnic.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
+    for _at in app_technics_list:
+        aApplicationTechnic.objects.using(ARCHIVE_DB).get_or_create(
+            id_A_T=_at.pk,
+            date=_at.app_for_day.date,
+            app_for_day_i=_at.app_for_day.pk,
+            technic_driver_i=_at.technic_driver.pk,
+            description=_at.description,
+            priority=_at.priority
+        )
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
@@ -369,15 +381,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if application_technic.exists():
             mess['application_technic'] = application_technic.count()
             if _flag_backup:
-                for _at in application_technic:
-                    aApplicationTechnic.objects.using(ARCHIVE_DB).get_or_create(
-                        id_A_T=_at.pk,
-                        date=_at.app_for_day.date,
-                        app_for_day_i=_at.app_for_day.pk,
-                        technic_driver_i=_at.technic_driver.pk,
-                        description=_at.description,
-                        priority=_at.priority
-                    )
+                make_backup_app_technics(app_technics_list=application_technic)
             if _flag_delete:
                 application_technic.delete()
 
