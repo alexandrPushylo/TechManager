@@ -210,6 +210,18 @@ def testA(request):
     # make_backup_staff()
 
     return HttpResponse(mess)
+def make_full_archive(request):
+    make_backup_app_materials()
+    make_backup_app_to_day()
+    make_backup_app_technics()
+    make_backup_staff()
+    make_backup_construction_site()
+    make_backup_driver_table()
+    make_backup_work_day_table()
+    make_backup_technic_table()
+    make_backup_technics()
+    # return HttpResponse('OK')
+    return HttpResponseRedirect('/list_backup/')
 
 
 def make_backup_technics(id_technic=None, action='add'):
