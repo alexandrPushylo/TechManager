@@ -629,7 +629,7 @@ def cancel_supply_app(request, id_app):
         _app_tech.var_check = False
         _app_tech.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def move_supply_app(request, day, id_app):
@@ -661,7 +661,7 @@ def move_supply_app(request, day, id_app):
         cur_app_tech.var_check = False
         cur_app_tech.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def supply_app_view(request, day):
@@ -1548,7 +1548,7 @@ def clear_application_view(request, id_application):
     current_application.status = STATUS_APP_absent
     current_application.save()
 
-    return HttpResponseRedirect(f'/applications/{current_day}')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 # ===============================================================================================
