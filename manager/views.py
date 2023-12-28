@@ -641,20 +641,32 @@ def move_supply_app(request, day, id_app):
 
     supply_list = Post.objects.filter(
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
-
     cur_app_tech = ApplicationTechnic.objects.get(id=id_app)
+
+    _TEMPLATE_for_app = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
+
     if not cur_app_tech.var_check:
         _id = cur_app_tech.id
         cur_app_tech.var_check = True
         cur_app_tech.save()
         cur_app_tech.pk = None
         cur_app_tech.var_check = False
-        cur_app_tech.description = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
+        cur_app_tech.description = _TEMPLATE_for_app
         cur_app_tech.app_for_day = app_for_day
         cur_app_tech.var_ID_orig = _id
         cur_app_tech.save()
         app_for_day.status = STATUS_APP_saved
         app_for_day.save()
+    elif cur_app_tech.var_check:
+        ApplicationTechnic.objects.filter(Q(app_for_day=app_for_day) and Q(var_ID_orig=cur_app_tech.id)).delete()
+
+        cur_app_tech.var_check = False
+        cur_app_tech.save()
+        if not ApplicationTechnic.objects.filter(app_for_day=app_for_day).exists():
+            app_for_day.status = STATUS_APP_absent
+            app_for_day.save()
+
+
     else:
         if TEXT_TEMPLATES['dismiss'] in cur_app_tech.description:
             cur_app_tech.description = cur_app_tech.description.replace(TEXT_TEMPLATES['dismiss'], '')
