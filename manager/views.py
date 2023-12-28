@@ -136,34 +136,39 @@ def show_backup_list_view(request):
     out['list_backup24'] = sorted(back24H(param='list'), reverse=True)[0:6]
 
     # --------------------------------------------------------------
-    app_materials_count = aTApplicationMeterial.objects.using(ARCHIVE_DB).count()
-    app_to_day_count = aApplicationToDay.objects.using(ARCHIVE_DB).count()
-    app_technic_count = aApplicationTechnic.objects.using(ARCHIVE_DB).count()
-    staff_count = aUser.objects.using(ARCHIVE_DB).count()
-    construction_site_count = aConstructionSite.objects.using(ARCHIVE_DB).count()
-    t_drivers_count = aTDriver.objects.using(ARCHIVE_DB).count()
-    t_work_day_count = aTWorkDay.objects.using(ARCHIVE_DB).count()
-    t_technic_count = aTTechnicDriver.objects.using(ARCHIVE_DB).count()
-    technic_count = aTechnic.objects.using(ARCHIVE_DB).count()
+    try:
+        app_materials_count = aTApplicationMeterial.objects.using(ARCHIVE_DB).count()
+        app_to_day_count = aApplicationToDay.objects.using(ARCHIVE_DB).count()
+        app_technic_count = aApplicationTechnic.objects.using(ARCHIVE_DB).count()
+        staff_count = aUser.objects.using(ARCHIVE_DB).count()
+        construction_site_count = aConstructionSite.objects.using(ARCHIVE_DB).count()
+        t_drivers_count = aTDriver.objects.using(ARCHIVE_DB).count()
+        t_work_day_count = aTWorkDay.objects.using(ARCHIVE_DB).count()
+        t_technic_count = aTTechnicDriver.objects.using(ARCHIVE_DB).count()
+        technic_count = aTechnic.objects.using(ARCHIVE_DB).count()
 
-    out['app_materials_count'] = (
-        aTApplicationMeterial._meta.verbose_name_plural.title().capitalize(), app_materials_count)
-    out['app_to_day_count'] = (
-        aApplicationToDay._meta.verbose_name_plural.title().capitalize(), app_to_day_count)
-    out['app_technic_count'] = (
-        aApplicationTechnic._meta.verbose_name_plural.title().capitalize(), app_technic_count)
-    out['staff_count'] = (
-        aUser._meta.verbose_name_plural.title().capitalize(), staff_count)
-    out['construction_site_count'] = (
-        aConstructionSite._meta.verbose_name_plural.title().capitalize(), construction_site_count)
-    out['t_drivers_count'] = (
-        aTDriver._meta.verbose_name_plural.title().capitalize(), t_drivers_count)
-    out['t_work_day_count'] = (
-        aTWorkDay._meta.verbose_name_plural.title().capitalize(), t_work_day_count)
-    out['t_technic_count'] = (
-        aTTechnicDriver._meta.verbose_name_plural.title().capitalize(), t_technic_count)
-    out['technic_count'] = (
-        aTechnic._meta.verbose_name_plural.title().capitalize(), technic_count)
+        out['app_materials_count'] = (
+            aTApplicationMeterial._meta.verbose_name_plural.title().capitalize(), app_materials_count)
+        out['app_to_day_count'] = (
+            aApplicationToDay._meta.verbose_name_plural.title().capitalize(), app_to_day_count)
+        out['app_technic_count'] = (
+            aApplicationTechnic._meta.verbose_name_plural.title().capitalize(), app_technic_count)
+        out['staff_count'] = (
+            aUser._meta.verbose_name_plural.title().capitalize(), staff_count)
+        out['construction_site_count'] = (
+            aConstructionSite._meta.verbose_name_plural.title().capitalize(), construction_site_count)
+        out['t_drivers_count'] = (
+            aTDriver._meta.verbose_name_plural.title().capitalize(), t_drivers_count)
+        out['t_work_day_count'] = (
+            aTWorkDay._meta.verbose_name_plural.title().capitalize(), t_work_day_count)
+        out['t_technic_count'] = (
+            aTTechnicDriver._meta.verbose_name_plural.title().capitalize(), t_technic_count)
+        out['technic_count'] = (
+            aTechnic._meta.verbose_name_plural.title().capitalize(), technic_count)
+    except Exception as e:
+        send_debug_messages('Error DB archive')
+
+
     # --------------------------------------------------------------
 
     return render(request, 'db_supply.html', out)
@@ -196,8 +201,21 @@ def testA(request):
     DB = 'archive'
     mess = 'OK'
 
+    # td = TechnicDriver.objects.filter(Q(driver__isnull=True) & Q(technic__isnull=True))
+    # t = TechnicDriver.objects.filter(technic__isnull=True)
+    # all = TechnicDriver.objects.all()
+    # t.delete()
+    # t, all,td=[]
+    # all = ApplicationTechnic.objects.all()
+    # t = ApplicationTechnic.objects.filter(technic_driver__isnull=True)
 
-    return HttpResponse(mess)
+    app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
+    # if app.exists():
+    #     mess['app'] = app.count()
+        # if _flag_delete:
+        #     app.delete()
+    # app.delete()
+    return HttpResponse(f'{app.count()}')
 
 
 def make_full_archive(request):
@@ -210,8 +228,7 @@ def make_full_archive(request):
     make_backup_work_day_table()
     make_backup_technic_table()
     make_backup_technics()
-    # return HttpResponse('OK')
-    return HttpResponseRedirect('/list_backup/')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 
@@ -275,11 +292,11 @@ def make_backup_technic_table(technic_driver_list: list = None):
     if technic_driver_list is None:
         technic_driver_list = TechnicDriver.objects.filter(date__lte=TODAY-timedelta(days=1))
     for _td in technic_driver_list:
-        if _td.technic is not None and _td.driver is not None:
+        if _td.technic is not None:
             aTTechnicDriver.objects.using(ARCHIVE_DB).get_or_create(
                 id_T_D=_td.pk,
-                technic_i=_td.technic.pk if _td.technic is not None else None,
-                driver_i=_td.driver.driver.pk,
+                technic_i=_td.technic.pk,
+                driver_i=_td.driver.driver.pk if _td.driver is not None else None,
                 date=_td.date,
                 status=_td.status
             )
@@ -313,38 +330,41 @@ def make_backup_app_materials(app_materials_list: list = None):
     if app_materials_list is None:
         app_materials_list = ApplicationMeterial.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
     for _am in app_materials_list:
-        aTApplicationMeterial.objects.using(ARCHIVE_DB).get_or_create(
-            id_A_M=_am.pk,
-            date=_am.app_for_day.date,
-            app_for_day_i=_am.app_for_day.pk,
-            description=_am.description
-        )
+        if _am.app_for_day is not None:
+            aTApplicationMeterial.objects.using(ARCHIVE_DB).get_or_create(
+                id_A_M=_am.pk,
+                date=_am.app_for_day.date,
+                app_for_day_i=_am.app_for_day.pk,
+                description=_am.description
+            )
 
 
 def make_backup_app_technics(app_technics_list: list = None):
     if app_technics_list is None:
         app_technics_list = ApplicationTechnic.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
     for _at in app_technics_list:
-        aApplicationTechnic.objects.using(ARCHIVE_DB).get_or_create(
-            id_A_T=_at.pk,
-            date=_at.app_for_day.date,
-            app_for_day_i=_at.app_for_day.pk,
-            technic_driver_i=_at.technic_driver.pk,
-            description=_at.description,
-            priority=_at.priority
-        )
+        if _at.technic_driver is not None:
+            aApplicationTechnic.objects.using(ARCHIVE_DB).get_or_create(
+                id_A_T=_at.pk,
+                date=_at.app_for_day.date,
+                app_for_day_i=_at.app_for_day.pk,
+                technic_driver_i=_at.technic_driver.pk,
+                description=_at.description,
+                priority=_at.priority
+            )
 
 
 def make_backup_app_to_day(app_to_day_list: list = None):
     if app_to_day_list is None:
         app_to_day_list = ApplicationToday.objects.filter(date__lte=TODAY-timedelta(days=1))
     for _at in app_to_day_list:
-        aApplicationToDay.objects.using(ARCHIVE_DB).get_or_create(
-            id_A_T_D=_at.pk,
-            date=_at.date,
-            construction_site_i=_at.construction_site.pk,
-            description=_at.description
-        )
+        if _at.construction_site is not None:
+            aApplicationToDay.objects.using(ARCHIVE_DB).get_or_create(
+                id_A_T_D=_at.pk,
+                date=_at.date,
+                construction_site_i=_at.construction_site.pk,
+                description=_at.description
+            )
 
 
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
@@ -366,59 +386,51 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
         work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date)
 
-        # technic_driver----------------------------------------------------
-        if technic_driver.exists():
-            mess['technic_driver'] = technic_driver.count()
-            if _flag_backup:
-                make_backup_technic_table(technic_driver_list=technic_driver)
-            if _flag_delete:
-                technic_driver.delete()
-
-        # table_drivers----------------------------------------------------
-        if table_drivers.exists():
-            mess['table_drivers'] = table_drivers.count()
-            if _flag_backup:
-                make_backup_driver_table(driver_list=table_drivers)
-            if _flag_delete:
-                table_drivers.delete()
-
-        # work_day_table----------------------------------------------------
-        if work_day_table.exists():
-            mess['work_day_table'] = work_day_table.count()
-            if _flag_backup:
-                make_backup_work_day_table(work_day_list=work_day_table)
-            if _flag_delete and False:
-                work_day_table.delete()
-
-        # application_material----------------------------------------------------
-        if application_material.exists():
-            mess['application_material'] = application_material.count()
-            if _flag_backup:
-                make_backup_app_materials(app_materials_list=application_material)
-            if _flag_delete:
-                application_material.delete()
-
-        # application_technic----------------------------------------------------
-        if application_technic.exists():
-            mess['application_technic'] = application_technic.count()
-            if _flag_backup:
-                make_backup_app_technics(app_technics_list=application_technic)
-            if _flag_delete:
-                application_technic.delete()
-
-        # application_today----------------------------------------------------
-        if application_today.exists():
-            mess['application_today'] = application_today.count()
-            if _flag_backup:
-                make_backup_app_to_day(app_to_day_list=application_today)
-            if _flag_delete:
-                application_today.delete()
-
         app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
         if app.exists():
             mess['app'] = app.count()
             if _flag_delete:
                 app.delete()
+
+        # make archive ------------------------------------------------------
+        if _flag_backup:
+            make_backup_technic_table(technic_driver_list=technic_driver)
+            make_backup_driver_table(driver_list=table_drivers)
+            make_backup_work_day_table(work_day_list=work_day_table)
+            make_backup_app_materials(app_materials_list=application_material)
+            make_backup_app_technics(app_technics_list=application_technic)
+            make_backup_app_to_day(app_to_day_list=application_today)
+
+        # sent messages ------------------------------------------------------
+
+        if technic_driver.exists():
+            mess['technic_driver'] = technic_driver.count()
+        if table_drivers.exists():
+            mess['table_drivers'] = table_drivers.count()
+        if work_day_table.exists():
+            mess['work_day_table'] = work_day_table.count()
+        if application_material.exists():
+            mess['application_material'] = application_material.count()
+        if application_technic.exists():
+            mess['application_technic'] = application_technic.count()
+        if application_today.exists():
+            mess['application_today'] = application_today.count()
+
+
+
+        # delete db ---------------------------------------------------------
+        if _flag_delete:
+            technic_driver.delete()
+            table_drivers.delete()
+            work_day_table.delete()
+            application_material.delete()
+            application_technic.delete()
+            application_today.delete()
+
+        # technic_driver----------------------------------------------------
+
+
+
         _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
         if _var.exists():
             mess['sent_var'] = _var.count()
@@ -444,8 +456,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
 
-# LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB)
-LOG_DB = clean_db(_flag_backup=True)
+LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
 
 
 # print(LOG_DB)
@@ -629,7 +640,7 @@ def cancel_supply_app(request, id_app):
         _app_tech.var_check = False
         _app_tech.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def move_supply_app(request, day, id_app):
@@ -641,27 +652,39 @@ def move_supply_app(request, day, id_app):
 
     supply_list = Post.objects.filter(
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
-
     cur_app_tech = ApplicationTechnic.objects.get(id=id_app)
+
+    _TEMPLATE_for_app = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
+
     if not cur_app_tech.var_check:
         _id = cur_app_tech.id
         cur_app_tech.var_check = True
         cur_app_tech.save()
         cur_app_tech.pk = None
         cur_app_tech.var_check = False
-        cur_app_tech.description = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
+        cur_app_tech.description = _TEMPLATE_for_app
         cur_app_tech.app_for_day = app_for_day
         cur_app_tech.var_ID_orig = _id
         cur_app_tech.save()
         app_for_day.status = STATUS_APP_saved
         app_for_day.save()
+    elif cur_app_tech.var_check:
+        ApplicationTechnic.objects.filter(Q(app_for_day=app_for_day) and Q(var_ID_orig=cur_app_tech.id)).delete()
+
+        cur_app_tech.var_check = False
+        cur_app_tech.save()
+        if not ApplicationTechnic.objects.filter(app_for_day=app_for_day).exists():
+            app_for_day.status = STATUS_APP_absent
+            app_for_day.save()
+
+
     else:
         if TEXT_TEMPLATES['dismiss'] in cur_app_tech.description:
             cur_app_tech.description = cur_app_tech.description.replace(TEXT_TEMPLATES['dismiss'], '')
         cur_app_tech.var_check = False
         cur_app_tech.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def supply_app_view(request, day):
@@ -687,6 +710,15 @@ def supply_app_view(request, day):
     #     _flag = request.POST.get('panel')
     #     _flag = str(_flag).capitalize()
     #     set_var('supply_panel', value=request.user.id, flag=_flag, user=request.user)
+
+
+    count_app_mat_not_checked = ApplicationMeterial.objects.filter(
+        Q(status_checked=False) &
+        Q(app_for_day__date=current_day)
+    )
+    if count_app_mat_not_checked.exists():
+        out['count_am_not_check'] = count_app_mat_not_checked.count()
+
 
     out['var_supply_panel'] = get_var(VAR['panel_for_supply'], user=request.user)
 
@@ -1530,7 +1562,6 @@ def clear_application_view(request, id_application):
         create_backup_db()
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    current_day = convert_str_to_date(current_application.date)
 
     for _app in app_tech:
         try:
@@ -1548,7 +1579,7 @@ def clear_application_view(request, id_application):
     current_application.status = STATUS_APP_absent
     current_application.save()
 
-    return HttpResponseRedirect(f'/applications/{current_day}')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 # ===============================================================================================
@@ -2558,8 +2589,7 @@ def success_application(request, id_application):
             send_message_for_admin(current_day, mess)
 
     current_application.save()
-
-    return HttpResponseRedirect(f'/applications/{current_day}')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def __get_current_day(selected_day: str):  # TODO: for del
