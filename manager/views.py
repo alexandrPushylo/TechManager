@@ -2558,8 +2558,7 @@ def success_application(request, id_application):
             send_message_for_admin(current_day, mess)
 
     current_application.save()
-
-    return HttpResponseRedirect(f'/applications/{current_day}')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 def __get_current_day(selected_day: str):  # TODO: for del
