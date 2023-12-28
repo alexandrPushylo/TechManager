@@ -201,8 +201,21 @@ def testA(request):
     DB = 'archive'
     mess = 'OK'
 
+    # td = TechnicDriver.objects.filter(Q(driver__isnull=True) & Q(technic__isnull=True))
+    # t = TechnicDriver.objects.filter(technic__isnull=True)
+    # all = TechnicDriver.objects.all()
+    # t.delete()
+    # t, all,td=[]
+    # all = ApplicationTechnic.objects.all()
+    # t = ApplicationTechnic.objects.filter(technic_driver__isnull=True)
 
-    return HttpResponse(mess)
+    app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
+    # if app.exists():
+    #     mess['app'] = app.count()
+        # if _flag_delete:
+        #     app.delete()
+    # app.delete()
+    return HttpResponse(f'{app.count()}')
 
 
 def make_full_archive(request):
@@ -1549,7 +1562,6 @@ def clear_application_view(request, id_application):
         create_backup_db()
     current_application = ApplicationToday.objects.get(id=id_application)
     app_tech = ApplicationTechnic.objects.filter(app_for_day=current_application)
-    current_day = convert_str_to_date(current_application.date)
 
     for _app in app_tech:
         try:
