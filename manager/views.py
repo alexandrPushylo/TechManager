@@ -136,34 +136,39 @@ def show_backup_list_view(request):
     out['list_backup24'] = sorted(back24H(param='list'), reverse=True)[0:6]
 
     # --------------------------------------------------------------
-    app_materials_count = aTApplicationMeterial.objects.using(ARCHIVE_DB).count()
-    app_to_day_count = aApplicationToDay.objects.using(ARCHIVE_DB).count()
-    app_technic_count = aApplicationTechnic.objects.using(ARCHIVE_DB).count()
-    staff_count = aUser.objects.using(ARCHIVE_DB).count()
-    construction_site_count = aConstructionSite.objects.using(ARCHIVE_DB).count()
-    t_drivers_count = aTDriver.objects.using(ARCHIVE_DB).count()
-    t_work_day_count = aTWorkDay.objects.using(ARCHIVE_DB).count()
-    t_technic_count = aTTechnicDriver.objects.using(ARCHIVE_DB).count()
-    technic_count = aTechnic.objects.using(ARCHIVE_DB).count()
+    try:
+        app_materials_count = aTApplicationMeterial.objects.using(ARCHIVE_DB).count()
+        app_to_day_count = aApplicationToDay.objects.using(ARCHIVE_DB).count()
+        app_technic_count = aApplicationTechnic.objects.using(ARCHIVE_DB).count()
+        staff_count = aUser.objects.using(ARCHIVE_DB).count()
+        construction_site_count = aConstructionSite.objects.using(ARCHIVE_DB).count()
+        t_drivers_count = aTDriver.objects.using(ARCHIVE_DB).count()
+        t_work_day_count = aTWorkDay.objects.using(ARCHIVE_DB).count()
+        t_technic_count = aTTechnicDriver.objects.using(ARCHIVE_DB).count()
+        technic_count = aTechnic.objects.using(ARCHIVE_DB).count()
 
-    out['app_materials_count'] = (
-        aTApplicationMeterial._meta.verbose_name_plural.title().capitalize(), app_materials_count)
-    out['app_to_day_count'] = (
-        aApplicationToDay._meta.verbose_name_plural.title().capitalize(), app_to_day_count)
-    out['app_technic_count'] = (
-        aApplicationTechnic._meta.verbose_name_plural.title().capitalize(), app_technic_count)
-    out['staff_count'] = (
-        aUser._meta.verbose_name_plural.title().capitalize(), staff_count)
-    out['construction_site_count'] = (
-        aConstructionSite._meta.verbose_name_plural.title().capitalize(), construction_site_count)
-    out['t_drivers_count'] = (
-        aTDriver._meta.verbose_name_plural.title().capitalize(), t_drivers_count)
-    out['t_work_day_count'] = (
-        aTWorkDay._meta.verbose_name_plural.title().capitalize(), t_work_day_count)
-    out['t_technic_count'] = (
-        aTTechnicDriver._meta.verbose_name_plural.title().capitalize(), t_technic_count)
-    out['technic_count'] = (
-        aTechnic._meta.verbose_name_plural.title().capitalize(), technic_count)
+        out['app_materials_count'] = (
+            aTApplicationMeterial._meta.verbose_name_plural.title().capitalize(), app_materials_count)
+        out['app_to_day_count'] = (
+            aApplicationToDay._meta.verbose_name_plural.title().capitalize(), app_to_day_count)
+        out['app_technic_count'] = (
+            aApplicationTechnic._meta.verbose_name_plural.title().capitalize(), app_technic_count)
+        out['staff_count'] = (
+            aUser._meta.verbose_name_plural.title().capitalize(), staff_count)
+        out['construction_site_count'] = (
+            aConstructionSite._meta.verbose_name_plural.title().capitalize(), construction_site_count)
+        out['t_drivers_count'] = (
+            aTDriver._meta.verbose_name_plural.title().capitalize(), t_drivers_count)
+        out['t_work_day_count'] = (
+            aTWorkDay._meta.verbose_name_plural.title().capitalize(), t_work_day_count)
+        out['t_technic_count'] = (
+            aTTechnicDriver._meta.verbose_name_plural.title().capitalize(), t_technic_count)
+        out['technic_count'] = (
+            aTechnic._meta.verbose_name_plural.title().capitalize(), technic_count)
+    except Exception as e:
+        send_debug_messages('Error DB archive')
+
+
     # --------------------------------------------------------------
 
     return render(request, 'db_supply.html', out)
@@ -444,8 +449,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
 
-# LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB)
-LOG_DB = clean_db(_flag_backup=True)
+LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
 
 
 # print(LOG_DB)
