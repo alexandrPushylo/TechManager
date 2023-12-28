@@ -50,14 +50,10 @@
                 fw-bold text-lowercase ps-2 pe-2">Заявка {{ app_today.status.status }}</label>
 
 
-          <div class="card-body position-relative m-0 mt-1 pb-0" >
-            <h6 class="card-title fw-bold fs-5">{{app_today.construction_site.address}}</h6>
-
+          <div class="card-body position-relative m-0 mt-1 p-0" >
           {% if apps_tech %}
-          <hr class="m-0" style="border-width: medium; border-color: green">
-              <h6 class="card-text mt-1"><label><b>Список техники:</b></label> </h6>
               {% for v in apps_tech %}
-                  <div class="row m-0">
+                  <div class="row m-0 mt-3">
                 <div class="card-text fs-6 col-auto fw-bold {% if v.technic_driver.technic.name.id in conflicts_vehicles_list_id %}text-danger{% endif %}">{{ v.technic_driver.technic.name }}</div>
                 <div class="card-text fs-6 col-auto fw-bold"> ({{ v.technic_driver.driver.driver }})
                 {% for count in count_app_list %}{% if v.technic_driver.id == count.0 %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
@@ -70,21 +66,19 @@
                   <hr class="m-0 mt-1 mb-1">
 
               {% endfor %}
-          {% endif %}
-          <div class="d-flex justify-content-end">
-            <div class="btn-group">
+          {% endif %}          
+          
+            <div class="btn-group d-flex justify-content-center m-0 mt-2">          
                 <a href="{% url 'show_info_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"> <i class="fa-solid fa-circle-info"></i> </a>
-                <a href="{% url 'add_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
+                <a href="{% url 'add_application' app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-plus"></i> | <i class="fa-regular fa-pen-to-square"></i></a>
                 <a href="{% url 'clear_application' app_today.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
                 {% if  app_today.status.status  == 'Сохранена' or post  == 'admin' and app_today.status.status  == 'Подана' %}
                 <a href="{% url 'success_application' app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
-
                 {% endif %}
-
-
             </div>
+          
           </div>
-          </div>
+        
         </div>
         </div>
         {% endfor %}
@@ -114,20 +108,19 @@
 
 
     {% block rigth_tab %}{% csrf_token %}
-<div class="foreman_panel container col-auto position-fixed end-0 top-0"style="margin-top: 5rem; height: 100vh;" {% if var_supply_panel.value == user.id|slugify and var_supply_panel.flag %} hidden="" {% endif %}>
-        <div class="card-body overflow-auto p-0 m-0 "style="height: 75%" >
+<div class="foreman_panel container col-auto position-fixed end-0 top-0" style="margin-top: 5rem; height: 100vh;" {% if var_supply_panel.value == user.id|slugify and var_supply_panel.flag %} hidden="" {% endif %}>
+        <div class="card-body  p-0 m-1" style="height: 75%; overflow-x: hidden;" >
 
             {% for app in today_applications_list %}
                 <div class="col-auto mb-3">
 
-        <div class="card p-0 m-0" style="width: 18rem;">
+        <div class="card p-0 m-0" style="width: 20rem;">
 
           <div class="card-body p-0" >
             <h6 class="card-title  fw-bold text-center">{{app.0.construction_site.address}} ({{app.0.construction_site.foreman.last_name}})</h6>
 
 
                     {% for t in app.1 %}
-
 {#                        <hr class="m-0 mt-3">#}
                         <div class="p-0 m-0 mt-3 {% if t.var_check %}border border-2 border-warning rounded{% endif %}">
                   <div class="row {% if t.var_check %}bg-warning{% endif %}">
