@@ -215,8 +215,7 @@ def make_full_archive(request):
     make_backup_work_day_table()
     make_backup_technic_table()
     make_backup_technics()
-    # return HttpResponse('OK')
-    return HttpResponseRedirect('/list_backup/')
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 
