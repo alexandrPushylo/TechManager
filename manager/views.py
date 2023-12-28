@@ -522,12 +522,6 @@ def supply_materials_view(request, day):
     )
 
     app_material = ApplicationMeterial.objects.filter(app_for_day__in=current_application)
-    if all(app_material.values_list('status_checked', flat=True)):
-        _status0 = True
-
-    else:
-        _status0 = False
-    out['status_checked'] = _status0
 
     out['materials_list'] = app_material.values(
         'id',
@@ -552,7 +546,8 @@ def supply_materials_view(request, day):
                         _app.status_checked = True
                         _app.save()
                 elif _app.description == _desc:
-                    _app.status_checked = True
+                    _app.status_checked = False if _app.status_checked else True
+                    # _app.status_checked = True
                     _app.save()
                 elif not _desc:
                     _app.delete()
