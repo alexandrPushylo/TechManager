@@ -123,8 +123,16 @@
           {% endif %}
 
           {% if a.app_mater  %}
-              <div class="card-text ms-2 mt-0"><label><b>Список материалов:</b></label> </div>
-              <textarea class="form-control app_description" readonly>{{ a.app_mater }}</textarea>
+              <div class="card-text ms-2 mt-0"><label>
+                                            <b>Список материалов:</b>
+                  {% if a.app_mater.1 %}  
+                      <small style="color: #24981f">Подтверждено</small>
+                  {% else %}    
+                      <small style="color: #ff0303">Не подтверждено</small>
+                  {% endif %}
+                                            
+                                                </label> </div>
+              <textarea class="form-control app_description {% if not a.app_mater.1 %} border border-1 border-danger{% endif %}" readonly>{{ a.app_mater.0 }}</textarea>
 
           {% endif %}
             <hr class="m-0 mt-1">

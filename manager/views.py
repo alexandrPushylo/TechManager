@@ -1656,7 +1656,7 @@ def show_applications_view(request, day, id_user=None):
             out['inf_btn_content'] = TEXT_TEMPLATES['message_not_submitted']
             out['saved_ap_list'] = saved_ap_list
 
-        materials_list = _Application_material.filter(status_checked=True)
+        materials_list = _Application_material
 
         out['technic_driver_table_TT'] = technic_driver_table.filter(
             status=True, driver__status=True).order_by('driver__driver__last_name')
@@ -1698,13 +1698,14 @@ def show_applications_view(request, day, id_user=None):
     elif 'materials' in filtr:
         for appToday in app_for_day.order_by('construction_site__address'):
             appMater = materials_list.filter(
-                app_for_day=appToday).values_list('description', flat=True).first()
+                app_for_day=appToday).values_list('description', 'status_checked').first()
             out['today_applications_list'].append({'app_today': appToday, 'app_mater': appMater})
     else:
         for appToday in app_for_day.order_by('construction_site__address'):
             appTech = _Application_technic.filter(app_for_day=appToday)
             appMater = materials_list.filter(
-                app_for_day=appToday).values_list('description', flat=True).first()
+                app_for_day=appToday).values_list('description', 'status_checked').first()
+
             out['today_applications_list'].append({'app_today': appToday, 'apps_tech': appTech, 'app_mater': appMater})
 
     # out['apps_today_save'] = app_for_day.filter(status=STATUS_APP_saved)
