@@ -279,11 +279,11 @@ def make_backup_technic_table(technic_driver_list: list = None):
     if technic_driver_list is None:
         technic_driver_list = TechnicDriver.objects.filter(date__lte=TODAY-timedelta(days=1))
     for _td in technic_driver_list:
-        if _td.technic is not None and _td.driver is not None:
+        if _td.technic is not None:
             aTTechnicDriver.objects.using(ARCHIVE_DB).get_or_create(
                 id_T_D=_td.pk,
-                technic_i=_td.technic.pk if _td.technic is not None else None,
-                driver_i=_td.driver.driver.pk,
+                technic_i=_td.technic.pk,
+                driver_i=_td.driver.driver.pk if _td.driver is not None else None,
                 date=_td.date,
                 status=_td.status
             )
@@ -317,38 +317,41 @@ def make_backup_app_materials(app_materials_list: list = None):
     if app_materials_list is None:
         app_materials_list = ApplicationMeterial.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
     for _am in app_materials_list:
-        aTApplicationMeterial.objects.using(ARCHIVE_DB).get_or_create(
-            id_A_M=_am.pk,
-            date=_am.app_for_day.date,
-            app_for_day_i=_am.app_for_day.pk,
-            description=_am.description
-        )
+        if _am.app_for_day is not None:
+            aTApplicationMeterial.objects.using(ARCHIVE_DB).get_or_create(
+                id_A_M=_am.pk,
+                date=_am.app_for_day.date,
+                app_for_day_i=_am.app_for_day.pk,
+                description=_am.description
+            )
 
 
 def make_backup_app_technics(app_technics_list: list = None):
     if app_technics_list is None:
         app_technics_list = ApplicationTechnic.objects.filter(app_for_day__date__lte=TODAY-timedelta(days=1))
     for _at in app_technics_list:
-        aApplicationTechnic.objects.using(ARCHIVE_DB).get_or_create(
-            id_A_T=_at.pk,
-            date=_at.app_for_day.date,
-            app_for_day_i=_at.app_for_day.pk,
-            technic_driver_i=_at.technic_driver.pk,
-            description=_at.description,
-            priority=_at.priority
-        )
+        if _at.technic_driver is not None:
+            aApplicationTechnic.objects.using(ARCHIVE_DB).get_or_create(
+                id_A_T=_at.pk,
+                date=_at.app_for_day.date,
+                app_for_day_i=_at.app_for_day.pk,
+                technic_driver_i=_at.technic_driver.pk,
+                description=_at.description,
+                priority=_at.priority
+            )
 
 
 def make_backup_app_to_day(app_to_day_list: list = None):
     if app_to_day_list is None:
         app_to_day_list = ApplicationToday.objects.filter(date__lte=TODAY-timedelta(days=1))
     for _at in app_to_day_list:
-        aApplicationToDay.objects.using(ARCHIVE_DB).get_or_create(
-            id_A_T_D=_at.pk,
-            date=_at.date,
-            construction_site_i=_at.construction_site.pk,
-            description=_at.description
-        )
+        if _at.construction_site is not None:
+            aApplicationToDay.objects.using(ARCHIVE_DB).get_or_create(
+                id_A_T_D=_at.pk,
+                date=_at.date,
+                construction_site_i=_at.construction_site.pk,
+                description=_at.description
+            )
 
 
 def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
@@ -370,59 +373,51 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
         work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date)
 
-        # technic_driver----------------------------------------------------
-        if technic_driver.exists():
-            mess['technic_driver'] = technic_driver.count()
-            if _flag_backup:
-                make_backup_technic_table(technic_driver_list=technic_driver)
-            if _flag_delete:
-                technic_driver.delete()
-
-        # table_drivers----------------------------------------------------
-        if table_drivers.exists():
-            mess['table_drivers'] = table_drivers.count()
-            if _flag_backup:
-                make_backup_driver_table(driver_list=table_drivers)
-            if _flag_delete:
-                table_drivers.delete()
-
-        # work_day_table----------------------------------------------------
-        if work_day_table.exists():
-            mess['work_day_table'] = work_day_table.count()
-            if _flag_backup:
-                make_backup_work_day_table(work_day_list=work_day_table)
-            if _flag_delete and False:
-                work_day_table.delete()
-
-        # application_material----------------------------------------------------
-        if application_material.exists():
-            mess['application_material'] = application_material.count()
-            if _flag_backup:
-                make_backup_app_materials(app_materials_list=application_material)
-            if _flag_delete:
-                application_material.delete()
-
-        # application_technic----------------------------------------------------
-        if application_technic.exists():
-            mess['application_technic'] = application_technic.count()
-            if _flag_backup:
-                make_backup_app_technics(app_technics_list=application_technic)
-            if _flag_delete:
-                application_technic.delete()
-
-        # application_today----------------------------------------------------
-        if application_today.exists():
-            mess['application_today'] = application_today.count()
-            if _flag_backup:
-                make_backup_app_to_day(app_to_day_list=application_today)
-            if _flag_delete:
-                application_today.delete()
-
         app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
         if app.exists():
             mess['app'] = app.count()
             if _flag_delete:
                 app.delete()
+
+        # make archive ------------------------------------------------------
+        if _flag_backup:
+            make_backup_technic_table(technic_driver_list=technic_driver)
+            make_backup_driver_table(driver_list=table_drivers)
+            make_backup_work_day_table(work_day_list=work_day_table)
+            make_backup_app_materials(app_materials_list=application_material)
+            make_backup_app_technics(app_technics_list=application_technic)
+            make_backup_app_to_day(app_to_day_list=application_today)
+
+        # sent messages ------------------------------------------------------
+
+        if technic_driver.exists():
+            mess['technic_driver'] = technic_driver.count()
+        if table_drivers.exists():
+            mess['table_drivers'] = table_drivers.count()
+        if work_day_table.exists():
+            mess['work_day_table'] = work_day_table.count()
+        if application_material.exists():
+            mess['application_material'] = application_material.count()
+        if application_technic.exists():
+            mess['application_technic'] = application_technic.count()
+        if application_today.exists():
+            mess['application_today'] = application_today.count()
+
+
+
+        # delete db ---------------------------------------------------------
+        if _flag_delete:
+            technic_driver.delete()
+            table_drivers.delete()
+            work_day_table.delete()
+            application_material.delete()
+            application_technic.delete()
+            application_today.delete()
+
+        # technic_driver----------------------------------------------------
+
+
+
         _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
         if _var.exists():
             mess['sent_var'] = _var.count()
