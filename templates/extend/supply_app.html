@@ -20,6 +20,12 @@
 
 
 <div class="p-0 mt-5">
+    <div class="mb-4" style="text-align: center">
+        {% if count_am_not_check %}
+            <a style="color: #24981f;" class="fw-bold" href="{% url 'supply_materials' cw_day %}">Есть {{ count_am_not_check }} не подтвержденных заявок</a>
+            
+        {% endif %}
+    </div>
     <div class="position-relative translate-middle-x start-50" style="width: max-content">
         <div class="p-0 ms-0">
         {% for app_today in apps_today %}

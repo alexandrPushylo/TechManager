@@ -700,6 +700,15 @@ def supply_app_view(request, day):
     #     _flag = str(_flag).capitalize()
     #     set_var('supply_panel', value=request.user.id, flag=_flag, user=request.user)
 
+
+    count_app_mat_not_checked = ApplicationMeterial.objects.filter(
+        Q(status_checked=False) &
+        Q(app_for_day__date=current_day)
+    )
+    if count_app_mat_not_checked.exists():
+        out['count_am_not_check'] = count_app_mat_not_checked.count()
+
+
     out['var_supply_panel'] = get_var(VAR['panel_for_supply'], user=request.user)
 
     apps_tech = ApplicationTechnic.objects.filter(app_for_day__in=app_for_day)
