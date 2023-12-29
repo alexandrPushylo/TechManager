@@ -1593,6 +1593,9 @@ def show_applications_view(request, day, id_user=None):
     if not current_day:
         return HttpResponseRedirect('/')
 
+    if current_day < TODAY:
+        return HttpResponseRedirect(f'/archive/{current_day}')
+
     out = {"constr_site_list": []}
 
     if id_user:
@@ -3134,3 +3137,35 @@ def restore_pwd_view(request, id_user=None):
         out['fu'] = fu
 
     return render(request, 'restore_pwd.html', out)
+
+
+def show_archive_page_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    work_day = aTWorkDay.objects.using(ARCHIVE_DB).get(date=day)
+    out['status_day'] = work_day.status
+    # print(work_day)
+    # list_app_todays = aApplicationToDay.objects.using(ARCHIVE_DB).filter(date=work_day.date)
+    # print(list_app_todays)
+    apps_today = {}
+    # for app_today in list_app_todays:
+    #     apps_today['app_technic'] = aApplicationTechnic.objects.using(ARCHIVE_DB).filter(
+    #         app_for_day_i=app_today.id_A_T_D)
+
+    apps = get_application_today(work_day.date)
+    if apps is not None:
+        for app in apps:
+            # for am in app.applications_material:
+            #     print(am)
+            for at in app.applications_technic:
+                print(at)
+
+
+
+
+
+    return render(request, 'archive_page.html', out)
