@@ -27,6 +27,8 @@ from archive.models import ApplicationToDay as aApplicationToDay
 from archive.models import Technic as aTechnic
 from archive.models import ConstructionSite as aConstructionSite
 from archive.models import User as aUser
+
+from archive.structures import get_application_today
 # ==================================
 
 # from manager.forms import CreateNewApplicationForm
