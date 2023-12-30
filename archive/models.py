@@ -73,7 +73,7 @@ class TDriver(models.Model):
 class TTechnicDriver(models.Model):
     id_T_D = models.IntegerField(null=False, blank=False, verbose_name="id отметки техники")
     technic_i = models.IntegerField(null=True, blank=True, verbose_name='id транспортного средства')
-    driver_i = models.IntegerField(null=True, blank=True, verbose_name="id водителя техники")
+    driver_i = models.IntegerField(null=True, blank=True, verbose_name="id отметки водителя")
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.BooleanField(default=True, verbose_name="Статус техники")
     def __str__(self): return f"{self.technic_i} - {self.date} [{self.status}]"

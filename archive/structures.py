@@ -43,7 +43,7 @@ class AConstructionSite:
             self.exists = True
             self.id = construction_site.id_C_S
             self.address = construction_site.address
-            self.foreman = AUser(construction_site.foreman_i).id if construction_site.foreman_i is not None else None
+            self.foreman = AUser(construction_site.foreman_i) if construction_site.foreman_i is not None else None
             self.deleted = construction_site.bd_status
         except ConstructionSite.objects.DoesNotExist:
             self.exists = False
@@ -120,7 +120,7 @@ class ATTechnicDriver:
             self.exists = True
             self.id = tech_driver.id_T_D
             self.technic = ATechnic(tech_driver.technic_i) if tech_driver.technic_i is not None else None
-            self.driver = AUser(tech_driver.driver_i) if tech_driver.driver_i is not None else None
+            self.driver = ATDriver(tech_driver.driver_i) if tech_driver.driver_i is not None else None
             self.date = tech_driver.date
             self.status = tech_driver.status
         except TTechnicDriver.DoesNotExist:

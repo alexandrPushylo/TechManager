@@ -298,7 +298,7 @@ def make_backup_technic_table(technic_driver_list: list = None):
             aTTechnicDriver.objects.using(ARCHIVE_DB).get_or_create(
                 id_T_D=_td.pk,
                 technic_i=_td.technic.pk,
-                driver_i=_td.driver.driver.pk if _td.driver is not None else None,
+                driver_i=_td.driver.pk if _td.driver is not None else None,
                 date=_td.date,
                 status=_td.status
             )
