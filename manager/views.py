@@ -386,7 +386,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         application_material = ApplicationMeterial.objects.filter(app_for_day__in=application_today)
         technic_driver = TechnicDriver.objects.filter(date__lt=comm_date)
         table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
-        work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date)
+        work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date-timedelta(days=30))
 
         app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
         if app.exists():
