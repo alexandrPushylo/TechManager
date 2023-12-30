@@ -3148,24 +3148,8 @@ def show_archive_page_view(request, day):
 
     work_day = aTWorkDay.objects.using(ARCHIVE_DB).get(date=day)
     out['status_day'] = work_day.status
-    # print(work_day)
-    # list_app_todays = aApplicationToDay.objects.using(ARCHIVE_DB).filter(date=work_day.date)
-    # print(list_app_todays)
-    apps_today = {}
-    # for app_today in list_app_todays:
-    #     apps_today['app_technic'] = aApplicationTechnic.objects.using(ARCHIVE_DB).filter(
-    #         app_for_day_i=app_today.id_A_T_D)
 
     apps = get_application_today(work_day.date)
-    if apps is not None:
-        for app in apps:
-            # for am in app.applications_material:
-            #     print(am)
-            for at in app.applications_technic:
-                print(at)
-
-
-
-
+    out['apps'] = apps
 
     return render(request, 'archive_page.html', out)

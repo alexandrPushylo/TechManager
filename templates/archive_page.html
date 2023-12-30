@@ -5,315 +5,103 @@
 {% endblock %}{% endif %}
 
 
-{% block indicator %}
-    {% if cw_day >= lw_day %}
-{% if post == 'admin' %}
-    {% if conflicts_vehicles_list_id %}<a href="{% url 'conflict_resolution' cw_day %}" class="btn btn-sm btn-danger ">Недостаток техники</a>
-     {% elif not conflicts_vehicles_list_id and submitted_app_list %}<a href="{% url 'approv_all_applications' cw_day %}" class="btn btn-sm btn-success ">Одобрить все заявки</a>
-     {% elif not conflicts_vehicles_list_id and send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-warning ">Отправить все заявки</a>
-     {% elif var_sent_app.flag and not conflicts_vehicles_list_id and not send_app_list %}<a href="{% url 'send_all_applications' cw_day %}" class="btn btn-sm btn-outline-secondary ">Повторно отправить заявки</a>
-    {% else %}{% endif %}
-{% elif post == 'foreman' or 'master' or 'employee_supply' %}
-    {% if saved_app_list %}
-    <a href="{% url 'submitted_all_applications' cw_day %}"  class="btn btn-sm btn-warning  " aria-current="page">Подать все заявки</a>
-        {% endif %}
-{% endif %}
-    {% endif %}
-{% endblock %}
-
 {% block content %}{% csrf_token %}
     {% block choosedate %}
-    <div class="container-fluid">
-        <div class="btn-group position-relative start-50 top-0 translate-middle-x">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'application_list' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3 p-0" type="date"   value="{{ cw_day }}"/>
-            {% else %}
-                <input class="form-control io_current_day border-success border border-3 p-0"  type="date"  value="{{ cw_day }}"/>
-                <a href="{% url 'application_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
-            {% endif %}
-        </div>
-    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap p-0"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
-    </div>
-    {% endblock %}
-
-
-    {% if inf_btn_status %}
-    <button type="button" class="btn  btn-warning col-auto ms-5 position-absolute" data-bs-toggle="modal" data-bs-target="#exampleModal">
-      <i class="fa-sharp fa-solid fa-info"></i>
-    </button>
-    {% endif %}
-    <div>
-
-
-
-
-    <div id="container" class="container-fluid mt-5 ms-5 app_container" style="width: inherit">
-
-{#        <div class="container">#}
-        {% for a in today_applications_list %}
-            <div id="per_{{ a.app_today.id }}" class="item">
-        <div id="{{ a.app_today.id }}" class="me-3 mb-4">
-
-        <div class="card shadow-lg
-            {% if  a.app_today.status.status  == 'Сохранена' %}
-                border border-3 border-warning
-            {% elif a.app_today.status.status == 'Одобрена' %}
-                border border-3 border-success
-            {% elif a.app_today.status.status == 'Подана' %}
-                border border-3 border-primary
-            {% endif %}
-    "style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
-
-          <label style="white-space: nowrap" class="position-absolute top-0 start-50 translate-middle bg-white rounded border border-2
-                {% if  a.app_today.status.status  == 'Сохранена' %}
-                    text-warning border-warning
-                {% elif a.app_today.status.status == 'Одобрена' %}
-                    text-success border-success
-                {% elif a.app_today.status.status == 'Подана' %}
-                    text-primary border-primary
+        <div class="container-fluid">
+            <div class="btn-group position-relative start-50 top-0 translate-middle-x">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'application_list' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
                 {% else %}
-                    text-dark border-dark
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'application_list' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
                 {% endif %}
-                fw-bold text-lowercase ps-2 pe-2">Заявка {{ a.app_today.status.status }}</label>
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap p-0">
+                <b class="fs-5">Архив за: {{ DAY }}</b>
+            </div>
+        </div>
+    {% endblock %}
+    
+    <div>
+        <div id="container" class="container-fluid mt-5 ms-5" style="width: inherit">
+            {% for app_td in apps %}
+                <div id="per_{{ a.app_today.id }}" class="item">
+                    <div id="{{ a.app_today.id }}" class="me-3 mb-4">
+                        <div class="card shadow-lg" style="width: 20rem;  background-color: rgba(248,248,247,0.75); ">
+                            <div class="card-body w-100 p-0 pt-3">
+                                <h6 class="card-title  fw-bold text-center "
+                                    style="color:{{ style_font_color.value }};">
+                                    {% if app_td.construction_site.address %}
+                                        {{ app_td.construction_site.address }}{% endif %}
+                                    {% if app_td.construction_site.foreman.last_name %}(
+                                        {{ app_td.construction_site.foreman.last_name }}){% endif %}</h6>
+                                <h6 class="card-title text-center">{{ app_td.date }}</h6>
+                                {% if app_td.description %}
+                                    <hr class="m-0">
+                                    <label class="small position-relative start-50 translate-middle-x fw-bold text-center">Примечание
+                                        к объекту</label>
+                                    <textarea readonly
+                                              class="form-control app_description ms-0">{{ app_td.description }}</textarea>
+                                {% endif %}
 
-
-          <div class="card-body w-100 p-0 pt-3" >
-            <h6 class="card-title  fw-bold text-center " style="color:{{ style_font_color.value }};">{% if a.app_today.construction_site.address %}{{a.app_today.construction_site.address}}{% endif %} {% if a.app_today.construction_site.foreman.last_name %}({{ a.app_today.construction_site.foreman.last_name }}){% endif %}</h6>
-            <h6 class="card-title text-center" >{{a.app_today.date}}</h6>
-          {% if a.app_today.description %}
-              <hr class="m-0">
-              <label class="small position-relative start-50 translate-middle-x fw-bold text-center">Примечание к объекту</label>
-          <textarea readonly class="form-control app_description ms-0">{{ a.app_today.description }}</textarea>
-          {% endif %}
-
-
-          {% if a.apps_tech %}
-          <hr class="mt-1 mb-0" style="border-width: medium; border-color: #0fb70f">
-              <h6 class="card-text mt-1 ms-2"><label><b>Список техники:</b></label> </h6>
-              {% for v in a.apps_tech %}
-                  <div class="row mt-1 ms-2" {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>
-                <div id="{{ v.technic_driver.technic.name.id }}" class="card-text fs-6 col-auto mt-0 technic_name_link
-                        {% if v.technic_driver.technic.name.id in conflicts_vehicles_list_id %}
-                            text-danger{% endif %}
-                        {% if not v.technic_driver.status %}
-                            text-decoration-line-through
-                        {% endif %}"
-                     {% if cw_day >= lw_day %}onclick="location.href = '/get_id_tech_name/{{ cw_day }}/'+this.id;"{% endif %} >
-                    {{ v.technic_driver.technic.name }}
-                </div>
-                <div id="{{ v.technic_driver.driver.driver.id }}" class="card-text fs-6 col-auto driver_name_link mt-0
-                            {% if v.id in priority_list %}
-                            text-primary{% endif %}
+                                {% if app_td.applications_technic %}
+                                    <hr class="mt-1 mb-0" style="border-width: medium; border-color: #0fb70f">
+                                    <h6 class="card-text mt-1 ms-2"><label><b>Список техники:</b></label></h6>
+                                    {% for v in app_td.applications_technic %}
+                                        <div class="row mt-1 ms-2">
+                                            <div class="card-text fs-6 col-auto mt-0 technic_name_link
+                                                {% if not v.technic_driver.status %}
+                                                    text-decoration-line-through
+                                                {% endif %}">{{ v.technic_driver.technic.name }}
+                                            </div>
+                                            <div class="card-text fs-6 col-auto driver_name_link mt-0
                             {% if not  v.technic_driver.driver.status %}
                                 text-warning">(Водитель не назначен){{ v.technic_driver.driver.driver.last_name }}
-                            {% else %}
-                    "> ({{ v.technic_driver.driver.driver.last_name }}){% for count in count_app_list %}{% if v.technic_driver.id == count.0 and not v.var_check %} [<b>{{ v.priority }}/{{ count.1 }}</b>]   {% endif %}{% endfor %}
-                            {% endif %}
-                </div>
+                                            {% else %}
+                                                "> ({{ v.technic_driver.driver.driver.last_name }}) [
+                                                <b>{{ v.priority }}</b>]
+                                            {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if v.description %}
+                                            <textarea class="form-control app_description shadow-sm " readonly
+                                                      {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
+                                        {% endif %}
+                                        <hr class="m-0 mt-1" style="border-width: medium; border-color: rgba(0,0,0,0)">
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if app_td.applications_material %}
+                                    {% for am in app_td.applications_material %}
+                                        <div class="card-text ms-2 mt-0"><label><b>Список материалов:</b>
+                                        </label></div>
+                                        <textarea class="form-control app_description"
+                                                  readonly>{{ am.description }}</textarea>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-
-                  {% if v.description %}
-
-                <textarea class="form-control app_description shadow-sm "  readonly {% if v.var_check %}style="color: rgba(7,1,1,0.26)"{% endif %}>{{ v.description }}</textarea>
-
-                {%endif%}
-                  <hr class="m-0 mt-1" style="border-width: medium; border-color: rgba(0,0,0,0)">
-              {% endfor %}
-          {% endif %}
-
-          {% if a.app_mater  %}
-              <div class="card-text ms-2 mt-0"><label>
-                                            <b>Список материалов:</b>
-                  {% if a.app_mater.1 %}  
-                      <small style="color: #24981f">Подтверждено</small>
-                  {% else %}    
-                      <small style="color: #ff0303">Не подтверждено</small>
-                  {% endif %}
-                                            
-                                                </label> </div>
-              <textarea class="form-control app_description {% if not a.app_mater.1 %} border border-1 border-danger{% endif %}" readonly>{{ a.app_mater.0 }}</textarea>
-
-          {% endif %}
-            <hr class="m-0 mt-1">
-            <div class="btn-group d-flex justify-content-center m-0 mt-2">
-                <a href="{% url 'show_info_application' a.app_today.id %}" class="btn btn-outline-info  m-1" aria-current="page"><i class="fa-solid fa-circle-info"></i></a>
-                {% if tense %}
-                <a href="{% url 'add_application' a.app_today.id %}" class="btn btn-outline-primary  m-1" aria-current="page"><i class="fa-solid fa-plus"></i> | <i class="fa-regular fa-pen-to-square"></i></a>
-                {% if a.app_today.status.status  == 'Отправлена' and post == 'foreman' %}
-                {% elif a.app_today.status.status  == 'Отправлена' and post == 'master'%}
-
-                {% else %}
-                    <a ondblclick="location.href = '/clear_app/{{ a.app_today.id }}'; return false;" class="btn btn-outline-danger  m-1" aria-current="page" title="Двойной клик для удаления"><i class="fa-solid fa-trash"></i></a>
-                {% endif %}
-                {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
-                <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>
-{#                <a id="success_application_{{ a.app_today.id }}" class="btn_T btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
-
-                {% elif post  == 'admin' and a.app_today.status.status  == 'Одобрена' %}
-                <a href="{% url 'success_application' a.app_today.id %}" class="btn btn-outline-warning  m-1" aria-current="page"><i class="fa-solid fa-paper-plane"></i></a>
-                {% endif %}
-                {% endif %}
-
-            </div>
-
-
-          </div>
-        </div>
-        </div>
-            </div>
-        {% endfor %}
-{#    </div>#}
-
-
-    </div>
-
-    {% if not status_day %}
-    <div class="card position-relative start-50 translate-middle-x shadow-lg" style="width: 18rem;">
-        <div class="card-header">
-            <p class="card-text text-center">{{ WEEKDAY }}, {{ DAY }}<br>отмечен как выходной день.</p>
-        </div>
-        <div class="card-body">
-            {% if post == 'admin' %}
-            <p class="card-text text-center">Вы желаете {{ DAY }} отметить как робочий день?</p>
-            {% else %}
-            <p class="card-text text-center">Вы все равно желаете дать заявку на {{ DAY }}?</p>
-            {% endif %}
-        </div>
-        <div class="card-footer d-flex justify-content-evenly">
-            <a href="{% url 'application_list' nw_day %}" class="btn btn-primary" aria-current="page">Нет</a>
-            <a href="{% url 'change_workday' cw_day %}" class="btn btn-success" aria-current="page">Да</a>
-        </div>
-    </div>
-    {% endif %}
-
-
-</div>
-    <!-- Modal -->
-    <div class="modal fade" id="copyModal" tabindex="-1" aria-labelledby="copyModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="copyModalLabel">Копировать заявку</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-
-          <div class="modal-body">
-              <p>Выберите заявку</p>
-              <select id="select_copy_app" class="form-control">
-                  {% for app in apps_today_save %}
-                  <option value="{{ app.id }}">{{ app.construction_site.address }}</option>
-                  {% endfor %}
-              </select>
-            <p>Выберите дату</p>
-            <input id="date_copy_app" class="form-control" name="copy_date" type="date" value="">
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-{#              <a href="{% url 'notice_submitt' cw_day %}"  class="btn btn-success me-5">Копировать</a>#}
-              <button id="btn_app_copy" role="button" class="btn btn-success">Копировать</button>
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{ inf_btn_content }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            {% for app in saved_ap_list %}
-                <div class="small">
-                    {% if app.construction_site.foreman.last_name %}{{ app.construction_site.foreman.last_name }} -- {% endif %}{{ app.construction_site.address }}
                 </div>
             {% endfor %}
-          </div>
-          <div class="modal-footer">
-              <a href="{% url 'notice_submitt' cw_day %}"  class=" btn btn-sm btn-outline-info me-5">Отправить напоминание</a>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-
-          </div>
         </div>
-      </div>
+
+        {% if not status_day %}
+            <div class="card position-relative start-50 translate-middle-x shadow-lg" style="width: 18rem;">
+                <p class="card-text text-center fs-5">{{ WEEKDAY }}, {{ DAY }}
+                    <br>Выходной день.
+                </p>
+            </div>
+        {% endif %}
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModalLabelChange" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabelChange" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabelChange">Замена водителя</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">Заменить:
-            <select id="select_from_drv" class="form-control">
-            <option selected></option>
-                {% for app in app_technic_today %}
-                    <option {% if app.technic_driver__technic__name__name in conflicts_technic_name %}style="color: red;" {% endif %} value="{{ app.technic_driver_id}}">{{ app.technic_driver__driver__driver__last_name }} ({{ app.technic_driver__technic__name__name }})</option>
-                {% endfor %}
-            </select>
-          на:
-
-
-            <select id="select_to_drv" class="form-control">
-            <option selected></option>
-                {% for td in technic_driver_table_TT %}
-                    <option {% if td.technic.name.name in conflicts_technic_name %}style="color: red;" {% endif %} value="{{ td.id }}">{{ td.driver.driver }} ({{ td.technic.name }})</option>
-                {% endfor %}
-            </select>
-          </div>
-          <div class="modal-footer">
-
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Oтмена</button>
-            <button id="btn_sub_change_drv" type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
-
-          </div>
-        </div>
-      </div>
-    </div>
 {% endblock %}
 
-{% block rigth_tab %}
-    {% if post == 'admin' %}
-    <div class="driver_panel  col-auto   position-fixed end-0 translate-middle-y top-50 mt-4" style="height: 90vh;" {% if var_drv_panel.value == user.id|slugify and var_drv_panel.flag %} hidden="" {% endif %}>
-        <div class="card-body overflow-auto " style="height: 90%;" >
-
-            {% for TD in DRV_LIST %}
-            <ol class="list-group" >
-                <li class="list-group-item d-flex justify-content-between align-items-start" >
-                <div class="div_td" {% if cw_day >= lw_day %} onclick="location.href = '/append_in_spec_tech/'+this.id;" {% endif %}  style="margin-left: -5px; margin-right: -10px;" id="{{ TD.id }}">
-                  <div class="fw-bold small
-                    {% if not TD.driver.status %} text-danger
-                    {% elif TD.id in work_drv %} text-success
-                    {% endif %}
-                    ">{% if TD.driver %}{{TD.driver.driver.last_name}}
-                    {% else %}{{ TD.technic.attached_driver.last_name }}
-                  {% endif %}
-                  </div>
-                    <div class="small">
-                        {% if TD.technic %}
-                                {% if TD.status %}
-                                    {% if TD.id in work_drv %}<div class="lh-sm text-success text-truncate">{{ TD.technic.name.name }}</div>
-                                    {% else %}<div class="lh-sm text-truncate">{{ TD.technic.name.name }}</div>
-                                    {% endif %}
-                                {% else %} <div class="lh-sm text-danger text-truncate">{{ TD.technic.name.name }}</div>
-                                {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
-                <span class="badge bg-primary rounded-pill"></span>
-              </li>
-            </ol>
-        {% endfor %}
-
-        </div>
-    </div>
-    {% endif %}
-{% endblock %}
 
 {% block script %}{% load static %}
     <script src="{% static "admin/js/scripts/main.js" %}"></script>
@@ -321,102 +109,19 @@
 
 {% block tab %}
 
-<a href="{% url 'find' cw_day %}" id="btn_find" style="margin-top: 6rem; margin-left: -0.4rem;" class="btn btn-outline-primary position-fixed" aria-current="page"><i class="fa-solid fa-magnifying-glass"></i></a>
-
-
-    <div class="btn-group dropend position-fixed" style="margin-top: 11rem; margin-left: -1.8rem;">
-      <button type="button" class="btn btn-outline-primary  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
-        Опции
-      </button>
-      <ul class="dropdown-menu">
-      {% if post == 'admin' %}
-          {% if tense %}
-        <a  class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange">Замена водителя </a>
-
-          {% endif %}
-        <a href="{% url 'create_backup' %}"  class="dropdown-item" aria-current="page" title="Создать резервную копию">Создать резервную копию</a>
-
-          {% else %}
-          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#copyModal">Копировать заявку</a>
-            {% endif %}
-      </ul>
-    </div>
+    <a href="#" id="btn_find" style="margin-top: 6rem; margin-left: -0.4rem;"
+       class="btn btn-outline-primary position-fixed" aria-current="page"><i
+            class="fa-solid fa-magnifying-glass"></i></a>
 
 
 
-
-
-    <div class="position-fixed translate-middle-x start-0 top-50 ms-3 mt-5 btn-group dropend">
-
-        {% if var_filter_apps.value == 'technics' %}
-      <button type="button" class="btn btn-success  dropdown-toggle position-relative " data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
-          Техника
-      </button>
-      <ul class="dropdown-menu" >
-           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item fs-5" aria-current="page">Всё</a>
-           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item fs-5" aria-current="page">Материалы</a>
-      </ul>
-
-        {% elif var_filter_apps.value == 'materials' %}
-      <button type="button" class="btn btn-primary  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
-          Материалы
-      </button>
-      <ul class="dropdown-menu">
-           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item fs-5" aria-current="page">Техника</a>
-           <a  id="btn_show_all"    class="btn  btn-sm dropdown-item fs-5" aria-current="page">Всё</a>
-      </ul>
-
-        {% else %}
-      <button type="button" class="btn btn-secondary  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="transform: rotate(90deg)">
-          Всё
-      </button>
-      <ul class="dropdown-menu">
-           <a  id="btn_show_tech"   class="btn btn-sm dropdown-item fs-5" aria-current="page">Техника</a>
-           <a  id="btn_show_mater"   class="btn btn-sm  dropdown-item fs-5" aria-current="page">Материалы</a>
-      </ul>
-
-        {% endif %}
-    </div>
-{#</div>#}
-
-{#<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >#}
-{#    <a  id="btn_show_tech"  style=" text-orientation: upright; writing-mode: vertical-lr; " class=" btn btn-sm {% if var_filter_apps.value == 'technics' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Техника</a>#}
-{#    <a  id="btn_show_all"   style=" text-orientation: upright; writing-mode: vertical-lr;" class="  btn  btn-sm {% if var_filter_apps.value == 'all' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Все</a>#}
-{#    <a  id="btn_show_mater"   style="text-orientation: upright; writing-mode: vertical-lr;" class=" btn btn-sm  {% if var_filter_apps.value == 'materials' %}btn-outline-success active {% else %} btn-outline-secondary{% endif %}" aria-current="page">Материалы</a>#}
-{#</div>#}
 
 {% endblock %}
 
 {% block bottom_panel %}
-
-<div class="d-flex  align-items-center">
-    {% if post == 'admin' %}
-    <a href="{% url 'undo_change_db' %}"  class="btn position-absolute {% if backups_list %} btn-warning {% else %}  {% endif %} start-0 ms-2" aria-current="page" title="Отменить изменения"><i class="fa-solid fa-rotate-left"></i></a>
-{#    <a href="{% url 'create_backup' %}"  class="btn btn-outline-info" aria-current="page" title="Создать резервную копию"><i class="fa-regular fa-floppy-disk"></i></a>#}
-
-    {% endif %}
-
-    <a href="{% url 'show_today_applications' cw_day  %}"  class="btn position-relative translate-middle-x start-50 btn-outline-secondary active" aria-current="page">Все заявки</a>
-
-{#    {% if post == 'admin' %}#}
-{#    <div class="btn-group dropup position-absolute ms-3 start-0">#}
-{#      <button type="button" class="btn btn-sm btn-outline-info  dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">#}
-{#        <i class="fa-solid fa-ellipsis"></i>#}
-{#      </button>#}
-{#      <ul class="dropdown-menu">#}
-{#          {% if tense %}#}
-{#        <a  class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModalLabelChange">Замена водителя </a>#}
-{#          {% endif %}#}
-{#      </ul>#}
-{#    </div>#}
-{#    {% endif %}#}
-
-
-
-    {% if post == 'admin' %}
-    <button role="button" class="btn_driver_panel btn btn-outline-light position-absolute me-3 end-0"><i class="fa-solid fa-list"></i> </button>
-    {% endif %}
-
-</div>
+    <div class="d-flex  align-items-center">
+        <a href="#" class="btn position-relative translate-middle-x start-50 btn-outline-secondary active"
+           aria-current="page">Все заявки</a>
+    </div>
 {% endblock %}
 
