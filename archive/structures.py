@@ -9,7 +9,6 @@ from archive.models import Technic
 from archive.models import ConstructionSite
 from archive.models import User
 
-
 from manager.utilities import archive_db as ARCHIVE_DB
 
 
@@ -209,3 +208,32 @@ def get_application_today(day):
         return applications
     else:
         return None
+
+
+# def get_filter_from_archive(model, **kwargs):
+#     if isinstance(model, str):
+#         if model == 'ttechnic':
+#             _tmp = []
+#             for t in TTechnicDriver.objects.using(ARCHIVE_DB).filter(**kwargs):
+#                 _tmp.append(ATTechnicDriver(t.id_T_D))
+#
+#             return _tmp
+#         elif model == 'tdriver':
+#             return TDriver.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'tworkday':
+#             return TWorkDay.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'appmaterial':
+#             return ApplicationMeterial.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'apptechnic':
+#             return ApplicationTechnic.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'apptoday':
+#             return ApplicationToDay.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'technic':
+#             return Technic.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'constrsite':
+#             return ConstructionSite.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         elif model == 'user':
+#             return User.objects.using(ARCHIVE_DB).filter(**kwargs)
+#         else:
+#             return None
+
