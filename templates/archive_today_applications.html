@@ -22,43 +22,44 @@
         </div>
     {% endblock %}
 
-    <div class="btn-group dropend mt-5 ms-3">
-        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                aria-expanded="false">
-            <i class="fa-solid fa-filter"></i> {{ filter }}
-        </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'all' 'all' %}">Все</a></li>
-            <hr>
-            {% for forem in foreman_list %}
-                <li><a class="dropdown-item"
-                       href="{% url 'show_today_applications' cw_day forem.user_post.id 'all' %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a>
-                </li>
-            {% endfor %}
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'supply' 'all' %}">Снабжение</a>
-            </li>
-        </ul>
-    </div>
+{#    <div class="btn-group dropend mt-5 ms-3">#}
+{#        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"#}
+{#                aria-expanded="false">#}
+{#            <i class="fa-solid fa-filter"></i> {{ filter }}#}
+{#        </button>#}
+{#        <ul class="dropdown-menu">#}
+{#            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'all' 'all' %}">Все</a></li>#}
+{#            <hr>#}
+{#            {% for forem in foreman_list %}#}
+{#                <li><a class="dropdown-item"#}
+{#                       href="{% url 'show_today_applications' cw_day forem.user_post.id 'all' %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a>#}
+{#                </li>#}
+{#            {% endfor %}#}
+{#            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'supply' 'all' %}">Снабжение</a>#}
+{#            </li>#}
+{#        </ul>#}
+{#    </div>#}
 
-    {% if constr_site %}
-        <div class="btn-group dropend mt-5 ms-3">
-            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                <i class="fa-solid fa-filter"></i> {{ filter_constr_site }}
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'current' 'all' %}">Все</a>
-                </li>
-                <hr>
-                {% for cs in constr_site %}
-                    <li><a class="dropdown-item"
-                           href="{% url 'show_today_applications' cw_day 'current' cs.construction_site_id %}">{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    <div class="container position-relative  mx-auto mt-1">
+{#    {% if constr_site %}#}
+{#        <div class="btn-group dropend mt-5 ms-3">#}
+{#            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"#}
+{#                    aria-expanded="false">#}
+{#                <i class="fa-solid fa-filter"></i> {{ filter_constr_site }}#}
+{#            </button>#}
+{#            <ul class="dropdown-menu">#}
+{#                <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'current' 'all' %}">Все</a>#}
+{#                </li>#}
+{#                <hr>#}
+{#                {% for cs in constr_site %}#}
+{#                    <li><a class="dropdown-item"#}
+{#                           href="{% url 'show_today_applications' cw_day 'current' cs.construction_site_id %}">{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}</a>#}
+{#                    </li>#}
+{#                {% endfor %}#}
+{#            </ul>#}
+{#        </div>#}
+{#    {% endif %}#}
+    
+    <div class="container position-relative mx-auto mt-5">
 
         {% for v in driver_technic %}
             <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">
