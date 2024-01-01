@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    {% block choosedate %}
+        <div class="container">
+            <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'show_today_applications' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'show_today_applications' nw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap">
+                <b class="fs-5">Архив за: {{ DAY }}</b>
+            </div>
+        </div>
+    {% endblock %}
+
+    <div class="btn-group dropend mt-5 ms-3">
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                aria-expanded="false">
+            <i class="fa-solid fa-filter"></i> {{ filter }}
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'all' 'all' %}">Все</a></li>
+            <hr>
+            {% for forem in foreman_list %}
+                <li><a class="dropdown-item"
+                       href="{% url 'show_today_applications' cw_day forem.user_post.id 'all' %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a>
+                </li>
+            {% endfor %}
+            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'supply' 'all' %}">Снабжение</a>
+            </li>
+        </ul>
+    </div>
+
+    {% if constr_site %}
+        <div class="btn-group dropend mt-5 ms-3">
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fa-solid fa-filter"></i> {{ filter_constr_site }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'current' 'all' %}">Все</a>
+                </li>
+                <hr>
+                {% for cs in constr_site %}
+                    <li><a class="dropdown-item"
+                           href="{% url 'show_today_applications' cw_day 'current' cs.construction_site_id %}">{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <div class="container position-relative  mx-auto mt-1">
+
+        {% for v in driver_technic %}
+            <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">
+                <div class="card-body">
+                    <ul class="container-fluid">
+
+                        <div class="  " id="vehicle_list">
+                            <label class="ms-1 fw-bold">
+                                {% if v.1 %}
+                                    {{ v.1 }}
+                                {% else %}
+                                    Водитель не назначен
+                                {% endif %}
+                                ({{ v.2 }}) </label>
+
+                            <div class=" conteiner-fluid form-floating row mt-1 ">
+                                <input type="hidden" name="prior_id" value="{{ v.id }}"/>
+                                <div class="input-group form-floating p-0 mb-1">
+                                    {% if post == 'admin' %}
+
+                                        <span class="input-group-text">
+                                <input type="number" readonly min="1" id="priority_{{ v.id }}" name="priority"
+                                       class="priority   col-auto  " value="{{ v.0 }}"
+                                       style="max-width: 50px; margin-left: -5px;"/>
+                                </span>
+                                    {% endif %}
+
+                                    <textarea {% if post != 'admin' or not tense %} readonly {% endif %}
+                                                                                    class="form-control app_description overflow-hidden"
+                                                                                    aria-label="With textarea"
+                                                                                    id="floatingInputValue"
+                                                                                    name="descr">{{ v.4 }}</textarea>
+                                    {% if v.3 %}
+                                        <label for="floatingInputValue" class="fw-bold text-nowrap"
+                                               style="color: black; margin-left: 60px; margin-top: -10px">
+                                            {% if v.5 %}{{ v.5 }}{% endif %}
+                                            ({{ v.3 }})</label>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/today_application.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+    <div class="input-group d-flex justify-content-center align-items-center">
+        {% if post == 'admin' %}
+            <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
+
+        {% else %}
+            <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
+        {% endif %}
+        {#    <a href="{% url 'show_today_materials' cw_day %}" class="btn btn-info col-auto m-1" aria-current="page">Материалы</a>#}
+    </div>
+{% endblock %}

@@ -3153,3 +3153,47 @@ def show_archive_page_view(request, day):
     out['apps'] = apps
 
     return render(request, 'archive_page.html', out)
+
+
+def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    work_day = aTWorkDay.objects.using(ARCHIVE_DB).get(date=day)
+
+    apps = get_application_today(work_day.date)
+    out['apps'] = apps
+
+    def filter_app(_apps: list):
+        # (priority, last_name, technic.name, address, description)
+        _tmp = _apps.copy()
+        for i in range(len(_apps)-1):
+            if _apps[i][1:3] == _apps[i+1][1:3]:
+                if TEXT_TEMPLATES['constr_site_supply_name'] in _apps[i][3]:
+                    _tmp.remove(_apps[i+1])
+                elif TEXT_TEMPLATES['constr_site_supply_name'] in _apps[i+1][3]:
+                    _tmp.remove(_apps[i])
+        return _tmp
+
+    driver_technic = []
+    for app in apps:
+        for tech in app.applications_technic:
+            if TEXT_TEMPLATES['dismiss'] not in tech.description:
+                driver_technic.append((
+                    int(tech.priority),
+                    tech.technic_driver.driver.driver.last_name,
+                    tech.technic_driver.technic.name,
+                    app.construction_site.address,
+                    tech.description
+                ))
+
+    driver_technic = set(driver_technic)
+    driver_technic = sorted(driver_technic, key=lambda x: (x[1], x[0]),)
+    driver_technic = filter_app(driver_technic)
+
+    out['driver_technic'] = driver_technic
+
+    return render(request, 'archive_today_applications.html', out)

@@ -190,6 +190,10 @@ class AApplicationToday:
     def _get_application_technic(self):
         for at in ApplicationTechnic.objects.using(ARCHIVE_DB).filter(app_for_day_i=self.id):
             self.applications_technic.append(AApplicationTechnic(at.id_A_T))
+        # print(f'{self.applications_technic=}')
+        # self.applications_technic = sorted(self.applications_technic,
+        #                                    key=lambda _at: _at.technic_driver.driver.driver.last_name)
+        # print(f'{self.applications_technic=}')
 
     def _get_applications_material(self):
         for am in ApplicationMeterial.objects.using(ARCHIVE_DB).filter(app_for_day_i=self.id):

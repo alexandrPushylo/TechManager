@@ -86,6 +86,7 @@ from manager.views import make_full_archive
 from manager.views import testA
 
 from manager.views import show_archive_page_view
+from manager.views import show_archive_all_app
 
 urlpatterns = [
     path('', show_start_page, name='start_page'),
@@ -175,7 +176,8 @@ urlpatterns = [
     path('notice_submitt/<str:current_day>', notice_submitt, name='notice_submitt'),
 
     path('archive/', testA, name='archive'),
-    path('archive/<str:day>', show_archive_page_view, name='archive')
+    path('archive/<str:day>', show_archive_page_view, name='archive'),
+    path('archive_all_app/<str:day>', show_archive_all_app, name='archive_all_app'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
