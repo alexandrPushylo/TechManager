@@ -27,6 +27,8 @@ from archive.models import ApplicationToDay as aApplicationToDay
 from archive.models import Technic as aTechnic
 from archive.models import ConstructionSite as aConstructionSite
 from archive.models import User as aUser
+
+from archive.structures import get_application_today
 # ==================================
 
 # from manager.forms import CreateNewApplicationForm
@@ -296,7 +298,7 @@ def make_backup_technic_table(technic_driver_list: list = None):
             aTTechnicDriver.objects.using(ARCHIVE_DB).get_or_create(
                 id_T_D=_td.pk,
                 technic_i=_td.technic.pk,
-                driver_i=_td.driver.driver.pk if _td.driver is not None else None,
+                driver_i=_td.driver.pk if _td.driver is not None else None,
                 date=_td.date,
                 status=_td.status
             )
@@ -384,7 +386,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         application_material = ApplicationMeterial.objects.filter(app_for_day__in=application_today)
         technic_driver = TechnicDriver.objects.filter(date__lt=comm_date)
         table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
-        work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date)
+        work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date-timedelta(days=30))
 
         app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
         if app.exists():
@@ -1590,6 +1592,9 @@ def show_applications_view(request, day, id_user=None):
     current_day = convert_str_to_date(day)
     if not current_day:
         return HttpResponseRedirect('/')
+
+    if current_day < TODAY:
+        return HttpResponseRedirect(f'/archive/{current_day}')
 
     out = {"constr_site_list": []}
 
@@ -3132,3 +3137,68 @@ def restore_pwd_view(request, id_user=None):
         out['fu'] = fu
 
     return render(request, 'restore_pwd.html', out)
+
+
+def show_archive_page_view(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    work_day = aTWorkDay.objects.using(ARCHIVE_DB).get(date=day)
+    out['status_day'] = work_day.status
+
+    apps = get_application_today(work_day.date)
+    out['apps'] = apps
+
+    return render(request, 'archive_page.html', out)
+
+
+def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    work_day = aTWorkDay.objects.using(ARCHIVE_DB).get(date=day)
+
+    apps = get_application_today(work_day.date)
+    out['apps'] = apps
+
+    if 'materials' in request.path:
+        return render(request, 'extend/archive_material_today_app.html', out)
+
+    def filter_app(_apps: list):
+        # (priority, last_name, technic.name, address, description)
+        _tmp = _apps.copy()
+        for i in range(len(_apps)-1):
+            if _apps[i][1:3] == _apps[i+1][1:3]:
+                if TEXT_TEMPLATES['constr_site_supply_name'] in _apps[i][3]:
+                    _tmp.remove(_apps[i+1])
+                elif TEXT_TEMPLATES['constr_site_supply_name'] in _apps[i+1][3]:
+                    _tmp.remove(_apps[i])
+        return _tmp
+
+    driver_technic = []
+    for app in apps:
+        for tech in app.applications_technic:
+            if TEXT_TEMPLATES['dismiss'] not in tech.description:
+                driver_technic.append((
+                    int(tech.priority),
+                    tech.technic_driver.driver.driver.last_name,
+                    tech.technic_driver.technic.name,
+                    app.construction_site.address,
+                    tech.description
+                ))
+
+    driver_technic = set(driver_technic)
+    driver_technic = sorted(driver_technic, key=lambda x: (x[1], x[0]),)
+    driver_technic = filter_app(driver_technic)
+
+    out['driver_technic'] = driver_technic
+
+    return render(request, 'archive_today_applications.html', out)
+
+
