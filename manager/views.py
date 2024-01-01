@@ -3167,6 +3167,9 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
     apps = get_application_today(work_day.date)
     out['apps'] = apps
 
+    if 'materials' in request.path:
+        return render(request, 'extend/archive_material_today_app.html', out)
+
     def filter_app(_apps: list):
         # (priority, last_name, technic.name, address, description)
         _tmp = _apps.copy()
@@ -3197,3 +3200,5 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
     out['driver_technic'] = driver_technic
 
     return render(request, 'archive_today_applications.html', out)
+
+

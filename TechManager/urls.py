@@ -178,6 +178,7 @@ urlpatterns = [
     path('archive/', testA, name='archive'),
     path('archive/<str:day>', show_archive_page_view, name='archive'),
     path('archive_all_app/<str:day>', show_archive_all_app, name='archive_all_app'),
+    path('archive_all_materials/<str:day>', show_archive_all_app, name='archive_all_materials'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
