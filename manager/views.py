@@ -29,6 +29,7 @@ from archive.models import ConstructionSite as aConstructionSite
 from archive.models import User as aUser
 
 from archive.structures import get_application_today
+from archive.structures import ATTechnicDriver
 # ==================================
 
 # from manager.forms import CreateNewApplicationForm
@@ -1472,8 +1473,12 @@ def Technic_Driver_view(request, day):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
-    out = {}
     current_day = convert_str_to_date(day)
+
+    if current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_technic_driver/{current_day}')
+
+    out = {}
     get_prepare_data(out, request, current_day)
 
     if DriverTabel.objects.filter(date=current_day, status=True).count() == 0:
@@ -3202,3 +3207,20 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
     return render(request, 'archive_today_applications.html', out)
 
 
+def show_archive_technic_driver(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+
+    out = {}
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    technic_driver_list = []
+
+    for technic_driver in aTTechnicDriver.objects.using(ARCHIVE_DB).filter(date=day):
+        technic_driver_list.append(ATTechnicDriver(technic_driver.id_T_D))
+
+    technic_driver_list = sorted(technic_driver_list, key=lambda x: x.technic.name)
+    out['technic_driver_list'] = technic_driver_list
+
+    return render(request, 'archive/archive_technic_driver.html', out)
