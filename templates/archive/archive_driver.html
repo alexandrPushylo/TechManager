@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% block choosedate %}
+        <div class="container">
+            <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'tabel_driver' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'tabel_driver' nw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap">
+                <b class="fs-5">Архив за: {{ DAY }}</b>
+            </div>
+        </div>
+    {% endblock %}
+
+    <div class="container-sm m-3 mt-5 mx-auto">
+        <div class="m-0">
+            <p class="card-text m-0 text-center"><b class="fs-5">Водители</b></p>
+
+
+            <table class="table table-bordered table-hover mx-auto w-auto">
+                <thead>
+                <tr>
+                    <th scope="col">№</th>
+                    <th scope="col">Работает</th>
+                    <th scope="col">Фамилия</th>
+                    <th scope="col">Имя</th>
+
+                </tr>
+                </thead>
+
+                <tbody>{% for driver in driver_list %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td style="text-align: center">
+                            {% if driver.status %}
+                                <i class="fa-solid fa-check" style="color: green;"></i>
+                            {% else %}
+                                <i class="fa-solid fa-xmark" style="color: red;"></i>
+                            {% endif %}
+                        </td>
+                        <td>{{ driver.driver.last_name }}</td>
+                        <td>{{ driver.driver.first_name }}</td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+    </div>
+
+
+    </div>
+
+{% endblock %}
+
+
+
+{% block bottom_panel %}
+    <div class="input-group d-flex justify-content-center align-items-center">
+        <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1"
+           aria-current="page">Назад</a>
+
+    </div>
+{% endblock %}
