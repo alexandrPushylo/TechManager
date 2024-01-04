@@ -3162,7 +3162,7 @@ def show_archive_page_view(request, day):
     apps = get_application_today(work_day.date)
     out['apps'] = apps
 
-    return render(request, 'archive_page.html', out)
+    return render(request, 'archive/archive_page.html', out)
 
 
 def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
@@ -3178,7 +3178,7 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
     out['apps'] = apps
 
     if 'materials' in request.path:
-        return render(request, 'extend/archive_material_today_app.html', out)
+        return render(request, 'archive/archive_material_today_app.html', out)
 
     def filter_app(_apps: list):
         # (priority, last_name, technic.name, address, description)
@@ -3209,7 +3209,7 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
 
     out['driver_technic'] = driver_technic
 
-    return render(request, 'archive_today_applications.html', out)
+    return render(request, 'archive/archive_today_applications.html', out)
 
 
 def show_archive_technic_driver(request, day):
