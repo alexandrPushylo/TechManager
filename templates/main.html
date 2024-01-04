@@ -162,22 +162,29 @@
                                 {% endif %}
                                 <hr class="m-0 mt-1">
                                 <div class="btn-group d-flex justify-content-center m-0 mt-2">
+                                
                                     <a href="{% url 'show_info_application' a.app_today.id %}"
                                        class="btn btn-outline-info  m-1" aria-current="page"><i
-                                            class="fa-solid fa-circle-info"></i></a>
+                                            class="fa-solid fa-circle-info"></i>
+                                    </a>
+                                
                                     {% if tense %}
-                                        <a href="{% url 'add_application' a.app_today.id %}"
-                                           class="btn btn-outline-primary  m-1" aria-current="page"><i
-                                                class="fa-solid fa-plus"></i> | <i
-                                                class="fa-regular fa-pen-to-square"></i></a>
                                         {% if a.app_today.status.status  == 'Отправлена' and post == 'foreman' %}
                                         {% elif a.app_today.status.status  == 'Отправлена' and post == 'master' %}
-
                                         {% else %}
+                                            
                                             <a ondblclick="location.href = '/clear_app/{{ a.app_today.id }}'; return false;"
                                                class="btn btn-outline-danger  m-1" aria-current="page"
                                                title="Двойной клик для удаления"><i class="fa-solid fa-trash"></i></a>
                                         {% endif %}
+                                        
+                                        <a href="{% url 'add_application' a.app_today.id %}"
+                                           class="btn btn-outline-primary  m-1" aria-current="page"><i
+                                                class="fa-solid fa-plus"></i> | <i
+                                                class="fa-regular fa-pen-to-square"></i>
+                                        </a>
+                                                                                
+                                        
                                         {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
                                             <a href="{% url 'success_application' a.app_today.id %}"
                                                class="btn btn-outline-success  m-1" aria-current="page"><i
@@ -411,40 +418,44 @@
 
 
 
-    <div class="position-fixed translate-middle-x start-0 top-50 ms-3 mt-5 btn-group dropend">
+    <div class="position-fixed translate-middle-x start-0 top-50 ms-4 mt-5 p-0 btn-group dropend">
 
         {% if var_filter_apps.value == 'technics' %}
             <button type="button" class="btn btn-success  dropdown-toggle position-relative " data-bs-toggle="dropdown"
-                    aria-expanded="false" style="transform: rotate(90deg)">
-                Техника
+                    aria-expanded="false">
+                <i class="fa-solid fa-truck"></i>
             </button>
             <ul class="dropdown-menu">
-                <a id="btn_show_all" class="btn  btn-sm dropdown-item fs-5" aria-current="page">Всё</a>
-                <a id="btn_show_mater" class="btn btn-sm  dropdown-item fs-5" aria-current="page">Материалы</a>
+                <a id="btn_show_all" class="btn  btn-sm dropdown-item fs-5" aria-current="page"><i class="fa-solid fa-truck"></i> + <i class="fa-solid fa-pen-ruler"></i></a>
+                <a id="btn_show_mater" class="btn btn-sm  dropdown-item fs-5" aria-current="page"><i class="fa-solid fa-pen-ruler"></i> материалы</a>
             </ul>
 
         {% elif var_filter_apps.value == 'materials' %}
             <button type="button" class="btn btn-primary  dropdown-toggle" data-bs-toggle="dropdown"
-                    aria-expanded="false" style="transform: rotate(90deg)">
-                Материалы
+                    aria-expanded="false">
+                <i class="fa-solid fa-pen-ruler"></i>
             </button>
             <ul class="dropdown-menu">
-                <a id="btn_show_tech" class="btn btn-sm dropdown-item fs-5" aria-current="page">Техника</a>
-                <a id="btn_show_all" class="btn  btn-sm dropdown-item fs-5" aria-current="page">Всё</a>
+                <a id="btn_show_tech" class="btn btn-sm dropdown-item fs-5" aria-current="page"><i class="fa-solid fa-truck"></i> техника</a>
+                <a id="btn_show_all" class="btn  btn-sm dropdown-item fs-5" aria-current="page"><i class="fa-solid fa-truck"></i> + <i class="fa-solid fa-pen-ruler"></i></a>
             </ul>
 
         {% else %}
-            <button type="button" class="btn btn-secondary  dropdown-toggle" data-bs-toggle="dropdown"
-                    aria-expanded="false" style="transform: rotate(90deg)">
-                Всё
+            <button type="button" class="btn btn-outline-secondary  dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fa-solid fa-filter"></i>
             </button>
             <ul class="dropdown-menu">
-                <a id="btn_show_tech" class="btn btn-sm dropdown-item fs-5" aria-current="page">Техника</a>
-                <a id="btn_show_mater" class="btn btn-sm  dropdown-item fs-5" aria-current="page">Материалы</a>
+                <a id="btn_show_tech" class="btn btn-sm btn-success dropdown-item fs-5" aria-current="page"><i class="fa-solid fa-truck"></i> техника</a>
+                <a id="btn_show_mater" class="btn btn-sm  dropdown-item fs-5" aria-current="page"><i class="fa-solid fa-pen-ruler"></i> материалы</a>
             </ul>
 
         {% endif %}
     </div>
+    
+    
+    
+    
     {#</div>#}
 
     {#<div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical" >#}
