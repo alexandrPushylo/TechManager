@@ -2,52 +2,84 @@
 {% block content %}
 
     {% block choosedate %}
-    <div class="container-fluid  ">
-        <div class="btn-group position-relative start-50 translate-middle-x">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'tech_list'  lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3 p-0" type="date"   value="{{ cw_day }}"/>
-            {% else %}
-                <input class="form-control io_current_day border-success border border-3 p-0"  type="date"  value="{{ cw_day }}"/>
-                <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
-            {% endif %}
+        <div class="container-fluid  ">
+            <div class="btn-group position-relative start-50 translate-middle-x">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'tech_list'  lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'tech_list'  nw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b
+                    class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
         </div>
-    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
-    </div>
     {% endblock %}
 
 
-<div class="container container-fluid mx-auto row">
-    <div class="container mt-5 mx-auto">
-        <div class="row">
-        {% for tdl in technic_driver_list %}
-        <div class="col-auto m-1">
-        <div class="card shadow-lg
-        {% if tdl.status %} border border-success border-2
+    <div class="container container-fluid mx-auto row">
+        <div class="container mt-5 mx-auto">
+            <div class="row">
+
+
+                {% for tdl in technic_driver_list %}
+                    <div class="col-auto m-1">
+                        <div class="card shadow-lg
+        {% if tdl.status %} border border-success border-3
         {% else %} border border-danger border-3
         {% endif %}
             " style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
-          <div class="card-body">
-              <h6 class="card-text fw-bold">{{ tdl.technic.name.name }} ({{ tdl.technic.attached_driver.last_name }})</h6>
-              <h6 class="card-text">[ {{ tdl.technic.id_information }} ]</h6>
-              <h6 class="card-text">{{ tdl.technic.description }}</h6>
-              <hr>
-              {% if tdl.driver.status %}
-                  <h6 class="card-text fw-bold">{{ tdl.driver.driver.last_name }} {{ tdl.driver.driver.first_name }}</h6>
-              {% else %}
-                  <h6 class="card-text fw-bold text-danger">Водитель не назначен</h6>
+                            <div class="card-body p-1 ps-2">
+                                <form id="tech_form_{{ tdl.pk }}" method="post"
+                                      action="{% url 'change_s_t' %}">{% csrf_token %}
+                                    <input type="hidden" value="{{ tdl.pk }}" name="technic_driver_id">
+                                </form>
+                                <h6 class="card-text fw-bold {% if not tdl.status %}text-decoration-line-through text-danger{% endif %}">
+                                    <button onclick="document.getElementById('tech_form_{{ tdl.pk }}').submit();"
+                                            class="btn btn-sm {% if tdl.status %}btn-outline-danger{% else %}btn-outline-success {% endif %} me-2">
+                                        <i class="fa-solid fa-truck"></i></button>
+                                    {{ tdl.technic.name.name }}
+                                    ({{ tdl.technic.attached_driver.last_name }})
 
-                {% endif %}
+                                </h6>
+                                <h6 class="card-text">[ {{ tdl.technic.id_information }} ]</h6>
+                                <h6 class="card-text">{{ tdl.technic.description }}</h6>
 
 
+                                <hr class="m-1">
 
-          </div>
+
+                                <form id="driver_form_{{ tdl.driver.pk }}" method="post"
+                                      action="{% url 'change_s_t' %}">{% csrf_token %}
+                                    <input type="hidden" value="{{ tdl.driver.pk }}" name="driver_id">
+                                </form>
+
+
+                                <h6 class="card-text fw-bold {% if not tdl.driver.status %}text-decoration-line-through text-danger{% endif %}">
+                                    <button onclick="document.getElementById('driver_form_{{ tdl.driver.pk }}').submit();"
+                                            class="btn btn-sm {% if tdl.driver.status %}btn-outline-danger{% else %}btn-outline-success{% endif %} me-3">
+                                        <i class="fa-solid fa-person"></i></button>
+                                    {% if tdl.driver.status %}
+                                        {{ tdl.driver.driver.last_name }} {{ tdl.driver.driver.first_name }}
+                                    {% else %}
+                                        Водитель не назначен
+                                    {% endif %}
+
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+
+            </div>
         </div>
-        </div>
-        {% endfor %}
     </div>
-</div>
-</div>
 
 
 {% endblock %}
@@ -59,11 +91,12 @@
 {% endblock %}
 
 {% block bottom_panel %}
-<div class="input-group d-flex justify-content-center align-items-center">
-<a href="{% url 'show_today_applications' cw_day  %}"  class="btn  btn-outline-secondary active" aria-current="page">Все заявки</a>
+    <div class="input-group d-flex justify-content-center align-items-center">
+        <a href="{% url 'show_today_applications' cw_day %}" class="btn  btn-outline-secondary active"
+           aria-current="page">Все заявки</a>
 
-{#<a href="" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>#}
+        {#<a href="" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>#}
 
 
-</div>
+    </div>
 {% endblock %}
