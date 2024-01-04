@@ -2,59 +2,86 @@
 
 {% block content %}
     <div class="container mt-5">
-    <p class="fw-bold fs-3 m-3">Список объектов</p>
+        <p class="fw-bold fs-3 m-3">Список объектов</p>
+    
         <div class="row">
-        {% for constr_site in construction_sites_list %}
-        <div class="col-auto">
-        <div class="card shadow-lg" style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
-           <div class="card-body">
-            <h6 class="card-title" style="text-align: center">{{constr_site.address}}
-                <br>
-                Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}</h6>
-            <hr style="border-width: medium; border-color: {% if constr_site.status.status == 'Открыт'  %}green{% else %}red{% endif %}">
+        
+            {% for constr_site in construction_sites_list %}
+                <div class="col-auto">
+                    <div class="card shadow-lg"
+                         style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
+                        <div class="card-body p-1">
+                            <h6 class="card-title fw-bolder" style="text-align: center">{{ constr_site.address }}
+                                <br>
+                                {% if constr_site.foreman%}
+                                    Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}
+                                {% endif %}
+                                </h6>
+                            <hr class="m-0" style="border-width: medium; border-color: {% if constr_site.status.status == 'Открыт' %}green{% else %}red{% endif %}">
+                            
+                            <div class="btn-group position-relative translate-middle-x start-50">
+                                <a href="{% url 'delete_construction_sites' constr_site.id %}"
+                                   class="btn btn-outline-secondary  m-1 me-5" aria-current="page">
+                                    <i class="fa-solid fa-boxes-packing"></i>
+                                </a>
+                            
+                                <a href="{% url 'edit_construction_sites' constr_site.id %}"
+                                   class="btn btn-outline-primary m-1" aria-current="page">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                
+                                <a href="{% url 'change_status_construction_site' constr_site.id %}"
+                                   {% if constr_site.status.status == 'Открыт' %}class="btn btn-outline-danger col-auto m-1"
+                                   aria-current="page"> Скрыть
+                                   {% else %}class="btn btn-outline-success col-auto m-1" aria-current="page">
+                                       Отобразить
+                                   {% endif %}
+                                </a>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        
+            <hr>
+        
+            {% for constr_site in constr_sites_list_close %}
+                <div class="col-auto">
+                    <div class="card"
+                         style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
+                        <div class="card-body p-1">
+                            <h6 class="card-title" style="text-align: center">{{ constr_site.address }}
+                                <br>
+                                Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}</h6>
+                            <hr class="m-0" style="border-width: medium; border-color: {% if constr_site.status.status == 'Открыт' %}green{% else %}red{% endif %}">
 
-            <div class="btn-group ">
+                            <div class="btn-group position-relative translate-middle-x start-50">
+                                <a href="{% url 'delete_construction_sites' constr_site.id %}"
+                                   class="btn btn-outline-secondary  m-1 me-5" aria-current="page">
+                                    <i class="fa-solid fa-boxes-packing"></i>
+                                </a>
+                            
+                                <a href="{% url 'edit_construction_sites' constr_site.id %}"
+                                   class="btn btn-outline-primary m-1" aria-current="page">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                
+                                <a href="{% url 'change_status_construction_site' constr_site.id %}"
+                                   {% if constr_site.status.status == 'Открыт' %}class="btn btn-outline-danger col-auto m-1"
+                                   aria-current="page"> Скрыть
+                                   {% else %}class="btn btn-outline-success col-auto m-1" aria-current="page">
+                                       Отобразить
+                                   {% endif %}
+                                </a>
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
 
-                <a href="{% url 'edit_construction_sites' constr_site.id %}" class="btn btn-outline-primary m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
-{#                {% if post == 'admin' %}#}
-                <a href="{% url 'delete_construction_sites' constr_site.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
-{#                {% endif %}#}
-                <a href="{% url 'change_status_construction_site' constr_site.id %}"
-                    {% if constr_site.status.status == 'Открыт' %}class="btn btn-outline-danger col-auto m-1" aria-current="page"> Скрыть
-                    {% else %}class="btn btn-outline-success col-auto m-1" aria-current="page"> Отобразить
-                    {% endif %}
-                </a>
-            </div>
-          </div>
         </div>
-        </div>
-        {% endfor %}
-        <hr>
-           {% for constr_site in constr_sites_list_close %}
-        <div class="col-auto">
-        <div class="card shadow-lg" style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
-          <div class="card-body">
-            <h6 class="card-title" style="text-align: center">{{constr_site.address}}
-                <br>
-                Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}</h6>
-            <hr style="border-width: medium; border-color: {% if constr_site.status.status == 'Открыт'  %}green{% else %}red{% endif %}">
-
-            <div class="btn-group ">
-
-                <a href="{% url 'edit_construction_sites' constr_site.id %}" class="btn btn-outline-primary m-1" aria-current="page"><i class="fa-regular fa-pen-to-square"></i></a>
-                <a href="{% url 'delete_construction_sites' constr_site.id %}" class="btn btn-outline-danger  m-1" aria-current="page"><i class="fa-solid fa-trash"></i></a>
-                <a href="{% url 'change_status_construction_site' constr_site.id %}"
-                    {% if constr_site.status.status == 'Открыт' %}class="btn btn-outline-danger col-auto m-1" aria-current="page"> Скрыть
-                    {% else %}class="btn btn-outline-success col-auto m-1" aria-current="page"> Отобразить
-                    {% endif %}
-                </a>
-            </div>
-          </div>
-        </div>
-        </div>
-        {% endfor %}
-
-    </div>
     </div>
 {% endblock %}
 
