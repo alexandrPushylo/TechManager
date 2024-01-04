@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <p class="fw-bold fs-3 m-3">Список объектов</p>
+
+        <div class="row">
+
+            {% for constr_site in arch_constr_sites %}
+                <div class="col-auto">
+                    <div class="card shadow-lg"
+                         style="width: 18rem; margin-bottom:15px; background-color: rgba(247,247,248,0.75)">
+                        <div class="card-body p-1">
+                            <h6 class="card-title fw-bolder" style="text-align: center">{{ constr_site.address }}
+                                <br>
+                                Прораб: {{ constr_site.foreman.last_name }} {{ constr_site.foreman.first_name }}</h6>
+
+                            <hr style="border-width: medium; border-color: {% if not constr_site.deleted %}green{% else %}red{% endif %}">
+                            <div class="card-title p-0">
+                                <h6 style="text-align: center">
+                                    Статус: {% if constr_site.deleted %}Удален из БД
+                                {% else %} Присутствует в БД
+                                {% endif %}
+                                </h6>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block bottom_panel %}
+
+    <div class="input-group d-flex justify-content-center align-items-center">
+        <a href="{% url 'construction_sites' %}" class="btn btn-outline-primary active  col-auto m-1"
+           aria-current="page">Назад</a>
+    </div>
+{% endblock %}
