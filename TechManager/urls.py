@@ -182,6 +182,7 @@ urlpatterns = [
     path('archive_all_materials/<str:day>', show_archive_all_app, name='archive_all_materials'),
     path('archive_technic_driver/<str:day>', show_archive_technic_driver, name='archive_technic_driver'),
     path('archive_driver/<str:day>', show_archive_driver, name='archive_driver'),
+    path('archive_construction_sites/', show_construction_sites_view, name='archive_construction_sites'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
