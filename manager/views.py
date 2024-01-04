@@ -31,6 +31,7 @@ from archive.models import User as aUser
 from archive.structures import get_application_today
 from archive.structures import ATTechnicDriver
 from archive.structures import ATDriver
+from archive.structures import AConstructionSite
 # ==================================
 
 # from manager.forms import CreateNewApplicationForm
@@ -1139,7 +1140,21 @@ def show_construction_sites_view(request):
     out = {}
     get_prepare_data(out, request)
 
+    if "archive" in request.path:
+        arch_constr_sites_list = []
+
+        for site in aConstructionSite.objects.using(ARCHIVE_DB).all().exclude(address=None):
+            arch_constr_sites_list.append(AConstructionSite(site.id_C_S))
+
+        arch_constr_sites_list = sorted(arch_constr_sites_list, key=lambda x: x.address)
+        out['arch_constr_sites'] = arch_constr_sites_list
+
+        return render(request, 'archive/archive_construction_sites.html', out)
+
     all_constr_site_list = ConstructionSite.objects.all().order_by('address').exclude(address=None, foreman=None)
+
+    #   Исключить объекты для Снабжения и Спец. задание
+    all_constr_site_list = all_constr_site_list.exclude(foreman=None)
 
     if is_admin(request.user):
         construction_sites_list = all_constr_site_list
@@ -3162,7 +3177,7 @@ def show_archive_page_view(request, day):
     apps = get_application_today(work_day.date)
     out['apps'] = apps
 
-    return render(request, 'archive_page.html', out)
+    return render(request, 'archive/archive_page.html', out)
 
 
 def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
@@ -3178,7 +3193,7 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
     out['apps'] = apps
 
     if 'materials' in request.path:
-        return render(request, 'extend/archive_material_today_app.html', out)
+        return render(request, 'archive/archive_material_today_app.html', out)
 
     def filter_app(_apps: list):
         # (priority, last_name, technic.name, address, description)
@@ -3209,7 +3224,7 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
 
     out['driver_technic'] = driver_technic
 
-    return render(request, 'archive_today_applications.html', out)
+    return render(request, 'archive/archive_today_applications.html', out)
 
 
 def show_archive_technic_driver(request, day):
