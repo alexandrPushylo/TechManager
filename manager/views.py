@@ -2551,7 +2551,7 @@ def show_start_page(request):
         elif is_driver(request.user):
             return HttpResponseRedirect(f"personal_application/{get_current_day('last_day')}/{request.user.id}")
         elif is_mechanic(request.user):
-            return HttpResponseRedirect(f"tech_list/{get_current_day('last_day')}")
+            return HttpResponseRedirect(f"tech_list/{get_current_day('next_day')}")
         elif is_employee_supply(request.user):
             return HttpResponseRedirect(f"supply_app/{get_current_day('next_day')}")
         else:
@@ -3263,3 +3263,17 @@ def show_archive_driver(request, day):
     out['driver_list'] = driver_list
 
     return render(request, 'archive/archive_driver.html', out)
+
+
+def change_status_technic_driver(request):
+    if request.method == 'POST':
+        if request.POST.get('technic_driver_id'):
+            _td = TechnicDriver.objects.get(pk=request.POST.get('technic_driver_id'))
+            _td.status = False if _td.status else True
+            _td.save()
+        if request.POST.get('driver_id'):
+            _d = DriverTabel.objects.get(pk=request.POST.get('driver_id'))
+            _d.status = False if _d.status else True
+            _d.save()
+        # print(request.POST)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
