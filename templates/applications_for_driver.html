@@ -1,72 +1,88 @@
 {% extends 'base.html' %}
 
 {% if var_reload_drv_page.value %}{% block meta %}
-    <meta http-equiv="refresh" content="{{ var_reload_drv_page.value }}; URL={% url 'application_for_driver' lw_day current_user.id %}">
+    <meta http-equiv="refresh"
+          content="{{ var_reload_drv_page.value }}; URL={% url 'application_for_driver' lw_day current_user.id %}">
 {% endblock %}{% endif %}
 
 {% block content %}
 
     {% block choosedate %}
-    <div class="container-fluid  ">
-        <div class="btn-group position-relative start-50 translate-middle-x">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3 p-0" id="{{ current_user.id }}" type="date"   value="{{ cw_day }}"/>
-            {% else %}
-                <input class="form-control io_current_day border-success border border-3 p-0" id="{{ current_user.id }}"  type="date"  value="{{ cw_day }}"/>
-                <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
-            {% endif %}
+        <div class="container-fluid  ">
+            <div class="btn-group position-relative start-50 translate-middle-x">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'application_for_driver' lw_day current_user.id %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0"
+                           id="{{ current_user.id }}" type="date" value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0"
+                           id="{{ current_user.id }}" type="date" value="{{ cw_day }}"/>
+                    <a href="{% url 'application_for_driver' nw_day current_user.id %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b
+                    class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
         </div>
-    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
-    </div>
     {% endblock %}
 
-<div class="container-lg  mx-auto  mt-5 p-0"  >
-    <div class="container shadow-lg mb-5 p-0" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
+    <div class="container-lg  mx-auto  mt-5 p-0">
+        <div class="container shadow-lg mb-5 p-0" style="background-color: rgba(247,247,248,0.71)">
+            <div class="card-body">
 
-        <p class="card-text ms-4">
-            <b class="fs-5">{{ DAY }},</b>
-            <br>
-            <b class="fs-5">{{ current_user.last_name }} {{ current_user.first_name }}</b>
-            <hr>
-        </p>    
+                <p class="card-text ms-4">
+                    <b class="fs-5">{{ DAY }},</b>
+                    <br>
+                    <b class="fs-5">{{ current_user.last_name }} {{ current_user.first_name }}</b>
+                <hr>
+                </p>
 
-        <ul class="container-fluid" >
-            {% for v in applications %}{% ifchanged %}<b class="fs-5" >{{ v.technic_driver.technic.name }}</b>{% endifchanged %}
-                <div class=" pb-1" id="vehicle_list">
-                    <label  class= "fw-bold start-50">{{ v.priority }}) {% if v.app_for_day.construction_site.address and not v.app_for_day.construction_site.address == 'Снабжение'  %}{{ v.app_for_day.construction_site.address }}{% endif %} {% if v.app_for_day.construction_site.foreman %}({{ v.app_for_day.construction_site.foreman }}){% endif %}</label>
-                    <textarea class="app_description form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ v.description }}</textarea>
+                <ul class="container-fluid">
+                
+                    {% for v in applications %}{% ifchanged %}<b class="fs-5">{{ v.technic_driver.technic.name }}</b>
+                    {% endifchanged %}
+                        <div class=" pb-1" id="vehicle_list">
+                            <label class="fw-bold start-50">{{ v.priority }})
+                                {% if v.app_for_day.construction_site.address and not v.app_for_day.construction_site.address == 'Снабжение' %}
+                                    {{ v.app_for_day.construction_site.address }}{% endif %}
+                                {% if v.app_for_day.construction_site.foreman %}(
+                                    {{ v.app_for_day.construction_site.foreman }}){% endif %}</label>
+                            <textarea class="app_description form-control app_description mb-2" id="floatingInputValue"
+                                      disabled rows="1">{{ v.description }}</textarea>
+                        </div>
+                    {% endfor %}
+                
+                </ul>
+
+            </div>
+        </div>
+
+
+        {% for a in material_list %}
+            <div class="container shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+                <div class="card-body">
+
+                    <p class="card-text">
+
+                    <h6 class="card-title  fw-bold">{{ a.app_for_day.construction_site.address }}
+                        ({{ a.app_for_day.construction_site.foreman.last_name }})</h6>
+                    <hr>
+                    </p>
+
+                    <ul class="container-fluid">
+
+                        <div class="pb-1" id="vehicle_list">
+                            <textarea class="app_description form-control app_description mb-2" id="floatingInputValue"
+                                      disabled rows="1">{{ a.description }}</textarea>
+                        </div>
+
+                    </ul>
+
                 </div>
-            {% endfor %}
-        </ul>
-
-      </div>
+            </div>
+        {% endfor %}
     </div>
-
-
-    {% for a in material_list %}
-    <div class="container shadow-lg" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
-
-        <p class="card-text">
-
-            <h6 class="card-title  fw-bold">{{a.app_for_day.construction_site.address}} ({{ a.app_for_day.construction_site.foreman.last_name }})</h6>
-            <hr>
-        </p>
-
-        <ul class="container-fluid" >
-
-                <div class="pb-1" id="vehicle_list">
-                    <textarea class="app_description form-control app_description mb-2" id="floatingInputValue" disabled rows="1">{{ a.description }}</textarea>
-                </div>
-
-        </ul>
-
-      </div>
-    </div>
-    {% endfor %}
-</div>
 
 {% endblock %}
 
@@ -76,13 +92,15 @@
 
 
 {% block bottom_panel %}
-<div class="input-group d-flex justify-content-center align-items-center">
-{% if post == 'admin' %}
-    <a href="{% url 'driver_app_list' cw_day  %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Назад</a>
-{% endif %}
+    <div class="input-group d-flex justify-content-center align-items-center">
+        {% if post == 'admin' %}
+            <a href="{% url 'driver_app_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1"
+               aria-current="page">Назад</a>
+        {% endif %}
 
-<a href="{% url 'show_today_applications' cw_day  %}" class="btn btn-outline-secondary active m-1" aria-current="page">Все заявки на {{ DAY }}</a>
-</div>
+        <a href="{% url 'show_today_applications' cw_day %}" class="btn btn-outline-secondary active m-1"
+           aria-current="page">Все заявки на {{ DAY }}</a>
+    </div>
 
 
 {% endblock %}

@@ -1,12 +1,21 @@
-import time
-import os, shutil, sys
-from datetime import date, timedelta, datetime
+# import os, shutil, sys
+# from datetime import date, timedelta, datetime
+# import telebot
+# import requests
+# from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
+import os
+import shutil
+import sys
+from datetime import date, timedelta, datetime, timezone
 from random import choice
-import telebot
 import requests
+import telebot
+
 from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
+
 # ---------------------------------------------------
 NOW = datetime.now().time()
+NOW_DATETIME = datetime.now().replace(microsecond=0).isoformat()
 ONE_DAY = timedelta(days=1)
 STATUS_APPLICATION = {"Подтвержден", "Не подтвержден", "Отменен"}
 WEEKDAY = ("Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье")
@@ -216,3 +225,12 @@ def back24H(param: str='list', backup=None):
                 else:
                     os.popen(f"cp {target} {name_db}")
     return out
+
+
+def check_last_activity(_time: datetime):
+    print(_time.time())
+    print(datetime.now().time().replace(microsecond=0))
+    if _time.time() < datetime.now().time():
+        return True
+    else:
+        return False
