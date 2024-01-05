@@ -55,9 +55,11 @@ from manager.utilities import get_week
 from manager.utilities import timedelta
 from manager.utilities import choice as rand_choice
 from manager.utilities import convert_str_to_date
+from manager.utilities import check_last_activity
 
 from manager.utilities import check_time as NOW_IN_TIME
 from manager.utilities import NOW
+from manager.utilities import NOW_DATETIME
 from manager.utilities import get_json
 from manager.utilities import get_id_chat
 from manager.utilities import BOT
@@ -1788,6 +1790,14 @@ def show_application_for_driver(request, day, id_user):
         current_user = User.objects.get(id=id_user)
     else:
         current_user = User.objects.get(username=request.user)
+    #   YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ].']
+    # current_user.last_login = NOW_DATETIME#.strftime("%Y-%m-%d %H:%M:%S")
+    # current_user.save()
+    # print(current_user.last_login)
+
+    # if is_driver(current_user) and current_day < TODAY:
+    #     return HttpResponseRedirect(f"/personal_application/{get_current_day('current_day')}/{request.user.id}")
+
 
     id_supply_list = Post.objects.filter(
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
@@ -2568,6 +2578,8 @@ def show_start_page(request):
 def get_prepare_data(out: dict, request, current_day=TOMORROW):
     if isinstance(current_day, str):
         current_day = convert_str_to_date(current_day)
+    # print(request.user.last_name)
+    # print(check_last_activity(request.user.last_login))
 
     out['message_status'] = False
     out['nw_day'] = str(get_current_day('next_day'))
