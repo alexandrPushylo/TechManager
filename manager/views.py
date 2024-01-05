@@ -2549,7 +2549,7 @@ def show_start_page(request):
         elif is_master(request.user):
             return HttpResponseRedirect(f"applications/{get_current_day('next_day')}")
         elif is_driver(request.user):
-            return HttpResponseRedirect(f"personal_application/{get_current_day('last_day')}/{request.user.id}")
+            return HttpResponseRedirect(f"personal_application/{get_current_day('current_day')}/{request.user.id}")
         elif is_mechanic(request.user):
             return HttpResponseRedirect(f"tech_list/{get_current_day('next_day')}")
         elif is_employee_supply(request.user):
@@ -2656,6 +2656,13 @@ def get_current_day(selected_day: str):
     elif selected_day == 'last_day':
         _day = WorkDayTabel.objects.filter(date__lte=TODAY, status=True).last()
         if _day:
+            return _day.date
+    elif selected_day == 'current_day':
+        _day = WorkDayTabel.objects.get(date=TODAY)
+        if _day is not None and _day.status:
+            return _day.date
+        else:
+            _day = WorkDayTabel.objects.filter(date__gt=TODAY, status=True).first()
             return _day.date
     else:
         return selected_day
