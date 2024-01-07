@@ -1,0 +1,106 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    {% block choosedate %}
+        <div class="container">
+            <div class="btn-group position-relative start-50 translate-middle-x">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'supply_app' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'supply_app' nw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-3 text-nowrap">
+                <b class="fs-5">Архив за: {{ DAY }}</b>
+            </div>
+        </div>
+    {% endblock %}
+
+
+    <div class="p-0 mt-5">
+        <div class="mb-4" style="text-align: center">
+            {% if count_am_not_check %}
+                <a style="color: #24981f;" class="fw-bold"
+                   href="{% url 'supply_materials' cw_day %}">Есть {{ count_am_not_check }} не подтвержденных заявок</a>
+
+            {% endif %}
+        </div>
+        <div class="position-relative translate-middle-x start-50" style="width: max-content">
+            <div class="p-0 ms-0">
+                {% for app_today in apps_today %}
+                    <div class="m-0">
+
+                        <div class="card shadow-lg" style="width: 20rem; margin-bottom:15px; background-color: rgba(248,248,247,0.75)">
+                            <div class="card-body position-relative m-0 mt-1 p-0">
+                                {% if app_today %}
+                                    {% for v in app_today.applications_technic %}
+                                        <div class="row m-0 mt-3">
+                                            <div class="card-text fs-6 col-auto fw-bold">{{ v.technic_driver.technic.name }}</div>
+                                            <div class="card-text fs-6 col-auto fw-bold">
+                                                ({{ v.technic_driver.driver.driver.last_name }})
+                                                [<b>{{ v.priority }}</b>]
+                                            </div>
+                                        </div>
+
+                                        {% if v.description %}
+                                            <textarea class="form-control app_description"
+                                                      readonly>{{ v.description }}</textarea>
+                                        {% endif %}
+
+                                    {% endfor %}
+                                {% endif %}
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% if not status_day %}
+        <div class="card position-relative start-50 translate-middle-x shadow-lg" style="width: 18rem;">
+            <div class="card-header">
+                <p class="card-text text-center">{{ WEEKDAY }}, {{ DAY }}<br> выходной день.</p>
+            </div>
+
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+
+
+
+{% block tab %}
+    <div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical-sm"
+         style="margin-left: -10px; width: 3.2rem">
+        <a id="btn_show_tech" href="{% url 'supply_app' cw_day %}"
+           style=" text-orientation: upright; writing-mode: vertical-rl; "
+           class=" btn btn-sm btn-outline-success active " aria-current="page">Техника</a>
+        <a id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"
+           style="text-orientation: upright; writing-mode: vertical-rl;" class=" btn btn-sm   btn-outline-secondary"
+           aria-current="page">Материалы</a>
+    </div>
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/supply_app.js" %}"></script>
+{% endblock %}
+
+{% block bottom_panel %}
+    <div class="input-group d-flex justify-content-center align-items-center">
+
+        <a href="{% url 'show_today_applications' cw_day %}" class="btn  btn-outline-secondary active"
+           aria-current="page">Все заявки</a>
+
+    </div>
+{% endblock %}
