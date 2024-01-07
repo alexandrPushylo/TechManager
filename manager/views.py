@@ -539,6 +539,10 @@ def supply_materials_view(request, day):
         return HttpResponseRedirect('/')
     out = {}
     current_day = convert_str_to_date(day)
+
+    if current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_supply_materials/{day}')
+
     get_prepare_data(out, request, current_day)
 
     current_application = ApplicationToday.objects.filter(
@@ -712,7 +716,7 @@ def supply_app_view(request, day):
     out = {}
     current_day = convert_str_to_date(day)
 
-    if current_day<TODAY:
+    if current_day < TODAY:
         return HttpResponseRedirect(f'/archive_supply_app/{day}')
 
     current_user = request.user
@@ -3380,3 +3384,23 @@ def show_archive_supply_app(request, day):
     out['apps_today'] = app_for_day
 
     return render(request, 'archive/archive_supply_app.html', out)
+
+
+def show_archive_supply_materials(request, day):
+    out = {}
+    current_user = request.user
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+
+    app_for_day = []
+    apps = get_application_today(current_day)
+
+    # for app in apps:
+    #     if TEXT_TEMPLATES['constr_site_supply_name'] in app.construction_site.address:
+    #         app_for_day.append(app)
+
+    out['apps'] = apps
+
+    return render(request, 'archive/archive_supply_app_materials.html', out)
+
