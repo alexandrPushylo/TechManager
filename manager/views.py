@@ -325,11 +325,20 @@ def make_backup_driver_table(driver_list: list = None):
 def make_backup_work_day_table(work_day_list: list = None):
     if work_day_list is None:
         work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY-timedelta(days=1))
+
+
+    # for _wd in work_day_list:
+    #     aTWorkDay.objects.using(ARCHIVE_DB).get_or_create(
+    #         id_W_D=_wd.pk,
+    #         date=_wd.date,
+    #         status=_wd.status
+    #     )
     for _wd in work_day_list:
-        aTWorkDay.objects.using(ARCHIVE_DB).get_or_create(
-            id_W_D=_wd.pk,
-            date=_wd.date,
-            status=_wd.status
+        aTWorkDay.objects.using(ARCHIVE_DB).update_or_create(
+            id_W_D=_wd.pk, defaults={
+                'date': _wd.date,
+                'status': _wd.status
+            }
         )
 
 
