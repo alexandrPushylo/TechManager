@@ -1790,13 +1790,9 @@ def show_application_for_driver(request, day, id_user):
         current_user = User.objects.get(id=id_user)
     else:
         current_user = User.objects.get(username=request.user)
-    #   YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ].']
-    # current_user.last_login = NOW_DATETIME#.strftime("%Y-%m-%d %H:%M:%S")
-    # current_user.save()
-    # print(current_user.last_login)
 
-    # if is_driver(current_user) and current_day < TODAY:
-    #     return HttpResponseRedirect(f"/personal_application/{get_current_day('current_day')}/{request.user.id}")
+    if is_driver(current_user) and current_day < TODAY:
+        return HttpResponseRedirect(f"/archive_personal_app/{current_day}/{request.user.id}")
 
 
     id_supply_list = Post.objects.filter(
@@ -3296,3 +3292,50 @@ def change_status_technic_driver(request):
             _d.save()
         # print(request.POST)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+def show_personal_app_for_driver(request, day, id_user):
+    out = {}
+    current_user = request.user
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    out["current_user"] = current_user
+
+    _driver = aTDriver.objects.using(ARCHIVE_DB).get(date=current_day, driver_i=current_user.pk)
+    _technic_driver = aTTechnicDriver.objects.using(ARCHIVE_DB).get(driver_i=_driver.id_D)
+
+    id_supply_list = Post.objects.filter(
+        post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
+
+    supply_driver_id_list = Post.objects.filter(supervisor_id__in=id_supply_list).values_list('user_post_id', flat=True)
+
+    applications = []
+    material_list = []
+
+    apps = get_application_today(current_day)
+
+    for app in apps:
+        for at in app.applications_technic:
+            if at.technic_driver.id == _technic_driver.id_T_D and at.technic_driver.driver.id == _driver.id_D:
+                applications.append({
+                    'address': app.construction_site.address,
+                    'foreman': app.construction_site.foreman.last_name if app.construction_site.foreman is not None else None,
+                    'technic': at.technic_driver.technic.name,
+                    'description': at.description,
+                    'priority': at.priority
+                })
+
+        if current_user.id in supply_driver_id_list:
+            for am in app.applications_material:
+                material_list.append({
+                    'address': app.construction_site.address,
+                    'foreman': app.construction_site.foreman.last_name if app.construction_site.foreman is not None else None,
+                    'description': am.description
+                })
+
+    applications = sorted(applications, key=lambda x: x['priority'])
+    out['applications'] = applications
+    out['material_list'] = material_list
+
+    return render(request, 'archive/archive_applications_for_driver.html', out)
