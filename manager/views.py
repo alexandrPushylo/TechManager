@@ -1831,6 +1831,12 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         return HttpResponseRedirect('/')
 
     current_day = convert_str_to_date(day)
+
+    if 'materials' in request.path and current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_all_materials/{day}')
+    elif current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_all_app/{day}')
+
     out = {}
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
