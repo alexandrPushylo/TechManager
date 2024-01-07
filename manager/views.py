@@ -707,11 +707,17 @@ def supply_app_view(request, day):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
 
+
     check_table(day)
     out = {}
     current_day = convert_str_to_date(day)
+
+    if current_day<TODAY:
+        return HttpResponseRedirect(f'/archive_supply_app/{day}')
+
     current_user = request.user
     get_prepare_data(out, request, current_day)
+
     status_day = check_table(current_day)
     out['status_day'] = status_day
 
@@ -1802,7 +1808,6 @@ def show_application_for_driver(request, day, id_user):
 
     if is_driver(current_user) and current_day < TODAY:
         return HttpResponseRedirect(f"/archive_personal_app/{current_day}/{request.user.id}")
-
 
     id_supply_list = Post.objects.filter(
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post_id', flat=True)
@@ -3354,3 +3359,24 @@ def show_personal_app_for_driver(request, day, id_user):
     out['material_list'] = material_list
 
     return render(request, 'archive/archive_applications_for_driver.html', out)
+
+
+def show_archive_supply_app(request, day):
+    out = {}
+    current_user = request.user
+    current_day = convert_str_to_date(day)
+    get_prepare_data(out, request, current_day)
+
+    _day = aTWorkDay.objects.using(ARCHIVE_DB).get(date=current_day)
+    out['status_day'] = _day.status
+    app_for_day = []
+
+    if _day.status:
+        apps = get_application_today(_day.date)
+        for app in apps:
+            if TEXT_TEMPLATES['constr_site_supply_name'] in app.construction_site.address:
+                app_for_day.append(app)
+
+    out['apps_today'] = app_for_day
+
+    return render(request, 'archive/archive_supply_app.html', out)
