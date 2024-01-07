@@ -1,0 +1,69 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    {% block choosedate %}
+        <div class="container">
+            <div class="btn-group position-relative start-50 translate-middle-x">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'supply_materials' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'supply_materials' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-3 text-nowrap">
+                <b class="fs-5">Архив за: {{ DAY }}</b>
+            </div>
+        </div>
+    {% endblock %}
+
+
+    <div class="container mx-auto  ">
+        <div class="container mt-5 ps-4">
+            {% for app in apps %}
+                {% for a in app.applications_material %}
+
+                    <div class="col-auto mb-3">
+                        <div id="div{{ a.id }}" class="container mt-1 ">
+
+
+                            <label for="{{ a.id }}" class="fw-bold text-center">{{ app.construction_site.address }}
+                                ({{ app.construction_site.foreman.last_name }})</label>
+                            {% if a.description %}
+                                <input type="hidden" name="materials_id" value="{{ a.id }}">
+                                <textarea id="{{ a.id }}" class="form-control app_description" readonly
+                                          name="materials_description">{{ a.description }}</textarea>
+
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+        </div>
+    </div>
+    {% csrf_token %}
+
+
+{% endblock %}
+
+{% block tab %}
+    <div class="position-fixed start-0 top-50 translate-middle-y btn-group-vertical-sm"
+         style="margin-left: -10px; width: 3.2rem">
+        <a id="btn_show_tech" href="{% url 'supply_app' cw_day %}"
+           style=" text-orientation: upright; writing-mode: vertical-rl; " class=" btn btn-sm  btn-outline-secondary"
+           aria-current="page">Техника</a>
+        <a id="btn_show_mater" href="{% url 'supply_materials' cw_day %}"
+           style="text-orientation: upright; writing-mode: vertical-rl;"
+           class=" btn btn-sm  btn-outline-success active " aria-current="page">Материалы</a>
+    </div>
+{% endblock %}
+
+{% block script %}{% load static %}
+    <script src="{% static "admin/js/scripts/supply_app_materials.js" %}"></script>
+{% endblock %}
