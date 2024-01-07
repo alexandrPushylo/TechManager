@@ -89,6 +89,7 @@ from manager.views import testA
 from manager.views import show_archive_page_view
 from manager.views import show_archive_all_app
 from manager.views import show_archive_technic_driver, show_archive_driver
+from manager.views import show_personal_app_for_driver
 
 urlpatterns = [
     path('', show_start_page, name='start_page'),
@@ -186,6 +187,7 @@ urlpatterns = [
     path('archive_technic_driver/<str:day>', show_archive_technic_driver, name='archive_technic_driver'),
     path('archive_driver/<str:day>', show_archive_driver, name='archive_driver'),
     path('archive_construction_sites/', show_construction_sites_view, name='archive_construction_sites'),
+    path('archive_personal_app/<str:day>/<str:id_user>', show_personal_app_for_driver, name='archive_personal_app'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
