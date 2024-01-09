@@ -26,7 +26,7 @@ class AUser:
             self.post = user.post
             self.telephone = user.telephone
             self.deleted = user.bd_status
-        except User.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -44,7 +44,7 @@ class AConstructionSite:
             self.address = construction_site.address
             self.foreman = AUser(construction_site.foreman_i) if construction_site.foreman_i is not None else None
             self.deleted = construction_site.bd_status
-        except ConstructionSite.objects.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -68,7 +68,7 @@ class ATechnic:
             self.supervisor = AUser(
                 technic.supervisor_i).id if technic.supervisor_i is not None else None
             self.deleted = technic.bd_status
-        except Technic.objects.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -85,7 +85,7 @@ class AWorkday:
             self.id = wday.id_W_D
             self.date = wday.date
             self.status = wday.status
-        except TWorkDay.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -103,7 +103,7 @@ class ATDriver:
             self.driver = AUser(driver.driver_i) if driver.driver_i is not None else None
             self.status = driver.status
             self.date = driver.date
-        except TDriver.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -122,7 +122,7 @@ class ATTechnicDriver:
             self.driver = ATDriver(tech_driver.driver_i) if tech_driver.driver_i is not None else None
             self.date = tech_driver.date
             self.status = tech_driver.status
-        except TTechnicDriver.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -140,7 +140,7 @@ class AApplicationMaterial:
             self.date = application_material.date
             self.app_to_day_id = application_material.app_for_day_i if application_material.app_for_day_i is not None else None
             self.description = application_material.description
-        except ApplicationMeterial.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -160,7 +160,7 @@ class AApplicationTechnic:
             self.technic_driver = ATTechnicDriver(application_technic.technic_driver_i) if application_technic.technic_driver_i is not None else None
             self.description = application_technic.description
             self.priority = application_technic.priority
-        except ApplicationTechnic.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def __str__(self):
@@ -184,7 +184,7 @@ class AApplicationToday:
             self._get_application_technic()
             self._get_applications_material()
 
-        except ApplicationToDay.DoesNotExist:
+        except Exception as e:
             self.exists = False
 
     def _get_application_technic(self):
