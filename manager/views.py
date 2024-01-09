@@ -238,7 +238,6 @@ def make_full_archive(request):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
-
 def make_backup_technics(id_technic=None, action='add'):
     if id_technic is None:
         technics = Technic.objects.all()
@@ -394,13 +393,14 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
             comm_date = TODAY - timedelta(days=60)
         else:
             comm_date = TODAY - timedelta(days=int(var_comm_date.value))
+        print(var_comm_date.value)
         mess = {}
         application_today = ApplicationToday.objects.filter(date__lt=comm_date)
         application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
         application_material = ApplicationMeterial.objects.filter(app_for_day__in=application_today)
         technic_driver = TechnicDriver.objects.filter(date__lt=comm_date)
         table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
-        work_day_table = WorkDayTabel.objects.filter(date__lt=comm_date-timedelta(days=30))
+        work_day_table = WorkDayTabel.objects.filter(date__lte=comm_date)
 
         app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
         if app.exists():
@@ -438,13 +438,12 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if _flag_delete:
             technic_driver.delete()
             table_drivers.delete()
-            work_day_table.delete()
+            work_day_table.filter(date__lt=comm_date-timedelta(days=30)).delete()
             application_material.delete()
             application_technic.delete()
             application_today.delete()
 
         # technic_driver----------------------------------------------------
-
 
 
         _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
