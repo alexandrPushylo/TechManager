@@ -393,16 +393,15 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
             comm_date = TODAY - timedelta(days=60)
         else:
             comm_date = TODAY - timedelta(days=int(var_comm_date.value))
-        print(var_comm_date.value)
         mess = {}
-        application_today = ApplicationToday.objects.filter(date__lt=comm_date)
+        application_today = ApplicationToday.objects.filter(date__lte=comm_date)
         application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
         application_material = ApplicationMeterial.objects.filter(app_for_day__in=application_today)
-        technic_driver = TechnicDriver.objects.filter(date__lt=comm_date)
-        table_drivers = DriverTabel.objects.filter(date__lt=comm_date)
+        technic_driver = TechnicDriver.objects.filter(date__lte=comm_date)
+        table_drivers = DriverTabel.objects.filter(date__lte=comm_date)
         work_day_table = WorkDayTabel.objects.filter(date__lte=comm_date)
 
-        app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
+        app = ApplicationToday.objects.filter(date__lte=comm_date).exclude(status=STATUS_APP_send)
         if app.exists():
             mess['app'] = app.count()
             if _flag_delete:
