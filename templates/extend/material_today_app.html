@@ -3,79 +3,117 @@
 {% block content %}
 
     {% block choosedate %}
-    <div class="container">
-        <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'show_today_materials' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3 p-0" type="date"   value="{{ cw_day }}"/>
-            {% else %}
-                <input class="form-control io_current_day border-success border border-3 p-0"  type="date"  value="{{ cw_day }}"/>
-                <a href="{% url 'show_today_materials' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
-            {% endif %}
+        <div class="container">
+            <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'today_materials' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'today_materials' nw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap">
+                <b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b>
+            </div>
         </div>
-    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
-    </div>
     {% endblock %}
-<div></div>
+    <div></div>
 
-<div class="container-lg  mx-auto mt-4">
+    
+    <div class="container-lg  mx-auto mt-4">
 
-<div class="btn-group dropend mt-2">
-    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fa-solid fa-filter"></i> {{ filter }}
-    </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day 'all' 'all' %}">Все</a></li>
-            <hr>
-            {% for forem in foreman_list %}
-            <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day forem.user_post.id 'all' %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
+        <div class="btn-group dropend mt-2">
+            <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fa-solid fa-person"></i>{% if filter_foreman %} {{ filter_foreman }}{% else %} Все{% endif %} 
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                        <form method="post" id="foreman_None" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="foreman" value="all">
+                            <input class="dropdown-item" form="foreman_None" type="submit" value="Все">
+                        </form>
+                    </li>
+                <hr>
+                {% for forem in foreman_list %}
+                    
+                    <li>
+                        <form method="post" id="foreman_{{ forem.user_post.pk }}" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="foreman" value="{{ forem.user_post.pk }}">
+                            <input class="dropdown-item" form="foreman_{{ forem.user_post.pk }}" type="submit" value="{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}">
+                        </form>
+                    </li>
+                    
+                    
+                {% endfor %}
+            </ul>
+        </div>
 
-    {% if constr_site %}
-    <div class="btn-group dropend mt-2">
-    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-filter"></i> {{ filter_constr_site }}
-    </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day 'current' 'all' %}">Все</a></li>
-            <hr>
-            {% for cs in constr_site %}
-            <li><a class="dropdown-item" href="{% url 'show_today_materials' cw_day 'current' cs.construction_site_id %}">{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+        {% if constr_site %}
+            <div class="btn-group dropend mt-2">
+                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fa-solid fa-tree-city"></i>{% if filter_constr_site %} {{ filter_constr_site }}{% else %} Все{% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                
+                    <li>
+                        <form method="post" id="constr_site_None" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="constr_site" value="all">
+                            <input class="dropdown-item" form="constr_site_None" type="submit" value="Все">
+                        </form>
+                    </li>
+                    <hr>
+                    {% for cs in constr_site %}
+                        
+                        <li>
+                        <form method="post" id="constr_site_{{ cs.construction_site_id }}" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="constr_site" value="{{ cs.construction_site_id }}">
+                            <input class="dropdown-item" form="constr_site_{{ cs.construction_site_id }}" type="submit" value="{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}">
+                        </form>
+                        </li>
+                        
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
-      {% for m in materials_list %}
-    <div class="container shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body">
-        <ul class="container-fluid" >
-                <div class="  " id="vehicle_list">
-                    <label class="ms-1 fw-bold">{{ m.app_for_day.construction_site.address}} ({{ m.app_for_day.construction_site.foreman.last_name }})  </label>
-                        <div class=" conteiner-fluid form-floating row mt-1 ">
-                            <div class="input-group form-floating p-0">
-                               <textarea  readonly class="form-control app_description mb-1 overflow-hidden" aria-label="With textarea" id="floatingInputValue" name="descr">{{ m.description }}</textarea>
+        {% for m in materials_list %}
+            <div class="container shadow-lg m-2" style="background-color: rgba(247,247,248,0.71)">
+                <div class="card-body">
+                    <ul class="container-fluid">
+                        <div class="  " id="vehicle_list">
+                            <label class="ms-1 fw-bold">{{ m.app_for_day.construction_site.address }}
+                                ({{ m.app_for_day.construction_site.foreman.last_name }}) </label>
+                            <div class=" conteiner-fluid form-floating row mt-1 ">
+                                <div class="input-group form-floating p-0">
+                                    <textarea readonly class="form-control app_description mb-1 overflow-hidden"
+                                              aria-label="With textarea" id="floatingInputValue"
+                                              name="descr">{{ m.description }}</textarea>
+                                </div>
                             </div>
                         </div>
+                    </ul>
                 </div>
-        </ul>
-      </div>
-    </div>
-      {% endfor %}
+            </div>
+        {% endfor %}
 
-</div>
+    </div>
 
 {% endblock %}
 
 {% block script %}{% load static %}
-    <script src="{% static "admin/js/scripts/today_application.js" %}"></script>
+    <script src="{% static "admin/js/scripts/today_materials.js" %}"></script>
 {% endblock %}
 
 {% block bottom_panel %}
-<div class="input-group d-flex justify-content-center align-items-center">
-    <a href="/" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
-    <a href="{% url 'show_today_applications' cw_day %}" class="btn btn-info col-auto m-1" aria-current="page">Техника</a>
-</div>
+    <div class="input-group d-flex justify-content-center align-items-center">
+        <a href="/" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
+        <a href="{% url 'show_today_applications' cw_day %}" class="btn btn-info col-auto m-1" aria-current="page">Техника</a>
+    </div>
 {% endblock %}

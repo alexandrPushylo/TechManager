@@ -1963,6 +1963,83 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     return render(request, "today_applications.html", out)
 
 
+def show_today_materials(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+
+    current_day = convert_str_to_date(day)
+    if 'materials' in request.path and current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_all_materials/{day}')
+    elif current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_all_app/{day}')
+    out = {}
+    get_prepare_data(out, request, current_day)
+    out["date_of_target"] = current_day
+
+    app_today = ApplicationToday.objects.filter(date=current_day).exclude(status=STATUS_APP_absent)
+
+    foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    out['foreman_list'] = foreman_list
+
+    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
+    F_foreman, F_constr_site = _FILTER.split(',')
+
+    if F_foreman == 'all':
+        constr_site_list = app_today.values('construction_site_id', 'construction_site__address')
+    else:
+        constr_site_list = app_today.filter(construction_site__foreman_id=F_foreman).values(
+            'construction_site_id',
+            'construction_site__address'
+        )
+    out['constr_site'] = constr_site_list
+
+    if request.method == "POST":
+        fil_foreman = request.POST.get('foreman')
+        fil_constr_site = request.POST.get('constr_site')
+
+        v = ['all', 'all']
+        if fil_foreman is not None:
+            v[0] = fil_foreman
+        elif fil_foreman == 'None':
+            v[0] = 'all'
+        else:
+            v[0] = F_foreman
+
+        if fil_constr_site is not None:
+            v[1] = fil_constr_site
+        elif fil_constr_site == 'None':
+            v[1] = 'all'
+        else:
+            v[1] = F_constr_site
+
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]}", user=request.user)
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    if F_foreman != 'all':
+        _app_today = app_today.filter(
+            construction_site__foreman_id=F_foreman
+        )
+        out['filter_foreman'] = User.objects.get(pk=F_foreman).last_name
+    else:
+        _app_today = app_today
+
+    if F_constr_site != 'all':
+        _app_today = _app_today.filter(
+            construction_site_id=F_constr_site
+        )
+        out['filter_constr_site'] = ConstructionSite.objects.get(pk=F_constr_site).address
+
+    app_materials = ApplicationMeterial.objects.filter(
+        app_for_day__in=_app_today,
+        status_checked=True
+    )
+
+    out['materials_list'] = app_materials
+
+    return render(request, 'extend/material_today_app.html', out)
+
+
 def show_info_application(request, id_application):
     if request.user.is_anonymous:
         return HttpResponseRedirect('/')
