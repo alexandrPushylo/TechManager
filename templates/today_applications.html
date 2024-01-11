@@ -2,96 +2,151 @@
 {% block content %}
 
     {% block choosedate %}
-    <div class="container">
-        <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
-            {% if cw_day == nw_day %}
-                <a href="{% url 'show_today_applications' lw_day %}" class="btn fw-light text-nowrap" aria-current="page">{{ lw_day }} <<</a>
-                <input class="form-control io_current_day border-success border border-3 p-0" type="date"   value="{{ cw_day }}"/>
-            {% else %}
-                <input class="form-control io_current_day border-success border border-3 p-0"  type="date"  value="{{ cw_day }}"/>
-                <a href="{% url 'show_today_applications' nw_day %}" class="btn fw-light text-nowrap" aria-current="page">>> {{ nw_day }}</a>
-            {% endif %}
+        <div class="container">
+            <div class="btn-group position-relative start-50 top-0 translate-middle-x ">
+                {% if cw_day == nw_day %}
+                    <a href="{% url 'show_today_applications' lw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">{{ lw_day }} <<</a>
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                {% else %}
+                    <input class="form-control io_current_day border-success border border-3 p-0" type="date"
+                           value="{{ cw_day }}"/>
+                    <a href="{% url 'show_today_applications' nw_day %}" class="btn fw-light text-nowrap"
+                       aria-current="page">>> {{ nw_day }}</a>
+                {% endif %}
+            </div>
+            <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap">
+                <b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b>
+            </div>
         </div>
-    <div class="position-absolute translate-middle-x  start-50  mb-2 text-nowrap"><b class="fs-5">{{ WEEKDAY }}, {{ DAY }}</b></div>
-    </div>
     {% endblock %}
 
-    <div class="btn-group dropend mt-5 ms-3">
-    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-filter"></i> {{ filter }}
-    </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'all' 'all' %}">Все</a></li>
-            <hr>
-            {% for forem in foreman_list %}
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day forem.user_post.id 'all' %}">{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}</a></li>
-            {% endfor %}
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'supply' 'all' %}">Снабжение</a></li>
-        </ul>
-    </div>
 
-    {% if constr_site %}
-    <div class="btn-group dropend mt-5 ms-3">
-    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-filter"></i> {{ filter_constr_site }}
-    </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'current' 'all' %}">Все</a></li>
-            <hr>
-            {% for cs in constr_site %}
-            <li><a class="dropdown-item" href="{% url 'show_today_applications' cw_day 'current' cs.construction_site_id %}">{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+    <div class="container-lg  mx-auto mt-4">
+        <div class="btn-group dropend mt-2">
+            <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fa-solid fa-person"></i>{% if filter_foreman %} {{ filter_foreman }}{% else %} Все{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <form method="post" id="foreman_None" enctype="multipart/form-data">{% csrf_token %}
+                        <input type="hidden" name="foreman" value="all">
+                        <input class="dropdown-item" form="foreman_None" type="submit" value="Все">
+                    </form>
+                </li>
+                <hr>
+                {% for forem in foreman_list %}
 
-<div class="container position-relative  mx-auto mt-1">
+                    <li>
+                        <form method="post" id="foreman_{{ forem.user_post.pk }}"
+                              enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="foreman" value="{{ forem.user_post.pk }}">
+                            <input class="dropdown-item" form="foreman_{{ forem.user_post.pk }}" type="submit"
+                                   value="{{ forem.user_post.last_name }} {{ forem.user_post.first_name }}">
+                        </form>
+                    </li>
 
-    <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
-      {% for v in today_technic_applications %}
-    <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">
-      <div class="card-body">
-        <ul class="container-fluid" >
 
-                <div class="  " id="vehicle_list">
-                    <label class="ms-1 fw-bold"
-                            {% for c in v.3 %}
-                            {% if c in conflicts_vehicles_list_id %}
-                                style="color: red"
-                            {% endif %}
-                           {% endfor %}
-                    >   {% if v.0 %}{{ v.0 }}
-                        {% else %}Водитель не назначен
-                        {% endif %}
-                        ({{ v.1 }})  </label>
+                {% endfor %}
+            </ul>
+        </div>
 
-                        {% for d in v.2 %}
-                        <div class=" conteiner-fluid form-floating row mt-1 ">
-                        <input type="hidden" name="prior_id" value="{{ d.id }}"/>
-                            <div class="input-group form-floating p-0 mb-1">
-                                {% if post == 'admin' %}
 
-                                <span class="input-group-text {% if d.id in priority_list %} border border-2 border-primary{% endif %}">
+        {% if constr_site %}
+            <div class="btn-group dropend mt-2">
+                <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fa-solid fa-tree-city"></i>{% if filter_constr_site %} {{ filter_constr_site }}{% else %} Все{% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                
+                    <li>
+                        <form method="post" id="constr_site_None" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="constr_site" value="all">
+                            <input class="dropdown-item" form="constr_site_None" type="submit" value="Все">
+                        </form>
+                    </li>
+                    <hr>
+                    {% for cs in constr_site %}
+                        
+                        <li>
+                        <form method="post" id="constr_site_{{ cs.construction_site_id }}" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="constr_site" value="{{ cs.construction_site_id }}">
+                            <input class="dropdown-item" form="constr_site_{{ cs.construction_site_id }}" type="submit" value="{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}">
+                        </form>
+                        </li>
+                        
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+
+
+        <div class="container position-relative  mx-auto mt-1">
+
+            <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
+
+            
+                {% for v in today_technic_applications %}
+                    <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">
+                        <div class="card-body">
+                            <ul class="container-fluid">
+
+                                <div class="  " id="vehicle_list">
+                                    <label class="ms-1 fw-bold"
+                                            {% for c in v.3 %}
+                                                {% if c in conflicts_vehicles_list_id %}
+                                           style="color: red"
+                                                {% endif %}
+                                            {% endfor %}
+                                    >   {% if v.0 %}{{ v.0 }}
+                                    {% else %}Водитель не назначен
+                                    {% endif %}
+                                        ({{ v.1 }}) </label>
+
+                                    {% for d in v.2 %}
+                                        <div class=" conteiner-fluid form-floating row mt-1 ">
+                                            <input type="hidden" name="prior_id" value="{{ d.id }}"/>
+                                            <div class="input-group form-floating p-0 mb-1">
+                                                {% if post == 'admin' %}
+
+                                                    <span class="input-group-text {% if d.id in priority_list %} border border-2 border-primary{% endif %}">
                                 <input type="number" min="1" id="priority_{{ d.id }}" name="priority"
-                               class="priority   col-auto  " value="{{ d.priority }}" style="max-width: 50px; margin-left: -5px;"/>
+                                       class="priority   col-auto  " value="{{ d.priority }}"
+                                       style="max-width: 50px; margin-left: -5px;"/>
                                 </span>
 
-                                {% endif %}
+                                                {% endif %}
 
-                                <textarea {% if post != 'admin' or not tense %} readonly {% endif %} class="form-control app_description overflow-hidden" aria-label="With textarea" id="floatingInputValue" name="descr">{{ d.description }}</textarea>
-                                 {% if d.app_for_day.construction_site.foreman.last_name %}
-                                <label for="floatingInputValue" class="fw-bold text-nowrap" style="color: black; margin-left: 60px; margin-top: -10px">{{ d.app_for_day.construction_site.foreman.last_name }} ({{ d.app_for_day.construction_site.address }})</label>
-                                {% endif %}
-                            </div>
+                                                <textarea {% if post != 'admin' or not tense %} readonly {% endif %}
+                                                                                                class="form-control app_description overflow-hidden"
+                                                                                                aria-label="With textarea"
+                                                                                                id="floatingInputValue"
+                                                                                                name="descr">{{ d.description }}</textarea>
+                                                {% if d.app_for_day.construction_site.address %}
+                                                    <label for="floatingInputValue" class="fw-bold text-nowrap"
+                                                           style="color: black; margin-left: 60px; margin-top: -10px">{{ d.app_for_day.construction_site.foreman.last_name }}
+                                                        ({{ d.app_for_day.construction_site.address }})</label>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </ul>
                         </div>
-                      {% endfor %}
-                </div>
-        </ul>
-      </div>
+                    </div>
+                {% endfor %}
+
+            
+            
+            
+            
+            </form>
+        </div>
     </div>
-      {% endfor %}
-      </form>
-</div>
 
 {% endblock %}
 
@@ -100,15 +155,15 @@
 {% endblock %}
 
 {% block bottom_panel %}
-<div class="input-group d-flex justify-content-center align-items-center">
-    {% if post == 'admin' %}
-    <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
-    {% if tense %}
-    <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить">
-    {% endif %}
+    <div class="input-group d-flex justify-content-center align-items-center">
+        {% if post == 'admin' %}
+            <a href="{% url 'application_list' cw_day %}" class="btn btn-primary col-auto  m-1" aria-current="page">Назад</a>
+            {% if tense %}
+                <input form="priority_form" class="btn btn-success  col-auto   m-1" type="submit" value="Сохранить">
+            {% endif %}
         {% else %}
-        <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
-    {% endif %}
-    <a href="{% url 'show_today_materials' cw_day %}" class="btn btn-info col-auto m-1" aria-current="page">Материалы</a>
-</div>
+            <a href="/" class="btn btn-primary col-auto m-1" aria-current="page">Назад</a>
+        {% endif %}
+        <a href="{% url 'today_materials' cw_day %}" class="btn btn-info col-auto m-1" aria-current="page">Материалы</a>
+    </div>
 {% endblock %}

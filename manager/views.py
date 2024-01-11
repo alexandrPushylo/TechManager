@@ -1848,71 +1848,74 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
 
     current_day = convert_str_to_date(day)
 
-    if 'materials' in request.path and current_day < TODAY:
-        return HttpResponseRedirect(f'/archive_all_materials/{day}')
-    elif current_day < TODAY:
+    if current_day < TODAY:
         return HttpResponseRedirect(f'/archive_all_app/{day}')
 
     out = {}
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
 
-    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
-    if not _FILTER:
-        _FILTER = ['all', 'all']  # foreman, constr_site
-    else:
-        _FILTER = _FILTER.split(',')
-
-    if filter_foreman:
-        if filter_foreman == 'current':
-            pass
-        elif filter_foreman != _FILTER[0]:
-            _FILTER[0] = filter_foreman
-        if filter_csite != _FILTER[1]:
-            _FILTER[1] = filter_csite
-        set_var(VAR['FILTER_APP_TODAY'], value=f"{_FILTER[0]},{_FILTER[1]}", user=request.user)
+    app_today = ApplicationToday.objects.filter(date=current_day).exclude(status=STATUS_APP_absent)
 
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
-    _application_today = ApplicationToday.objects.filter(date=current_day)
+    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
+    F_foreman, F_constr_site = _FILTER.split(',')
 
-    if str(_FILTER[0]) == 'supply':
-        application_today = _application_today.filter(
-            construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
-        out['filter'] = TEXT_TEMPLATES['constr_site_supply_name']
-
-    elif str(_FILTER[0]).isnumeric():
-        _id_foreman = int(_FILTER[0])
-        application_today = _application_today.filter(construction_site__foreman_id=_id_foreman)
-        out['filter'] = User.objects.get(id=_id_foreman).last_name
-
-        constr_site = application_today.exclude(
-            status=STATUS_APP_absent).values(
+    if F_foreman == 'all':
+        constr_site_list = app_today.values('construction_site_id', 'construction_site__address')
+    else:
+        constr_site_list = app_today.filter(construction_site__foreman_id=F_foreman).values(
             'construction_site_id',
             'construction_site__address'
         )
-        out['constr_site'] = constr_site
+    out['constr_site'] = constr_site_list
 
-        try:
-            id_constr_site = int(_FILTER[1])
-            application_today = application_today.filter(construction_site_id=id_constr_site)
-            out['filter_constr_site'] = application_today.values_list('construction_site__address', flat=True)[0]
-        except ValueError:
-            out['filter_constr_site'] = 'Все'
+    if request.method == "POST":
+        fil_foreman = request.POST.get('foreman')
+        fil_constr_site = request.POST.get('constr_site')
 
+        v = ['all', 'all']
+        if fil_foreman is not None:
+            v[0] = fil_foreman
+        elif fil_foreman == 'None':
+            v[0] = 'all'
+        else:
+            v[0] = F_foreman
+
+        if fil_constr_site is not None:
+            v[1] = fil_constr_site
+        elif fil_constr_site == 'None':
+            v[1] = 'all'
+        else:
+            v[1] = F_constr_site
+
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]}", user=request.user)
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
+#   ============================================================================
+
+    if F_foreman == 'all':
+        _app_today = app_today
+    elif F_foreman == 'supply':
+        _app_today = app_today.filter(construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
+        out['filter_foreman'] = TEXT_TEMPLATES['constr_site_supply_name']
+    elif F_foreman is not None:
+        _app_today = app_today.filter(construction_site__foreman_id=F_foreman)
+        out['filter_foreman'] = User.objects.get(pk=F_foreman).last_name
     else:
-        application_today = _application_today
-        out['filter'] = 'Все'
+        _app_today = app_today
 
-    if 'materials' in request.path:
-        _application_materials = ApplicationMeterial.objects.filter(
-            app_for_day__in=application_today,
-            status_checked=True)
-        out['materials_list'] = _application_materials
-        return render(request, "extend/material_today_app.html", out)
+    if F_constr_site != 'all':
+        _app_today = _app_today.filter(construction_site_id=F_constr_site)
+        out['filter_constr_site'] = ConstructionSite.objects.get(pk=F_constr_site).address
 
-    _application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
+    # ----------------------------------------------------------
+
+    _application_technic = ApplicationTechnic.objects.filter(app_for_day__in=_app_today)
     _app = _application_technic
 
     if is_admin(request.user):
@@ -1929,19 +1932,21 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         'technic_driver__technic__name__name').order_by(
         'technic_driver__driver__driver__last_name').distinct()
 
-    # ----------------------------------------------------------
-
     app_list = []
     for _drv, _tech in driver_technic:
         desc = app_tech_day.filter(
             technic_driver__driver__driver__last_name=_drv,
             technic_driver__technic__name__name=_tech).order_by('priority')
+
         _id_list = [_[0] for _ in desc.values_list('id')]
 
         if (_drv, _tech, desc, _id_list) not in app_list:
             app_list.append((_drv, _tech, desc, _id_list))
 
     out["today_technic_applications"] = app_list
+
+#   ======================================================================
+
     if is_admin(request.user):
         out["priority_list"] = get_priority_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
