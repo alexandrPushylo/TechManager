@@ -82,6 +82,53 @@
                 </ul>
             </div>
         {% endif %}
+    
+            <div class="btn-group dropend mt-2">
+                <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fa-regular fa-object-group"></i>{% if filter_group_by %} {{ filter_group_by }}{% else %} Группировка{% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                
+                    <li>
+                        <form method="post" id="group_None" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="group" value="all">
+                            <input class="dropdown-item" form="group_None" type="submit" value="Все">
+                        </form>
+                    </li>
+                    <hr class="m-0">
+                    {% for gb in filter_group_by %}
+                        
+                        <li>
+                        <form method="post" id="group_{{ gb.id }}" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="group" value="{{ gb.id }}">
+                            <input class="dropdown-item m-0 p-1" form="group_{{ gb.id }}" type="submit" value="{{ gb.1 }}">
+                        </form>
+                        </li>
+                        
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="btn-group dropend mt-2">
+                <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <i class="fa-solid fa-arrow-up-wide-short"></i>{% if filter_sorting %} {{ filter_sorting }}{% else %} Сортировка{% endif %}
+                </button>
+                <ul class="dropdown-menu">               
+                    
+                    {% for k, v in filter_sorting.items %}
+                        
+                        <li>
+                        <form method="post" id="sort_{{ k }}" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="sort" value="{{ k }}">
+                            <input class="dropdown-item m-0 p-1" form="sort_{{ k }}" type="submit" value="{{ v }}">
+                        </form>
+                        </li>
+                        
+                    {% endfor %}
+                </ul>
+            </div>
 
 
 

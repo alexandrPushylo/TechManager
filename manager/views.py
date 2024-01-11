@@ -1913,6 +1913,17 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         _app_today = _app_today.filter(construction_site_id=F_constr_site)
         out['filter_constr_site'] = ConstructionSite.objects.get(pk=F_constr_site).address
 
+    # if F_groupby
+
+    out['filter_group_by'] = sorted(set(Technic.objects.filter().values_list(
+        'name_id', 'name__name')), key=lambda x: x[1])
+
+    out['filter_sorting'] = {
+        'driver': 'Водители',
+        'technic': 'Техника',
+        'constr_site': 'Объекты'
+        }
+
     # ----------------------------------------------------------
 
     _application_technic = ApplicationTechnic.objects.filter(app_for_day__in=_app_today)
