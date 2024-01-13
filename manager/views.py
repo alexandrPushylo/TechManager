@@ -436,7 +436,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
 
         # technic_driver----------------------------------------------------
 
-        _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
+        _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY)
         if _var.exists():
             mess['sent_var'] = _var.count()
             if _flag_delete:
