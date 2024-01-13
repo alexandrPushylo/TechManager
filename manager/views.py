@@ -1857,8 +1857,19 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
+    out['filter_group_by_list'] = sorted(set(Technic.objects.filter().values_list(
+        'name_id', 'name__name')), key=lambda x: x[1])
+
+    out['filter_sorting_list'] = TEXT_TEMPLATES['filter_sorting_list']
+
     _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
-    F_foreman, F_constr_site = _FILTER.split(',')
+    try:
+        F_foreman, F_constr_site, F_group, F_sort = _FILTER.split(',')
+    except ValueError:
+        F_foreman = 'all'
+        F_constr_site = 'all'
+        F_group = 'all'
+        F_sort = 'all'
 
     if F_foreman == 'all':
         constr_site_list = app_today.values('construction_site_id', 'construction_site__address')
@@ -1872,8 +1883,11 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     if request.method == "POST":
         fil_foreman = request.POST.get('foreman')
         fil_constr_site = request.POST.get('constr_site')
+        fil_group = request.POST.get('group')
+        fil_sort = request.POST.get('sort')
 
-        v = ['all', 'all']
+        v = ['all', 'all', 'all', 'all']
+
         if fil_foreman is not None:
             v[0] = fil_foreman
         elif fil_foreman == 'None':
@@ -1888,10 +1902,22 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         else:
             v[1] = F_constr_site
 
-        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]}", user=request.user)
+        if fil_group is not None:
+            v[2] = fil_group
+        elif fil_group == 'None':
+            v[2] = 'all'
+        else:
+            v[2] = F_group
+
+        if fil_sort is not None:
+            v[3] = fil_sort
+        elif fil_sort == 'None':
+            v[3] = 'all'
+        else:
+            v[3] = F_sort
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]},{v[2]},{v[3]}", user=request.user)
 
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
-
 
 #   ============================================================================
 
@@ -1910,21 +1936,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         _app_today = _app_today.filter(construction_site_id=F_constr_site)
         out['filter_constr_site'] = ConstructionSite.objects.get(pk=F_constr_site).address
 
-    # if F_groupby
-
-    out['filter_group_by'] = sorted(set(Technic.objects.filter().values_list(
-        'name_id', 'name__name')), key=lambda x: x[1])
-
-    out['filter_sorting'] = {
-        'driver': 'Водители',
-        'technic': 'Техника',
-        'constr_site': 'Объекты'
-        }
-
-    # ----------------------------------------------------------
-
-    _application_technic = ApplicationTechnic.objects.filter(app_for_day__in=_app_today)
-    _app = _application_technic
+    _app = ApplicationTechnic.objects.filter(app_for_day__in=_app_today)
 
     if is_admin(request.user):
         app_tech_day = _app.filter(
@@ -1935,10 +1947,41 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     else:
         app_tech_day = _app.filter(app_for_day__status=STATUS_APP_send).exclude(var_check=True)
 
-    driver_technic = app_tech_day.values_list(
-        'technic_driver__driver__driver__last_name',
-        'technic_driver__technic__name__name').order_by(
-        'technic_driver__driver__driver__last_name').distinct()
+    if F_group != 'all':
+        app_tech_day = app_tech_day.filter(technic_driver__technic__name_id=F_group)
+        for gby in out['filter_group_by_list']:
+            if f'{gby[0]}' == F_group:
+                out['filter_group_by'] = gby[1]
+    else:
+        pass
+
+    if F_sort == 'driver':
+        driver_technic = app_tech_day.values_list(
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name').order_by(
+            'technic_driver__driver__driver__last_name').distinct()
+        out['filter_sorting'] = TEXT_TEMPLATES['filter_sorting_list']['driver']
+
+    elif F_sort == 'technic':
+        driver_technic = app_tech_day.values_list(
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name').order_by(
+            'technic_driver__technic__name__name').distinct()
+        out['filter_sorting'] = TEXT_TEMPLATES['filter_sorting_list']['technic']
+
+    # elif F_sort == 'constr_site':
+        # driver_technic = app_tech_day.values_list(
+        #     'technic_driver__driver__driver__last_name',
+        #     'technic_driver__technic__name__name').order_by(
+        #     'technic_driver__technic__name__name').distinct()
+        # out['filter_sorting'] = TEXT_TEMPLATES['filter_sorting_list']['constr_site']
+        # pass
+
+    else:
+        driver_technic = app_tech_day.values_list(
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name').order_by(
+            'technic_driver__technic__name__name').distinct()
 
     app_list = []
     for _drv, _tech in driver_technic:
@@ -1950,6 +1993,8 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
 
         if (_drv, _tech, desc, _id_list) not in app_list:
             app_list.append((_drv, _tech, desc, _id_list))
+
+
 
     out["today_technic_applications"] = app_list
 
