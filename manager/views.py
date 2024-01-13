@@ -326,13 +326,6 @@ def make_backup_work_day_table(work_day_list: list = None):
         work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY)
         # work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY - timedelta(days=1))
 
-
-    # for _wd in work_day_list:
-    #     aTWorkDay.objects.using(ARCHIVE_DB).get_or_create(
-    #         id_W_D=_wd.pk,
-    #         date=_wd.date,
-    #         status=_wd.status
-    #     )
     for _wd in work_day_list:
         aTWorkDay.objects.using(ARCHIVE_DB).update_or_create(
             id_W_D=_wd.pk, defaults={
@@ -432,8 +425,6 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if application_today.exists():
             mess['application_today'] = application_today.count()
 
-
-
         # delete db ---------------------------------------------------------
         if _flag_delete:
             technic_driver.delete()
@@ -444,7 +435,6 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
             application_today.delete()
 
         # technic_driver----------------------------------------------------
-
 
         _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
         if _var.exists():
@@ -470,6 +460,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
 
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
+# LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
 
 # ------FUNCTION VIEW----------------------
 
