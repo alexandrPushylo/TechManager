@@ -58,10 +58,11 @@
             <div class="btn-group dropend mt-2">
                 <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                    <i class="fa-solid fa-tree-city"></i>{% if filter_constr_site %} {{ filter_constr_site }}{% else %} Все{% endif %}
+                    <i class="fa-solid fa-tree-city"></i>{% if filter_constr_site %} {{ filter_constr_site }}{% else %}
+                    Все{% endif %}
                 </button>
                 <ul class="dropdown-menu">
-                
+
                     <li>
                         <form method="post" id="constr_site_None" enctype="multipart/form-data">{% csrf_token %}
                             <input type="hidden" name="constr_site" value="all">
@@ -70,73 +71,80 @@
                     </li>
                     <hr>
                     {% for cs in constr_site %}
-                        
+
                         <li>
-                        <form method="post" id="constr_site_{{ cs.construction_site_id }}" enctype="multipart/form-data">{% csrf_token %}
-                            <input type="hidden" name="constr_site" value="{{ cs.construction_site_id }}">
-                            <input class="dropdown-item" form="constr_site_{{ cs.construction_site_id }}" type="submit" value="{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}">
-                        </form>
+                            <form method="post" id="constr_site_{{ cs.construction_site_id }}"
+                                  enctype="multipart/form-data">{% csrf_token %}
+                                <input type="hidden" name="constr_site" value="{{ cs.construction_site_id }}">
+                                <input class="dropdown-item" form="constr_site_{{ cs.construction_site_id }}"
+                                       type="submit"
+                                       value="{{ cs.construction_site__address }} {{ cs.construction_site__foreman__last_name }}">
+                            </form>
                         </li>
-                        
+
                     {% endfor %}
                 </ul>
             </div>
         {% endif %}
-    
-            <div class="btn-group dropend mt-2">
-                <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    <i class="fa-regular fa-object-group"></i>{% if filter_group_by %} {{ filter_group_by }}{% else %} Группировка{% endif %}
-                </button>
-                <ul class="dropdown-menu">
-                
+
+
+        <div class="btn-group dropend mt-2">
+            <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fa-solid fa-arrow-up-wide-short"></i>{% if filter_sorting %} {{ filter_sorting }}{% else %}
+                Сортировка{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+
+                {% for k, v in filter_sorting_list.items %}
+
                     <li>
-                        <form method="post" id="group_None" enctype="multipart/form-data">{% csrf_token %}
-                            <input type="hidden" name="group" value="all">
-                            <input class="dropdown-item" form="group_None" type="submit" value="Все">
-                        </form>
-                    </li>
-                    <hr class="m-0">
-                    {% for gb in filter_group_by %}
-                        
-                        <li>
-                        <form method="post" id="group_{{ gb.id }}" enctype="multipart/form-data">{% csrf_token %}
-                            <input type="hidden" name="group" value="{{ gb.id }}">
-                            <input class="dropdown-item m-0 p-1" form="group_{{ gb.id }}" type="submit" value="{{ gb.1 }}">
-                        </form>
-                        </li>
-                        
-                    {% endfor %}
-                </ul>
-            </div>
-            
-            <div class="btn-group dropend mt-2">
-                <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                    <i class="fa-solid fa-arrow-up-wide-short"></i>{% if filter_sorting %} {{ filter_sorting }}{% else %} Сортировка{% endif %}
-                </button>
-                <ul class="dropdown-menu">               
-                    
-                    {% for k, v in filter_sorting.items %}
-                        
-                        <li>
                         <form method="post" id="sort_{{ k }}" enctype="multipart/form-data">{% csrf_token %}
                             <input type="hidden" name="sort" value="{{ k }}">
                             <input class="dropdown-item m-0 p-1" form="sort_{{ k }}" type="submit" value="{{ v }}">
                         </form>
-                        </li>
-                        
-                    {% endfor %}
-                </ul>
-            </div>
+                    </li>
 
+                {% endfor %}
+            </ul>
+        </div>
+    
+
+        <div class="btn-group dropend mt-2">
+            <button type="button" class="btn btn-sm btn-outline-warning dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <i class="fa-regular fa-object-group"></i>{% if filter_group_by %} {{ filter_group_by }}{% else %}
+                Группировка{% endif %}
+            </button>
+            <ul class="dropdown-menu">
+
+                <li>
+                    <form method="post" id="group_None" enctype="multipart/form-data">{% csrf_token %}
+                        <input type="hidden" name="group" value="all">
+                        <input class="dropdown-item" form="group_None" type="submit" value="Все">
+                    </form>
+                </li>
+                <hr class="m-0">
+                {% for gb in filter_group_by_list %}
+
+                    <li>
+                        <form method="post" id="group_{{ gb.0 }}" enctype="multipart/form-data">{% csrf_token %}
+                            <input type="hidden" name="group" value="{{ gb.0 }}">
+                            <input class="dropdown-item m-0 p-1" form="group_{{ gb.0 }}" type="submit"
+                                   value="{{ gb.1 }}">
+                        </form>
+                    </li>
+
+                {% endfor %}
+            </ul>
+        </div>
 
 
         <div class="container position-relative  mx-auto mt-1">
 
             <form method="post" id="priority_form" enctype="multipart/form-data">{% csrf_token %}
 
-            
+
                 {% for v in today_technic_applications %}
                     <div class="shadow-lg m-2 ps-2 pe-2" style="background-color: rgba(247,247,248,0.71);">
                         <div class="card-body">
@@ -187,10 +195,7 @@
                     </div>
                 {% endfor %}
 
-            
-            
-            
-            
+
             </form>
         </div>
     </div>
