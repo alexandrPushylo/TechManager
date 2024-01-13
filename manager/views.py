@@ -2747,7 +2747,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['referer'] = request.headers.get('Referer')
     out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day(
         'next_day').weekday() == 5 and current_day.weekday() == 0
-    out['LOG_DB'] = LOG_DB
+    out['LOG_DB'] = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
 
     return out
 
