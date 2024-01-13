@@ -323,15 +323,9 @@ def make_backup_driver_table(driver_list: list = None):
 
 def make_backup_work_day_table(work_day_list: list = None):
     if work_day_list is None:
-        work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY-timedelta(days=1))
+        work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY)
+        # work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY - timedelta(days=1))
 
-
-    # for _wd in work_day_list:
-    #     aTWorkDay.objects.using(ARCHIVE_DB).get_or_create(
-    #         id_W_D=_wd.pk,
-    #         date=_wd.date,
-    #         status=_wd.status
-    #     )
     for _wd in work_day_list:
         aTWorkDay.objects.using(ARCHIVE_DB).update_or_create(
             id_W_D=_wd.pk, defaults={
@@ -386,11 +380,11 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
         return "date_of_last_clean_db is not exists"
-    if (TODAY - timedelta(days=2)) > var_date_clean.date:
+    if (TODAY - timedelta(days=1)) > var_date_clean.date:
         # var_comm_date = get_var(var=VAR['LIMIT_for_apps'])
         var_comm_date = Variable.objects.get_or_create(name=VAR['LIMIT_for_apps'])[0]
         if var_comm_date.value is None:
-            comm_date = TODAY - timedelta(days=60)
+            comm_date = TODAY - timedelta(days=1)
         else:
             comm_date = TODAY - timedelta(days=int(var_comm_date.value))
         mess = {}
@@ -431,8 +425,6 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
         if application_today.exists():
             mess['application_today'] = application_today.count()
 
-
-
         # delete db ---------------------------------------------------------
         if _flag_delete:
             technic_driver.delete()
@@ -443,7 +435,6 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
             application_today.delete()
 
         # technic_driver----------------------------------------------------
-
 
         _var = Variable.objects.filter(name=VAR['sent_app'], date__lt=TODAY - timedelta(days=2))
         if _var.exists():
@@ -469,11 +460,8 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
 
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
+# LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
 
-LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
-
-
-# print(LOG_DB)
 # ------FUNCTION VIEW----------------------
 
 
@@ -1848,72 +1836,98 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
 
     current_day = convert_str_to_date(day)
 
-    if 'materials' in request.path and current_day < TODAY:
-        return HttpResponseRedirect(f'/archive_all_materials/{day}')
-    elif current_day < TODAY:
+    if current_day < TODAY:
         return HttpResponseRedirect(f'/archive_all_app/{day}')
 
     out = {}
     get_prepare_data(out, request, current_day)
     out["date_of_target"] = current_day
 
-    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
-    if not _FILTER:
-        _FILTER = ['all', 'all']  # foreman, constr_site
-    else:
-        _FILTER = _FILTER.split(',')
-
-    if filter_foreman:
-        if filter_foreman == 'current':
-            pass
-        elif filter_foreman != _FILTER[0]:
-            _FILTER[0] = filter_foreman
-        if filter_csite != _FILTER[1]:
-            _FILTER[1] = filter_csite
-        set_var(VAR['FILTER_APP_TODAY'], value=f"{_FILTER[0]},{_FILTER[1]}", user=request.user)
+    app_today = ApplicationToday.objects.filter(date=current_day).exclude(status=STATUS_APP_absent)
 
     foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
     out['foreman_list'] = foreman_list
 
-    _application_today = ApplicationToday.objects.filter(date=current_day)
+    out['filter_group_by_list'] = sorted(set(Technic.objects.filter().values_list(
+        'name_id', 'name__name')), key=lambda x: x[1])
 
-    if str(_FILTER[0]) == 'supply':
-        application_today = _application_today.filter(
-            construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
-        out['filter'] = TEXT_TEMPLATES['constr_site_supply_name']
+    out['filter_sorting_list'] = TEXT_TEMPLATES['filter_sorting_list']
 
-    elif str(_FILTER[0]).isnumeric():
-        _id_foreman = int(_FILTER[0])
-        application_today = _application_today.filter(construction_site__foreman_id=_id_foreman)
-        out['filter'] = User.objects.get(id=_id_foreman).last_name
+    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
+    try:
+        F_foreman, F_constr_site, F_group, F_sort = _FILTER.split(',')
+    except ValueError:
+        F_foreman = 'all'
+        F_constr_site = 'all'
+        F_group = 'all'
+        F_sort = 'all'
 
-        constr_site = application_today.exclude(
-            status=STATUS_APP_absent).values(
+    if F_foreman == 'all':
+        constr_site_list = app_today.values('construction_site_id', 'construction_site__address')
+    else:
+        constr_site_list = app_today.filter(construction_site__foreman_id=F_foreman).values(
             'construction_site_id',
             'construction_site__address'
         )
-        out['constr_site'] = constr_site
+    out['constr_site'] = constr_site_list
 
-        try:
-            id_constr_site = int(_FILTER[1])
-            application_today = application_today.filter(construction_site_id=id_constr_site)
-            out['filter_constr_site'] = application_today.values_list('construction_site__address', flat=True)[0]
-        except ValueError:
-            out['filter_constr_site'] = 'Все'
+    if request.method == "POST":
+        fil_foreman = request.POST.get('foreman')
+        fil_constr_site = request.POST.get('constr_site')
+        fil_group = request.POST.get('group')
+        fil_sort = request.POST.get('sort')
 
+        v = ['all', 'all', 'all', 'all']
+
+        if fil_foreman is not None:
+            v[0] = fil_foreman
+        elif fil_foreman == 'None':
+            v[0] = 'all'
+        else:
+            v[0] = F_foreman
+
+        if fil_constr_site is not None:
+            v[1] = fil_constr_site
+        elif fil_constr_site == 'None':
+            v[1] = 'all'
+        else:
+            v[1] = F_constr_site
+
+        if fil_group is not None:
+            v[2] = fil_group
+        elif fil_group == 'None':
+            v[2] = 'all'
+        else:
+            v[2] = F_group
+
+        if fil_sort is not None:
+            v[3] = fil_sort
+        elif fil_sort == 'None':
+            v[3] = 'all'
+        else:
+            v[3] = F_sort
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]},{v[2]},{v[3]}", user=request.user)
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+#   ============================================================================
+
+    if F_foreman == 'all':
+        _app_today = app_today
+    elif F_foreman == 'supply':
+        _app_today = app_today.filter(construction_site__address=TEXT_TEMPLATES['constr_site_supply_name'])
+        out['filter_foreman'] = TEXT_TEMPLATES['constr_site_supply_name']
+    elif F_foreman is not None:
+        _app_today = app_today.filter(construction_site__foreman_id=F_foreman)
+        out['filter_foreman'] = User.objects.get(pk=F_foreman).last_name
     else:
-        application_today = _application_today
-        out['filter'] = 'Все'
+        _app_today = app_today
 
-    if 'materials' in request.path:
-        _application_materials = ApplicationMeterial.objects.filter(
-            app_for_day__in=application_today,
-            status_checked=True)
-        out['materials_list'] = _application_materials
-        return render(request, "extend/material_today_app.html", out)
+    if F_constr_site != 'all':
+        _app_today = _app_today.filter(construction_site_id=F_constr_site)
+        out['filter_constr_site'] = ConstructionSite.objects.get(pk=F_constr_site).address
 
-    _application_technic = ApplicationTechnic.objects.filter(app_for_day__in=application_today)
-    _app = _application_technic
+    _app = ApplicationTechnic.objects.filter(app_for_day__in=_app_today)
 
     if is_admin(request.user):
         app_tech_day = _app.filter(
@@ -1924,24 +1938,59 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
     else:
         app_tech_day = _app.filter(app_for_day__status=STATUS_APP_send).exclude(var_check=True)
 
-    driver_technic = app_tech_day.values_list(
-        'technic_driver__driver__driver__last_name',
-        'technic_driver__technic__name__name').order_by(
-        'technic_driver__driver__driver__last_name').distinct()
+    if F_group != 'all':
+        app_tech_day = app_tech_day.filter(technic_driver__technic__name_id=F_group)
+        for gby in out['filter_group_by_list']:
+            if f'{gby[0]}' == F_group:
+                out['filter_group_by'] = gby[1]
+    else:
+        pass
 
-    # ----------------------------------------------------------
+    if F_sort == 'driver':
+        driver_technic = app_tech_day.values_list(
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name').order_by(
+            'technic_driver__driver__driver__last_name').distinct()
+        out['filter_sorting'] = TEXT_TEMPLATES['filter_sorting_list']['driver']
+
+    elif F_sort == 'technic':
+        driver_technic = app_tech_day.values_list(
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name').order_by(
+            'technic_driver__technic__name__name').distinct()
+        out['filter_sorting'] = TEXT_TEMPLATES['filter_sorting_list']['technic']
+
+    # elif F_sort == 'constr_site':
+        # driver_technic = app_tech_day.values_list(
+        #     'technic_driver__driver__driver__last_name',
+        #     'technic_driver__technic__name__name').order_by(
+        #     'technic_driver__technic__name__name').distinct()
+        # out['filter_sorting'] = TEXT_TEMPLATES['filter_sorting_list']['constr_site']
+        # pass
+
+    else:
+        driver_technic = app_tech_day.values_list(
+            'technic_driver__driver__driver__last_name',
+            'technic_driver__technic__name__name').order_by(
+            'technic_driver__technic__name__name').distinct()
 
     app_list = []
     for _drv, _tech in driver_technic:
         desc = app_tech_day.filter(
             technic_driver__driver__driver__last_name=_drv,
             technic_driver__technic__name__name=_tech).order_by('priority')
+
         _id_list = [_[0] for _ in desc.values_list('id')]
 
         if (_drv, _tech, desc, _id_list) not in app_list:
             app_list.append((_drv, _tech, desc, _id_list))
 
+
+
     out["today_technic_applications"] = app_list
+
+#   ======================================================================
+
     if is_admin(request.user):
         out["priority_list"] = get_priority_list(current_day)
         out['conflicts_vehicles_list_id'] = get_conflicts_vehicles_list(current_day)
@@ -1961,6 +2010,105 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
         return HttpResponseRedirect(f'/today_app/{day}')
 
     return render(request, "today_applications.html", out)
+
+
+def show_today_materials(request, day):
+    if request.user.is_anonymous:
+        return HttpResponseRedirect('/')
+
+    current_day = convert_str_to_date(day)
+    if current_day < TODAY:
+        return HttpResponseRedirect(f'/archive_all_materials/{day}')
+    # elif current_day < TODAY:
+    #     return HttpResponseRedirect(f'/archive_all_app/{day}')
+    out = {}
+    get_prepare_data(out, request, current_day)
+    out["date_of_target"] = current_day
+
+    app_today = ApplicationToday.objects.filter(date=current_day).exclude(status=STATUS_APP_absent)
+
+    foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    out['foreman_list'] = foreman_list
+
+    _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
+    try:
+        F_foreman, F_constr_site, F_group, F_sort = _FILTER.split(',')
+    except ValueError:
+        F_foreman = 'all'
+        F_constr_site = 'all'
+        F_group = 'all'
+        F_sort = 'all'
+
+    if F_foreman == 'all':
+        constr_site_list = app_today.values('construction_site_id', 'construction_site__address')
+    else:
+        constr_site_list = app_today.filter(construction_site__foreman_id=F_foreman).values(
+            'construction_site_id',
+            'construction_site__address'
+        )
+    out['constr_site'] = constr_site_list
+
+    if request.method == "POST":
+        fil_foreman = request.POST.get('foreman')
+        fil_constr_site = request.POST.get('constr_site')
+        fil_group = request.POST.get('group')
+        fil_sort = request.POST.get('sort')
+
+        v = ['all', 'all', 'all', 'all']
+
+        if fil_foreman is not None:
+            v[0] = fil_foreman
+        elif fil_foreman == 'None':
+            v[0] = 'all'
+        else:
+            v[0] = F_foreman
+
+        if fil_constr_site is not None:
+            v[1] = fil_constr_site
+        elif fil_constr_site == 'None':
+            v[1] = 'all'
+        else:
+            v[1] = F_constr_site
+
+        if fil_group is not None:
+            v[2] = fil_group
+        elif fil_group == 'None':
+            v[2] = 'all'
+        else:
+            v[2] = F_group
+
+        if fil_sort is not None:
+            v[3] = fil_sort
+        elif fil_sort == 'None':
+            v[3] = 'all'
+        else:
+            v[3] = F_sort
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]},{v[2]},{v[3]}", user=request.user)
+
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    if F_foreman != 'all':
+        _app_today = app_today.filter(
+            construction_site__foreman_id=F_foreman
+        )
+        out['filter_foreman'] = User.objects.get(pk=F_foreman).last_name
+    else:
+        _app_today = app_today
+
+    if F_constr_site != 'all':
+        _app_today = _app_today.filter(
+            construction_site_id=F_constr_site
+        )
+        out['filter_constr_site'] = ConstructionSite.objects.get(pk=F_constr_site).address
+
+    app_materials = ApplicationMeterial.objects.filter(
+        app_for_day__in=_app_today,
+        status_checked=True
+    )
+
+    out['materials_list'] = app_materials
+
+    return render(request, 'extend/material_today_app.html', out)
 
 
 def show_info_application(request, id_application):
@@ -2612,7 +2760,7 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['referer'] = request.headers.get('Referer')
     out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day(
         'next_day').weekday() == 5 and current_day.weekday() == 0
-    out['LOG_DB'] = LOG_DB
+    out['LOG_DB'] = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
 
     return out
 
@@ -3249,7 +3397,7 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
             if TEXT_TEMPLATES['dismiss'] not in tech.description:
                 driver_technic.append((
                     int(tech.priority),
-                    tech.technic_driver.driver.driver.last_name,
+                    tech.technic_driver.driver.driver.last_name if tech.technic_driver.driver is not None else '',
                     tech.technic_driver.technic.name,
                     app.construction_site.address,
                     tech.description
