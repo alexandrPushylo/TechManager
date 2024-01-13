@@ -3384,7 +3384,7 @@ def show_archive_all_app(request, day, filter_foreman=None, filter_csite=None):
             if TEXT_TEMPLATES['dismiss'] not in tech.description:
                 driver_technic.append((
                     int(tech.priority),
-                    tech.technic_driver.driver.driver.last_name,
+                    tech.technic_driver.driver.driver.last_name if tech.technic_driver.driver is not None else '',
                     tech.technic_driver.technic.name,
                     app.construction_site.address,
                     tech.description
