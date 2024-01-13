@@ -2040,7 +2040,13 @@ def show_today_materials(request, day):
     out['foreman_list'] = foreman_list
 
     _FILTER = get_var(VAR['FILTER_APP_TODAY'], value=True, user=request.user)
-    F_foreman, F_constr_site = _FILTER.split(',')
+    try:
+        F_foreman, F_constr_site, F_group, F_sort = _FILTER.split(',')
+    except ValueError:
+        F_foreman = 'all'
+        F_constr_site = 'all'
+        F_group = 'all'
+        F_sort = 'all'
 
     if F_foreman == 'all':
         constr_site_list = app_today.values('construction_site_id', 'construction_site__address')
@@ -2054,8 +2060,11 @@ def show_today_materials(request, day):
     if request.method == "POST":
         fil_foreman = request.POST.get('foreman')
         fil_constr_site = request.POST.get('constr_site')
+        fil_group = request.POST.get('group')
+        fil_sort = request.POST.get('sort')
 
-        v = ['all', 'all']
+        v = ['all', 'all', 'all', 'all']
+
         if fil_foreman is not None:
             v[0] = fil_foreman
         elif fil_foreman == 'None':
@@ -2070,7 +2079,20 @@ def show_today_materials(request, day):
         else:
             v[1] = F_constr_site
 
-        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]}", user=request.user)
+        if fil_group is not None:
+            v[2] = fil_group
+        elif fil_group == 'None':
+            v[2] = 'all'
+        else:
+            v[2] = F_group
+
+        if fil_sort is not None:
+            v[3] = fil_sort
+        elif fil_sort == 'None':
+            v[3] = 'all'
+        else:
+            v[3] = F_sort
+        set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]},{v[2]},{v[3]}", user=request.user)
 
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
