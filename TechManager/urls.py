@@ -23,6 +23,7 @@ from manager.views import create_new_application
 from manager.views import show_start_page
 
 from manager.views import show_today_applications
+from manager.views import show_today_materials
 from manager.views import show_info_application
 from manager.views import clear_application_view
 from manager.views import show_application_for_driver
@@ -149,6 +150,7 @@ urlpatterns = [
     path('today_app/<str:day>/<str:filter_foreman>/<str:filter_csite>', show_today_applications, name="show_today_applications"),
     path('today_app/<str:day>/materials', show_today_applications, name="show_today_materials"),
     path('today_app/<str:day>/materials/<str:filter_foreman>/<str:filter_csite>', show_today_applications, name="show_today_materials"),
+    path('today_materials/<str:day>', show_today_materials, name="today_materials"),
 
     path('materials/<str:day>', supply_materials_view, name='supply_materials'),
 
