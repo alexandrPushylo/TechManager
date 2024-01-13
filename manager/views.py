@@ -323,7 +323,8 @@ def make_backup_driver_table(driver_list: list = None):
 
 def make_backup_work_day_table(work_day_list: list = None):
     if work_day_list is None:
-        work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY-timedelta(days=1))
+        work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY)
+        # work_day_list = WorkDayTabel.objects.filter(date__lte=TODAY - timedelta(days=1))
 
 
     # for _wd in work_day_list:
@@ -386,11 +387,11 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
         return "date_of_last_clean_db is not exists"
-    if (TODAY - timedelta(days=2)) > var_date_clean.date:
+    if (TODAY - timedelta(days=1)) > var_date_clean.date:
         # var_comm_date = get_var(var=VAR['LIMIT_for_apps'])
         var_comm_date = Variable.objects.get_or_create(name=VAR['LIMIT_for_apps'])[0]
         if var_comm_date.value is None:
-            comm_date = TODAY - timedelta(days=60)
+            comm_date = TODAY - timedelta(days=1)
         else:
             comm_date = TODAY - timedelta(days=int(var_comm_date.value))
         mess = {}
@@ -470,10 +471,6 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     return f"status:BRK, time:{NOW}, date:{TODAY}"
 
 
-LOG_DB = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
-
-
-# print(LOG_DB)
 # ------FUNCTION VIEW----------------------
 
 
