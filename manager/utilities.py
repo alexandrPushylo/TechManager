@@ -52,6 +52,10 @@ text_templates = {
     'message_not_submitted': 'Имеются не поданные заявки',
     'message_invalid_password': 'Неверный логин или пороль',
     'user_exists': 'Такой пользователь уже существует',
+    'filter_sorting_list': {
+        'driver': 'Водители',
+        'technic': 'Техника'
+    }
 }
 
 TELE_URL = f'https://api.telegram.org/bot{TOKEN}/getUpdates'

@@ -76,7 +76,7 @@ class TTechnicDriver(models.Model):
     driver_i = models.IntegerField(null=True, blank=True, verbose_name="id отметки водителя")
     date = models.DateField(verbose_name="Дата", null=True)
     status = models.BooleanField(default=True, verbose_name="Статус техники")
-    def __str__(self): return f"{self.technic_i} - {self.date} [{self.status}]"
+    def __str__(self): return f"{self.id_T_D} | {self.technic_i} - {self.date} [{self.status}]"
 
     class Meta:
         verbose_name = 'Отметка техники'
