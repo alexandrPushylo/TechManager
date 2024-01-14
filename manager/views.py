@@ -380,7 +380,7 @@ def clean_db(_flag_delete=False, send_mess=True, _flag_backup=False):
     var_date_clean = Variable.objects.get_or_create(name=VAR['last_clean_db'])[0]
     if var_date_clean.date is None:
         return "date_of_last_clean_db is not exists"
-    if (TODAY - timedelta(days=1)) > var_date_clean.date:
+    if TODAY > var_date_clean.date:
         # var_comm_date = get_var(var=VAR['LIMIT_for_apps'])
         var_comm_date = Variable.objects.get_or_create(name=VAR['LIMIT_for_apps'])[0]
         if var_comm_date.value is None:
