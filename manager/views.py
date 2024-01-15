@@ -1908,7 +1908,7 @@ def show_today_applications(request, day, filter_foreman=None, filter_csite=None
             v[3] = F_sort
         set_var(VAR['FILTER_APP_TODAY'], value=f"{v[0]},{v[1]},{v[2]},{v[3]}", user=request.user)
 
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+        # return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 #   ============================================================================
 
