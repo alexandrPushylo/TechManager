@@ -43,29 +43,11 @@
                     {% for v in applications %}{% ifchanged %}<b class="fs-5">{{ v.technic_driver.technic.name }}</b>
                     {% endifchanged %}
                         <div class=" pb-1" id="vehicle_list">
-
                             <label class="fw-bold start-50">{{ v.priority }})
                                 {% if v.app_for_day.construction_site.address and not v.app_for_day.construction_site.address == 'Снабжение' %}
                                     {{ v.app_for_day.construction_site.address }}{% endif %}
                                 {% if v.app_for_day.construction_site.foreman %}(
                                     {{ v.app_for_day.construction_site.foreman }}){% endif %}</label>
-
-                                    <!-- {% if v.app_for_day.description %}
-
-                                    <div>
-                                    {% ifchanged %}
-                                    
-                                    <textarea readonly class="form-control app_description overflow-hidden" aria-label="With textarea" id="floatingInputValue2" name="descr">{{v.app_for_day.description}}</textarea>
-                                    <label for="floatingInputValue2" class="fw-bold text-nowrap"style="color: black; margin-left: 60px; margin-top: -10px">Примечание к объекту</label>
-                                                
-                                                {% endifchanged %}
-                                            </div>
-                                    {% endif %} -->
-
-
-
-
-
                             <textarea class="app_description form-control app_description mb-2" id="floatingInputValue"
                                       disabled rows="1">{{ v.description }}</textarea>
                         </div>
