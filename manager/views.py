@@ -73,6 +73,7 @@ from manager.utilities import clear_db_backup
 from manager.utilities import restore_db_backup
 from manager.utilities import delete_db_backup
 from manager.utilities import back24H
+from manager.utilities import get_read_only_mode
 # ----------------
 from TechManager.settings import AUTO_CREATE_BACKUP_DB
 
@@ -1639,6 +1640,7 @@ def show_applications_view(request, day, id_user=None):
     get_prepare_data(out, request, current_day)
     status_day = check_table(current_day)
     out['status_day'] = status_day
+    out['READ_ONLY_MODE'] = get_read_only_mode()
     # ---------------------------------------
     _Application_today = ApplicationToday.objects.filter(date=current_day)
     _Application_technic = ApplicationTechnic.objects.filter(app_for_day__date=current_day)
@@ -2144,6 +2146,8 @@ def create_new_application(request, id_application):
     out = {}
     current_application = ApplicationToday.objects.get(id=id_application)
     current_date = current_application.date
+
+    out['READ_ONLY_MODE'] = get_read_only_mode()
 
     flag = check_table(current_date)
     get_prepare_data(out, request, current_day=current_date)
@@ -3550,3 +3554,19 @@ def show_archive_supply_materials(request, day):
 
     return render(request, 'archive/archive_supply_app_materials.html', out)
 
+
+def change_read_only_mode(request):
+    if is_admin(request.user):
+        if request.GET.get('readonly_mode') == 'change':
+            print(request.GET.get('readonly_mode'))
+            try:
+                read_only_mode = Variable.objects.get(name='read_only_mode', date=TODAY)
+                if read_only_mode.flag:
+                    read_only_mode.flag = False
+                    read_only_mode.save()
+                else:
+                    read_only_mode.flag = True
+                    read_only_mode.save()
+            except Variable.DoesNotExist:
+                pass
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

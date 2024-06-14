@@ -10,6 +10,7 @@ from datetime import date, timedelta, datetime, timezone
 from random import choice
 import requests
 import telebot
+from manager.models import Variable
 
 from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
 
@@ -238,3 +239,24 @@ def check_last_activity(_time: datetime):
         return True
     else:
         return False
+
+
+def get_read_only_mode():
+    var_name = 'read_only_mode'
+    read_only_mode, created = Variable.objects.get_or_create(name=var_name, date=TODAY)
+    # print(f'{created=}')
+    if read_only_mode.time is None:
+        read_only_mode.time = datetime.now().time().replace(hour=16, minute=0, second=0, microsecond=0)
+        read_only_mode.save()
+        # print(read_only_mode.time)
+    # print(read_only_mode.time)
+    if created:
+        if read_only_mode.time < datetime.now().time():
+            read_only_mode.flag = True
+            read_only_mode.save()
+        else:
+            read_only_mode.flag = False
+            read_only_mode.save()
+
+    Variable.objects.filter(name=var_name, date__lt=TODAY).delete()
+    return read_only_mode.flag

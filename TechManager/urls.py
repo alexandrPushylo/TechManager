@@ -75,6 +75,7 @@ from manager.views import notice_submitt
 
 from manager.views import find_view
 from manager.views import change_workday
+from manager.views import change_read_only_mode
 
 from manager.views import show_backup_list_view
 from manager.views import restore_db
@@ -109,6 +110,7 @@ urlpatterns = [
     path('undo_change/', undo_change_db, name='undo_change_db'),
     path('clear_db_backup/', clear_db, name='clear_db_backup'),
     path('make_archive/', make_full_archive, name='make_archive'),
+    path('change_read_only_mode/', change_read_only_mode, name='change_read_only_mode'),
 
 
 
