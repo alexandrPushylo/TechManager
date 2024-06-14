@@ -186,7 +186,7 @@ urlpatterns = [
     path('test_bot/<int:id_user>', test_bot, name='test_bot'),
     path('notice_submitt/<str:current_day>', notice_submitt, name='notice_submitt'),
 
-    path('archive/', testA, name='archive'),
+    path('testA/', testA, name='testA'),
     path('archive/<str:day>', show_archive_page_view, name='archive'),
     path('archive_all_app/<str:day>', show_archive_all_app, name='archive_all_app'),
     path('archive_all_materials/<str:day>', show_archive_all_app, name='archive_all_materials'),
