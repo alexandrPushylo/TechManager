@@ -217,13 +217,19 @@ def testA(request):
     # all = ApplicationTechnic.objects.all()
     # t = ApplicationTechnic.objects.filter(technic_driver__isnull=True)
 
-    app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
+    # app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
     # if app.exists():
     #     mess['app'] = app.count()
         # if _flag_delete:
         #     app.delete()
     # app.delete()
-    return HttpResponse(f'{app.count()}')
+    # return HttpResponse(f'{app.count()}')
+    msg = '''
+        ВНИМАНИЕ!
+     С данного момента время подачи заявок на технику ограниченно до 16.00
+    '''
+    send_status_app_for_foreman(TODAY, messages=msg)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
 def make_full_archive(request):
