@@ -1,132 +1,182 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container-sm mx-auto m-2 "  >
-  <form method="post" id="create_new_appls_form" enctype="multipart/form-data">{% csrf_token %}
-    <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
-      <div class="container p-0">
+    <div class="container-sm mx-auto m-2 ">
+        <form method="post" id="create_new_appls_form" enctype="multipart/form-data">{% csrf_token %}
+            <div class="card shadow-lg" style="background-color: rgba(247,247,248,0.71)">
+                <div class="container p-0">
 
 
-      <div class="input-group">
-        <p class="card-text ms-3">
-            <label>Объект:</label>
-            <input class="form-control form-control-sm" readonly type="text" name="construction_site" value="{{ construction_site.address }}">
-        </p>
+                    <div class="input-group">
+                        <p class="card-text ms-3">
+                            <label>Объект:</label>
+                            <input class="form-control form-control-sm" readonly type="text" name="construction_site"
+                                   value="{{ construction_site.address }}">
+                        </p>
 
-        <p class="card-text ms-3">
-            <label>Заявка на:</label>
-            <input class="form-control form-control-sm" readonly type="date" name="date_of_target" value="{{ date_of_target.isoformat }}">
+                        <p class="card-text ms-3">
+                            <label>Заявка на:</label>
+                            <input class="form-control form-control-sm" readonly type="date" name="date_of_target"
+                                   value="{{ date_of_target.isoformat }}">
 
-        </p>
-      </div>
-          <p>
-              <label class="small ms-3">Примечание к объекту</label>
-              <textarea class="form-control app_description" name="app_today_desc" placeholder="Примечание к объекту">{{ applications_today_desc }}</textarea>
-          </p>
+                        </p>
+                    </div>
+                    <p>
+                        <label class="small ms-3">Примечание к объекту</label>
+                        <textarea class="form-control app_description" name="app_today_desc"
+                                  placeholder="Примечание к объекту">{{ applications_today_desc }}</textarea>
+                    </p>
 
-      <hr>
-        <div class="container-fluid p-0 ul_tech_list" >
-             {% for v in list_of_vehicles %}
-            <div class="mt-4 " id="{{forloop.counter}}">
-                <div class="input-group tech_driver_list" id="{{forloop.counter}}">
-                    <input name="io_id_app_tech" type="hidden" value="{{ v.id }}">
-                    <input id="chack{{ v.id }}" name="io_app_tech_var_chack" type="hidden" value="{{ v.var_check }}">
-                    <input name="io_id_tech_driver" type="hidden" value="{{ v.technic_driver.id }}" id="io_id_tech_driver_{{forloop.counter}}">
-                    <input name="io_id_tech_name" type="hidden" value="{{ v.technic_driver.technic.name.id }}" id="io_tech_name_id_{{ forloop.counter }}">
+                    <hr>
+                    <div class="container-fluid p-0 ul_tech_list">
+                        {% for v in list_of_vehicles %}
+                            <div class="mt-4 " id="{{ forloop.counter }}">
+                                <div class="input-group tech_driver_list" id="{{ forloop.counter }}">
+                                    <input name="io_id_app_tech" type="hidden" value="{{ v.id }}">
+                                    <input id="chack{{ v.id }}" name="io_app_tech_var_chack" type="hidden"
+                                           value="{{ v.var_check }}">
+                                    <input name="io_id_tech_driver" type="hidden" value="{{ v.technic_driver.id }}"
+                                           id="io_id_tech_driver_{{ forloop.counter }}">
+                                    <input name="io_id_tech_name" type="hidden"
+                                           value="{{ v.technic_driver.technic.name.id }}"
+                                           id="io_tech_name_id_{{ forloop.counter }}">
 
-                    <input type="text" id="io_technic_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.technic.name }}">
-                    <input type="text" id="io_driver_{{forloop.counter}}" readonly class="form-control" value="{{ v.technic_driver.driver.driver.last_name }}">
-                    {% if not v.var_check %}
-                    <button id="btn_edit_io{{ v.id }}" role="button" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
-                    <button role="button" class="btn btn-danger col-auto {% if post == 'admin' %} btn_del_io {% else %} btn_delete {% endif %}"><i class="fa-solid fa-trash"></i></button>
-                    {% elif v.var_check and post == 'admin' %}
-                        <button id="btn_edit_io{{ v.id }}" role="button" hidden="" class="btn btn-primary col-auto btn_edit_io"><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button id="btn_back{{ v.id }}" role="button" class="btn btn-primary col-auto btn_del_io"><i class="fa-solid fa-rotate-left"></i></button>
-                        <button id="btn_delete{{ v.id }}" role="button" hidden="" class="btn btn-danger col-auto btn_del_io"><i class="fa-solid fa-trash"></i></button>
-                    {% elif v.var_check %}
-                        <button role="button" class="btn btn-danger col-auto btn_delete "><i class="fa-solid fa-trash"></i></button>
-                    {% endif %}
-                </div>
+                                    <input type="text" id="io_technic_{{ forloop.counter }}" readonly
+                                           class="form-control" value="{{ v.technic_driver.technic.name }}">
+                                    <input type="text" id="io_driver_{{ forloop.counter }}" readonly
+                                           class="form-control" value="{{ v.technic_driver.driver.driver.last_name }}">
+                                    {% if not v.var_check %}
+                                        <button id="btn_edit_io{{ v.id }}" role="button"
+                                                class="btn btn-primary col-auto btn_edit_io"><i
+                                                class="fa-regular fa-pen-to-square"></i></button>
+                                        <button role="button"
+                                                class="btn btn-danger col-auto {% if post == 'admin' %} btn_del_io {% else %} btn_delete {% endif %}">
+                                            <i class="fa-solid fa-trash"></i></button>
+                                    {% elif v.var_check and post == 'admin' %}
+                                        <button id="btn_edit_io{{ v.id }}" role="button" hidden=""
+                                                class="btn btn-primary col-auto btn_edit_io"><i
+                                                class="fa-regular fa-pen-to-square"></i></button>
+                                        <button id="btn_back{{ v.id }}" role="button"
+                                                class="btn btn-primary col-auto btn_del_io"><i
+                                                class="fa-solid fa-rotate-left"></i></button>
+                                        <button id="btn_delete{{ v.id }}" role="button" hidden=""
+                                                class="btn btn-danger col-auto btn_del_io"><i
+                                                class="fa-solid fa-trash"></i></button>
+                                    {% elif v.var_check %}
+                                        <button role="button" class="btn btn-danger col-auto btn_delete "><i
+                                                class="fa-solid fa-trash"></i></button>
+                                    {% endif %}
+                                </div>
 
 
-                <div hidden="" class="p-1 input-group mt-2 div_edit_io" id="div_edit_io_{{forloop.counter}}">
-                    <select class="col-auto" id="select_add_technic_{{forloop.counter}}">
-                    <option selected></option>
-                    {% for tn in technic_names %}
-                        <option {% if tn.id not in free_tech_name %} style="color: red" {% endif %} value="{{ tn.id }}">{{ tn.name }} {% if tn.id not in free_tech_name %}[занят]{% endif %}</option>
-                    {% endfor %}
-                    </select>
+                                <div hidden="" class="p-1 input-group mt-2 div_edit_io"
+                                     id="div_edit_io_{{ forloop.counter }}">
+                                    <select class="col-auto" id="select_add_technic_{{ forloop.counter }}">
+                                        <option selected></option>
+                                        {% for tn in technic_names %}
+                                            <option {% if tn.id not in free_tech_name %} style="color: red" {% endif %}
+                                                                                         value="{{ tn.id }}">{{ tn.name }}
+                                                {% if tn.id not in free_tech_name %}[занят]{% endif %}</option>
+                                        {% endfor %}
+                                    </select>
 
-                    {% for d in tech_driver_list %}
-                    <select class="col-auto select_td_{{ d.0.id }} select_add_driver_{{forloop.parentloop.counter}}" hidden="" >
-                        <option selected id_dt=""></option>
-                        {% for td in d.1 %}
-                        <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} class="opt_{{ d.0.id }}" value="{{td.id}}">{{td.driver__driver__last_name}} {% if td.id in work_TD_list %}[занят]{% else %}[своб.]{% endif %}</option>
+                                    {% for d in tech_driver_list %}
+                                        <select class="col-auto select_td_{{ d.0.id }} select_add_driver_{{ forloop.parentloop.counter }}"
+                                                hidden="">
+                                            <option selected id_dt=""></option>
+                                            {% for td in d.1 %}
+                                                <option {% if td.id in work_TD_list %}style="color: blue" {% endif %}
+                                                        class="opt_{{ d.0.id }}"
+                                                        value="{{ td.id }}">{{ td.driver__driver__last_name }}
+                                                    {% if td.id in work_TD_list %}[занят]{% else %}
+                                                        [своб.]{% endif %}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endfor %}
+
+                                    <button role="button" class="btn btn-success btn-sm  btn_check_new_tech"><i
+                                            class="fa-sharp fa-solid fa-check"></i></button>
+                                    <button role="button" class="btn btn-danger btn-sm btn_check_cancel_tech"><i
+                                            class="fa-solid fa-ban"></i></button>
+
+                                </div>
+
+
+                                <div class="mt-1 p-0 desc_area">
+                                    <textarea id="desc{{ v.id }}" {% if v.var_check %}readonly{% endif %}
+                                              class="form-control app_description m-0" name="description_app_list"
+                                              rows="1">{{ v.description }}</textarea>
+                                </div>
+                            </div>
                         {% endfor %}
-                    </select>
-                    {% endfor %}
-
-                    <button role="button" class="btn btn-success btn-sm  btn_check_new_tech" ><i class="fa-sharp fa-solid fa-check"></i></button>
-                    <button role="button" class="btn btn-danger btn-sm btn_check_cancel_tech" ><i class="fa-solid fa-ban"></i></button>
-
-                </div>
-
-
-                <div class="mt-1 p-0 desc_area">
-                    <textarea id="desc{{ v.id }}" {% if v.var_check %}readonly{% endif %} class="form-control app_description m-0" name="description_app_list" rows="1">{{ v.description }}</textarea>
+                    </div>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-      </div>
+            {#------------------------------------------------------------------------------------------------------------------#}
+            <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
+                {% if not READ_ONLY_MODE or post == 'admin' %}
+                    <div class="card-body p-0">
+
+                        <div class="container d-flex mt-2">
+
+                            <select class="col-auto" id="input_tech_add">
+                                <option selected>---</option>
+                                {% for v in technic_names %}
+                                    <option {% if v.id not in free_tech_name %} style="color: red" {% endif %}
+                                                                                value="{{ v.id }}">{{ v.name }}
+                                        {% if v.id not in free_tech_name %}[занят]{% endif %}</option>
+                                {% endfor %}
+                            </select>
+
+                            {% for d in tech_driver_list %}
+                                <select class="col-auto  driver_add select_td_add_{{ d.0.id }}" hidden="">
+                                    <option selected></option>
+                                    {% for td in d.1 %}
+                                        <option {% if td.id in work_TD_list %}style="color: blue" {% endif %}
+                                                value="{{ td.id }}">{{ td.driver__driver__last_name }}
+                                            {% if td.id in work_TD_list %} [занят]{% else %}[своб.] {% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endfor %}
+
+                            <div class="d-flex justify-content-end">
+                                <button role="button" class="btn btn-success btn-sm col-auto  fs-5"
+                                        id="add_vehicle_btn"><i
+                                        class="fa-solid fa-plus"></i></button>
+                            </div>
+
+                        </div>
+
+                        <textarea class="form-control mt-3 app_description mx-auto" rows="3" id="description_app_add"
+                                  placeholder="Описание для техники"></textarea>
+                    </div>
+                {% else %}
+                    <span class="p-2 ms-2">Время подачи заявок на технику закончилось</span>
+                {% endif %}
+            </div>
+
+            <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
+                <div class="card-body p-0">
+                    <p class="card-text fs-5 m-0 ms-3 fw-bold col-auto">Список материалов</p>
+                    <hr class="m-0 mt-1">
+                    <div>{# {{ cw_day }} {{ nw_day }} {{ weekend_flag }}#}
+                        {% if check_time and cw_day == nw_day or weekend_flag and check_time %}
+                            <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials"
+                                      placeholder="Время подачи заявок на материалы ограниченно до {{ LIMIT_for_submission }}">{{ material_list_raw }}</textarea>
+                        {% elif cw_day > nw_day and not weekend_flag or post == 'employee_supply' and cw_day > lw_day %}
+                            <textarea class="form-control app_description mx-auto" rows="5"
+                                      name="desc_meterials">{{ material_list_raw }}</textarea>
+                        {% else %}
+                            <textarea readonly class="form-control app_description mx-auto" name="desc_meterials"
+                                      placeholder="Время подачи заявок на материалы закончилось">{{ material_list_raw }}</textarea>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </form>
+
     </div>
-{#------------------------------------------------------------------------------------------------------------------#}
-    <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body p-0">
-        <div class="container d-flex mt-2">
-
-            <select class="col-auto" id="input_tech_add">
-                <option selected>---</option>
-                {% for v in technic_names %}
-                    <option {% if v.id not in free_tech_name %} style="color: red" {% endif %} value="{{ v.id }}">{{ v.name }} {% if v.id not in free_tech_name %}[занят]{% endif %}</option>
-                {% endfor %}
-            </select>
-
-        {% for d in tech_driver_list %}
-            <select  class="col-auto  driver_add select_td_add_{{ d.0.id }}" hidden="">
-                <option selected></option>
-                {% for td in d.1 %}
-                    <option {% if td.id in work_TD_list %}style="color: blue" {% endif %} value="{{ td.id }}">{{ td.driver__driver__last_name }} {% if td.id in work_TD_list %} [занят]{% else %}[своб.] {% endif %}</option>
-                {% endfor %}
-            </select>
-        {% endfor %}
-
-        <div class="d-flex justify-content-end">
-            <button role="button" class="btn btn-success btn-sm col-auto  fs-5" id = "add_vehicle_btn"><i class="fa-solid fa-plus"></i></button>
-        </div></div>
-            <textarea class="form-control mt-3 app_description mx-auto" rows="3" id="description_app_add" placeholder="Описание для техники"></textarea>
-      </div>
-    </div>
-
-    <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
-      <div class="card-body p-0">
-         <p class="card-text fs-5 m-0 ms-3 fw-bold col-auto">Список материалов</p>
-         <hr class="m-0 mt-1">
-         <div >{# {{ cw_day }} {{ nw_day }} {{ weekend_flag }}#}
-            {% if check_time and cw_day == nw_day or weekend_flag and check_time %}
-                <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials" placeholder="Время подачи заявок на материалы ограниченно до {{ LIMIT_for_submission }}">{{ material_list_raw }}</textarea>
-            {% elif cw_day > nw_day and not weekend_flag or post == 'employee_supply' and cw_day > lw_day  %}
-                <textarea class="form-control app_description mx-auto" rows="5" name="desc_meterials" >{{ material_list_raw }}</textarea>
-            {% else %}
-                <textarea readonly class="form-control app_description mx-auto" name="desc_meterials" placeholder="Время подачи заявок на материалы закончилось">{{ material_list_raw }}</textarea>
-            {% endif %}
-
-        </div>
-      </div>
-    </div>
-    </form>
-
-</div>
 
 {% endblock %}
 
@@ -135,11 +185,14 @@
 {% endblock %}
 
 {% block bottom_panel %}
-<div class="input-group d-flex justify-content-center align-items-center">
-  <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1" aria-current="page">Отмена</a>
+    <div class="input-group d-flex justify-content-center align-items-center">
+        <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1"
+           aria-current="page">Отмена</a>
+        {% if not READ_ONLY_MODE or post == 'admin' %}
+            <input form="create_new_appls_form" class="btn btn-success  col-auto  m-1" type="submit"
+                   value="Сохранить заявку">
+        {% endif %}
 
-  <input form="create_new_appls_form" class="btn btn-success  col-auto  m-1" type="submit" value="Сохранить заявку">
-
-</div>
+    </div>
 
 {% endblock %}
