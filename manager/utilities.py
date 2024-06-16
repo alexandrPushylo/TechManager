@@ -248,8 +248,7 @@ def get_read_only_mode():
     if read_only_mode.time is None:
         read_only_mode.time = datetime.now().time().replace(hour=16, minute=0, second=0, microsecond=0)
         read_only_mode.save()
-        # print(read_only_mode.time)
-    # print(read_only_mode.time)
+
     if created:
         if read_only_mode.time < datetime.now().time():
             read_only_mode.flag = True
@@ -257,6 +256,14 @@ def get_read_only_mode():
         else:
             read_only_mode.flag = False
             read_only_mode.save()
+    else:
+        if read_only_mode.value is None or read_only_mode.value == '':
+            if read_only_mode.time < datetime.now().time():
+                read_only_mode.flag = True
+                read_only_mode.save()
+            else:
+                read_only_mode.flag = False
+                read_only_mode.save()
 
     Variable.objects.filter(name=var_name, date__lt=TODAY).delete()
     return read_only_mode.flag

@@ -208,29 +208,22 @@ def send_debug_messages(messages='Test'):
 
 
 def testA(request):
-    DB = 'archive'
-    mess = 'OK'
+    out = []
 
-    # td = TechnicDriver.objects.filter(Q(driver__isnull=True) & Q(technic__isnull=True))
-    # t = TechnicDriver.objects.filter(technic__isnull=True)
-    # all = TechnicDriver.objects.all()
-    # t.delete()
-    # t, all,td=[]
-    # all = ApplicationTechnic.objects.all()
-    # t = ApplicationTechnic.objects.filter(technic_driver__isnull=True)
+    id_foreman_list = Post.objects.filter(post_name__name_post=POST_USER['foreman'])
+    id_master_list = Post.objects.filter(post_name__name_post=POST_USER['master'])
+    id_supply_list = Post.objects.filter(post_name__name_post=POST_USER['employee_supply'])
 
-    # app = ApplicationToday.objects.filter(date__lt=TODAY - timedelta(days=2)).exclude(status=STATUS_APP_send)
-    # if app.exists():
-    #     mess['app'] = app.count()
-        # if _flag_delete:
-        #     app.delete()
-    # app.delete()
-    # return HttpResponse(f'{app.count()}')
     msg = '''
         ВНИМАНИЕ!
-     С данного момента время подачи заявок на технику ограниченно до 16.00
+     Время подачи заявок на технику ограниченно до 16.00
     '''
-    send_status_app_for_foreman(TODAY, messages=msg)
+    for _id in id_foreman_list:
+        out.append(_id.user_post.id)
+    for _id in id_master_list:
+        out.append(_id.user_post.id)
+    for _id in out:
+        send_message(_id, msg)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
@@ -3569,14 +3562,16 @@ def show_archive_supply_materials(request, day):
 def change_read_only_mode(request):
     if is_admin(request.user):
         if request.GET.get('readonly_mode') == 'change':
-            print(request.GET.get('readonly_mode'))
+            # print(request.GET.get('readonly_mode'))
             try:
                 read_only_mode = Variable.objects.get(name='read_only_mode', date=TODAY)
                 if read_only_mode.flag:
                     read_only_mode.flag = False
+                    read_only_mode.value = 'custom_false'
                     read_only_mode.save()
                 else:
                     read_only_mode.flag = True
+                    read_only_mode.value = 'custom_true'
                     read_only_mode.save()
             except Variable.DoesNotExist:
                 pass
