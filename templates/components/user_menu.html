@@ -1,5 +1,6 @@
 <div class="dropdown">
-    <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
         <b>{{ user.last_name }}</b>
     </button>
     <ul class="dropdown-menu dropdown-menu-end dropdown-menu">
@@ -14,17 +15,21 @@
             <ul class="small m-0">
                 База данных
             </ul>
-                <li class="btn-group ms-1">
-                    <a class="btn dropdown-item border border-2" href="{% url 'add_technic' %}"><i class="fa-solid fa-plus small"></i> <i class="fa-solid fa-truck"></i></a>
-                    <a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
-                <li class="btn-group ms-1">
-                    <a class="btn dropdown-item border border-2" href="/signup/"><i class="fa-solid fa-plus small"></i> <i class="fa-solid fa-person"></i></a>
-                    <a class="dropdown-item fw-bolder" href="{% url 'show_staff' %}">Персонал</a></li>
+            <li class="btn-group ms-1">
+                <a class="btn dropdown-item border border-2" href="{% url 'add_technic' %}"><i
+                        class="fa-solid fa-plus small"></i> <i class="fa-solid fa-truck"></i></a>
+                <a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
+            <li class="btn-group ms-1">
+                <a class="btn dropdown-item border border-2" href="/signup/"><i class="fa-solid fa-plus small"></i> <i
+                        class="fa-solid fa-person"></i></a>
+                <a class="dropdown-item fw-bolder" href="{% url 'show_staff' %}">Персонал</a></li>
             <hr>
             <ul class="small">Табели
-                <li><a class="dropdown-item fw-bolder" href="{% url 'tabel_workday' 'currweek' %}">Табель (Рабочие дни)</a></li>
+                <li><a class="dropdown-item fw-bolder" href="{% url 'tabel_workday' 'currweek' %}">Табель (Рабочие
+                    дни)</a></li>
                 <li><a class="dropdown-item fw-bolder" href="{% url 'tabel_driver' cw_day %}">Табель (Водители)</a></li>
-                <li><a class="dropdown-item fw-bolder" href="{% url 'technic_driver' cw_day %}">Табель (Техника)</a></li>
+                <li><a class="dropdown-item fw-bolder" href="{% url 'technic_driver' cw_day %}">Табель (Техника)</a>
+                </li>
             </ul>
 
 
@@ -52,17 +57,21 @@
             <ul class="small m-0">
                 База данных
             </ul>
-                <li class="btn-group ms-1">
-                    <a class="btn dropdown-item border border-2" href="{% url 'add_technic' %}"><i class="fa-solid fa-plus small"></i> <i class="fa-solid fa-truck"></i></a>
-                    <a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
-                <li class="btn-group ms-1">
-                    <a class="btn dropdown-item border border-2" href="/signup/"><i class="fa-solid fa-plus small"></i> <i class="fa-solid fa-person"></i></a>
-                    <a class="dropdown-item fw-bolder" href="{% url 'show_staff' %}">Персонал</a></li>
+            <li class="btn-group ms-1">
+                <a class="btn dropdown-item border border-2" href="{% url 'add_technic' %}"><i
+                        class="fa-solid fa-plus small"></i> <i class="fa-solid fa-truck"></i></a>
+                <a class="dropdown-item fw-bolder" href="{% url 'technic_list' %}">Техника</a></li>
+            <li class="btn-group ms-1">
+                <a class="btn dropdown-item border border-2" href="/signup/"><i class="fa-solid fa-plus small"></i> <i
+                        class="fa-solid fa-person"></i></a>
+                <a class="dropdown-item fw-bolder" href="{% url 'show_staff' %}">Персонал</a></li>
             <hr>
             <ul class="small">Табели
-                <li><a class="dropdown-item fw-bolder" href="{% url 'tabel_workday' 'currweek' %}">Табель (Рабочие дни)</a></li>
+                <li><a class="dropdown-item fw-bolder" href="{% url 'tabel_workday' 'currweek' %}">Табель (Рабочие
+                    дни)</a></li>
                 <li><a class="dropdown-item fw-bolder" href="{% url 'tabel_driver' nw_day %}">Табель (Водители)</a></li>
-                <li><a class="dropdown-item fw-bolder" href="{% url 'technic_driver' nw_day %}">Табель (Техника)</a></li>
+                <li><a class="dropdown-item fw-bolder" href="{% url 'technic_driver' nw_day %}">Табель (Техника)</a>
+                </li>
             </ul>
 
 
@@ -90,7 +99,10 @@
         {% if user.username == 'admin' %}
             <li><a class="dropdown-item" href="#">...</a></li>
             <li><a class="dropdown-item" href="{% url 'testA' %}">RUN 1</a></li>
-        <hr>
+            <hr>
+            <li><span class="ms-2">{{ server_time }}</span></li>
+            <li><span class="ms-2">{{ server_datetime_now }}</span></li>
+            <hr>
         {% endif %}
 
         <li><a class="dropdown-item" href="{% url 'logout' %}">Выйти</a></li>

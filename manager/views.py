@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render
 from django.contrib.auth import logout, login, authenticate
 from django.http import HttpResponseRedirect, HttpResponse
@@ -2771,6 +2773,9 @@ def get_prepare_data(out: dict, request, current_day=TOMORROW):
     out['weekend_flag'] = TODAY.weekday() == 4 and get_current_day(
         'next_day').weekday() == 5 and current_day.weekday() == 0
     out['LOG_DB'] = clean_db(_flag_delete=AUTO_CLEAR_DB, _flag_backup=True)
+
+    out['server_time'] = datetime.datetime.now().time()
+    out['server_datetime_now'] = datetime.datetime.now()
 
     return out
 
