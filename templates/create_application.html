@@ -114,7 +114,7 @@
             </div>
             {#------------------------------------------------------------------------------------------------------------------#}
             <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
-                {% if not READ_ONLY_MODE or post == 'admin' %}
+{#                {% if not READ_ONLY_MODE or post == 'admin' %}#}
                     <div class="card-body p-0">
 
                         <div class="container d-flex mt-2">
@@ -150,9 +150,9 @@
                         <textarea class="form-control mt-3 app_description mx-auto" rows="3" id="description_app_add"
                                   placeholder="Описание для техники"></textarea>
                     </div>
-                {% else %}
-                    <span class="p-2 ms-2">Время подачи заявок на технику закончилось</span>
-                {% endif %}
+{#                {% else %}#}
+{#                    <span class="p-2 ms-2">Время подачи заявок на технику закончилось</span>#}
+{#                {% endif %}#}
             </div>
 
             <div class="card shadow-lg mt-3" style="background-color: rgba(247,247,248,0.71)">
@@ -188,10 +188,10 @@
     <div class="input-group d-flex justify-content-center align-items-center">
         <a href="{% url 'application_list' cw_day %}" class="btn btn-outline-primary active  col-auto m-1"
            aria-current="page">Отмена</a>
-        {% if not READ_ONLY_MODE or post == 'admin' %}
+{#        {% if not READ_ONLY_MODE or post == 'admin' %}#}
             <input form="create_new_appls_form" class="btn btn-success  col-auto  m-1" type="submit"
                    value="Сохранить заявку">
-        {% endif %}
+{#        {% endif %}#}
 
     </div>
 

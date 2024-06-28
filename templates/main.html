@@ -22,8 +22,10 @@
             {% else %}{% endif %}
         {% elif post == 'foreman' or 'master' or 'employee_supply' %}
             {% if saved_app_list %}
+                {% if not READ_ONLY_MODE or post == 'admin' %}
                 <a href="{% url 'submitted_all_applications' cw_day %}" class="btn btn-sm btn-warning  "
                    aria-current="page">Подать все заявки</a>
+            {% endif %}
             {% endif %}
         {% endif %}
     {% endif %}
@@ -180,28 +182,30 @@
                                         {% endif %}
                                         
                                         
-                                        {% if not READ_ONLY_MODE or post == 'admin' %}
+                                        
                                         
                                         <a href="{% url 'add_application' a.app_today.id %}"
                                            class="btn btn-outline-primary  m-1" aria-current="page"><i
                                                 class="fa-solid fa-plus"></i> | <i
                                                 class="fa-regular fa-pen-to-square"></i>
                                         </a>
-                                                                                
-                                        
+                                                                          
+                                        {% if not READ_ONLY_MODE or post == 'admin' %}
                                         {% if  a.app_today.status.status  == 'Сохранена' or post  == 'admin' and a.app_today.status.status  == 'Подана' %}
                                             <a href="{% url 'success_application' a.app_today.id %}"
                                                class="btn btn-outline-success  m-1" aria-current="page"><i
                                                     class="fa-solid fa-check"></i></a>
                                             {#                <a id="success_application_{{ a.app_today.id }}" class="btn_T btn btn-outline-success  m-1" aria-current="page"><i class="fa-solid fa-check"></i></a>#}
 
+                                        {% endif %}   
+                                            
                                         {% elif post  == 'admin' and a.app_today.status.status  == 'Одобрена' %}
                                             <a href="{% url 'success_application' a.app_today.id %}"
                                                class="btn btn-outline-warning  m-1" aria-current="page"><i
                                                     class="fa-solid fa-paper-plane"></i></a>
                                         {% endif %}
                                             
-                                        {% endif %}
+                                        
                                         
                                         
                                     {% endif %}
@@ -388,7 +392,9 @@
 
 {% block tab %}
     
-    <a href="{%  url 'change_read_only_mode' %}?readonly_mode=change"  style="margin-top: 6rem; margin-left: -0.4rem;"       
+    <a {% if post == 'admin' %}
+            href="{%  url 'change_read_only_mode' %}?readonly_mode=change"  {% endif %}
+       style="margin-top: 6rem; margin-left: -0.4rem;"       
     {% if READ_ONLY_MODE %}class="btn btn-danger position-fixed" {% else %}class="btn btn-success position-fixed"{% endif %}
     >
     {% if READ_ONLY_MODE %}<i class="fa-solid fa-lock"></i>{% else %}<i class="fa-solid fa-lock-open"></i>{% endif %}
