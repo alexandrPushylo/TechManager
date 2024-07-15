@@ -662,7 +662,10 @@ def move_supply_app(request, day, id_app):
         post_name__name_post=POST_USER['employee_supply']).values_list('user_post', flat=True)
     cur_app_tech = ApplicationTechnic.objects.get(id=id_app)
 
-    _TEMPLATE_for_app = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
+    if cur_app_tech.app_for_day.construction_site.foreman:
+        _TEMPLATE_for_app = f'{cur_app_tech.app_for_day.construction_site.address} ({cur_app_tech.app_for_day.construction_site.foreman.last_name})\r\n{cur_app_tech.description}'
+    else:
+        _TEMPLATE_for_app = f'{cur_app_tech.app_for_day.construction_site.address}\r\n{cur_app_tech.description}'
 
     if not cur_app_tech.var_check:
         _id = cur_app_tech.id
