@@ -943,6 +943,10 @@ def append_in_spec_tech(request, id_td):
     app_for_day.status = STATUS_APP_submitted
     app_for_day.save()
 
+    if not technic_driver.technic.tech_type.name in ('Спец. техника', 'Экскаватор'):
+        if not technic_driver.technic.name.name in ('Каток',):
+            message = ''
+
     ApplicationTechnic.objects.get_or_create(
         app_for_day=app_for_day,
         technic_driver=technic_driver,
