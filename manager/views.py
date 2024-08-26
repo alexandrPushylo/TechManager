@@ -50,6 +50,7 @@ from manager.utilities import variable as VAR
 from manager.utilities import text_templates as TEXT_TEMPLATES
 from manager.utilities import colors as COLOR_LIST
 from manager.utilities import archive_db as ARCHIVE_DB
+from manager.utilities import ApiTelegramException
 # -----------------
 from manager.utilities import get_day_in_days
 # from manager.utilities import get_difference
@@ -197,7 +198,10 @@ def send_message(id_user, message):
         chat_id = TeleBot.objects.get(user_bot=id_user)
 
         if chat_id and chat_id.id_chat:
-            BOT.send_message(chat_id.id_chat, message)
+            try:
+                BOT.send_message(chat_id.id_chat, message)
+            except ApiTelegramException as e:
+                pass
 
 
 def send_debug_messages(messages='Test'):
