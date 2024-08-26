@@ -10,6 +10,7 @@ from datetime import date, timedelta, datetime, timezone
 from random import choice
 import requests
 import telebot
+from telebot.apihelper import ApiTelegramException
 from manager.models import Variable
 
 from TechManager.settings import TELEGRAM_BOT_TOKEN as TOKEN
